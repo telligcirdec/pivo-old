@@ -235,7 +235,7 @@
 									<destFileName>${project.artifactId}.jar</destFileName>
 								</artifactItem>
 							</artifactItems>
-							<outputDirectory>c:\ProgramData\Santeclair\portal\moduleDir</outputDirectory>
+							<outputDirectory>c:\ProgramData\Santeclair\portal-exp\moduleDir</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
