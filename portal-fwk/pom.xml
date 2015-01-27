@@ -1,0 +1,90 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>santeclair</groupId>
+		<artifactId>super-pom</artifactId>
+		<version>4.57.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>portal-fwk</artifactId>
+	<version>1.7.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- Paramétrage de la connexion au gestionnaire de source -->
+	<scm>
+		<developerConnection>scm:svn:http://hephaistos/svn/framework/portal-fwk/trunk</developerConnection>
+	</scm>
+
+	<!-- Injection dépendances managées -->
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>santeclair</groupId>
+				<artifactId>infra-bom</artifactId>
+				<type>pom</type>
+				<version>${santeclair.infra.bom.version}</version>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+
+		<!-- Santeclair -->
+		<dependency>
+			<groupId>santeclair</groupId>
+			<artifactId>lunar-fwk</artifactId>
+		</dependency>
+
+		<!-- Vaadin -->
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-server</artifactId>
+		</dependency>
+
+		<!-- Spring -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</dependency>
+
+		<!-- OSGi -->
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.main</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+        <!-- Divers -->
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+        </dependency>
+	</dependencies>
+</project>

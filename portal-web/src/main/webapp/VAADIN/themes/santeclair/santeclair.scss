@@ -1,0 +1,383 @@
+$v-layout-spacing-vertical: 1em;
+$v-unit-size: 26px;
+$v-font-weight: 400;
+$v-font-size: 13px !default;
+$v-bevel: false;
+/* $v-shadow: false; */
+$v-selection-color: #FFA500 ;
+$v-focus-color: #224E6A ;
+$v-border: 0px solid #999999;
+$v-background-color: #ffffff;
+$v-app-background-color: #D2EDFF;
+$v-layout-spacing-vertical: 2em;
+$v-disabled-opacity: .3;
+
+$v-textfield-background-color: #ffffff;
+$v-textfield-border: 1px solid #999999;
+
+$v-table-border-width: 1px;
+
+@import "../valo/valo";
+
+@mixin santeclair {
+  @include valo;
+  
+  	// Pour avoir des police a chasse fixe
+	textarea.v-textarea.v-textarea-font-chasse-fixe {
+		font-family: "Courier New";
+    	font-size: 13px;
+	}
+	
+	[class*="spacing"] > tbody > [class*="row"] > td {
+		padding-top: 1em;
+	}
+  
+    /*******************************************************************
+     * layout
+     *******************************************************************/
+    .v-margin-right {
+      padding-right: 11px;
+    }
+    
+    .v-margin-left {
+      padding-left: 11px;
+    }
+    
+    .v-margin-top {
+      padding-top: 11px;
+    }
+    
+    .v-margin-bottom {
+      padding-bottom: 11px;
+    }
+    
+    .v-tabsheet-content > div > .v-scrollable > .v-margin-bottom {
+      padding-bottom: 50px;
+  	}
+  	
+  	.v-spacing {
+  		height: 1em;
+	}
+	
+    /*******************************************************************
+     * combobox
+     *******************************************************************/
+	.v-select select {
+		border-width: 1px;
+	}
+	
+	
+    /*******************************************************************
+     * checkbox
+     *******************************************************************/
+    .v-checkbox > input ~ label:before {
+      border-width: 2px !important;
+    }
+    
+    /*******************************************************************
+     * buttons
+     *******************************************************************/
+    .v-button {
+      border-radius: 0;
+      -moz-box-shadow: 0px 2px 20px 1px rgba(0,0,0,.1);
+      -webkit-box-shadow: 0px 2px 2px 1px rgba(0,0,0,.1);
+      box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, .1);
+    }
+
+    .v-button-primary {
+      border: none;
+      background-image: none;
+      min-width: 32px;
+    }
+
+    .v-button-borderless-colored {
+      -moz-box-shadow: none;
+      -webkit-box-shadow: none;
+      box-shadow: none;
+    }
+    
+    /*******************************************************************
+     * panels
+     *******************************************************************/
+    .v-panel {
+      border: none;
+      background-color: white;
+      -moz-box-shadow: 0px 2px 20px 1px rgba(0,0,0,.1);
+      -webkit-box-shadow: 0px 2px 2px 1px rgba(0,0,0,.1);
+      box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, .1);
+      -webkit-transform: translate3d(0,0,0);
+      transform: translate3d(0,0,0);
+      -moz-transition: all .2s cubic-bezier(.4,0,.2,1);
+      -webkit-transition: all .2s cubic-bezier(.4,0,.2,1);
+      transition: all .2s cubic-bezier(.4,0,.2,1);
+    }
+
+    .v-panel:hover {
+      -moz-box-shadow: 0 17px 50px 0 rgba(0,0,0,.19);
+      -webkit-box-shadow: 0 17px 50px 0 rgba(0,0,0,.19);
+      box-shadow: 0 17px 50px 0 rgba(0,0,0,.19);
+      position: relative;
+      z-index: 100;
+    }
+
+    .v-panel-caption {
+      background-image: none;
+      background-color: none;
+      color: #224E6A;
+      font-size: 1.4em;
+    }
+    
+    .v-panel-content > .v-margin-left {
+    	padding-left: 5px;
+    }
+    
+    .v-panel-content > .v-margin-bottom {
+    	padding-bottom: 5px;
+    }
+    
+    .v-panel-content > .v-margin-right {
+    	padding-right: 5px;
+    }
+    
+    .v-panel-content > .v-margin-top {
+    	padding-top: 5px;
+    }
+    
+    /*******************************************************************
+     * Notification
+     *******************************************************************/
+     .v-Notification h1 {
+     	display: inline;
+     	font-size: 2.5em;
+     	&:after {
+     		content: "\f05c";
+			font-family: FontAwesome;
+			position: absolute;
+			top: 5px;
+			right: 5px;
+     	}
+     }
+     
+     .v-Notification p {
+     	display: inline;
+     	max-width: 50em;
+     	margin: 0;
+     	font-size: 1.2em;
+     }
+
+    /*******************************************************************
+     * popins
+     *******************************************************************/
+
+    .v-window-outerheader {
+      .v-window-header {
+        color: #224E6A;
+        font-size: 1.4em;
+      }
+    }
+
+    /*******************************************************************
+     * Tables
+     *******************************************************************/
+    .v-table {
+      box-sizing: content-box;
+    }
+
+    .v-table-cell-wrapper {
+      padding-right: 5px;
+      padding-left: 5px;
+    }
+    
+    .v-table-header-wrap {
+    	background-color: rgba(34, 78, 106, 0.5);
+    	background-image: none;
+    	color: white;
+    }
+    
+    .v-table-caption-container {
+    	white-space: normal;
+    }
+    
+    .table-total-libelle {
+  		padding-right: 5px;
+		padding-left: 5px;
+  	}
+
+  	.table-total {
+  		padding-right: 5px;
+		padding-left: 5px;
+		color: white;
+		background-color: rgba(34, 78, 106, 0.5);
+  	}
+
+    /*******************************************************************
+     * tabsheet
+     *******************************************************************/
+    .v-tabsheet-framed.padded-tabbar > .v-tabsheet-tabcontainer {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .v-tabsheet-tabitemcell .v-tabsheet-tabitem-focus .v-caption.v-caption, .v-tabsheet-tabitemcell .v-tabsheet-tabitem-selected .v-caption.v-caption {
+      border-bottom-color: orange;
+      color: #224E6A;
+      font-weight: bold;
+    }
+
+    /*******************************************************************
+     * portail side menu
+     *******************************************************************/
+    .portail-menu-application-wrapper {
+      background: url(santeclair-logo-side.png) bottom no-repeat;
+      height: 100%;
+      width: 100%;
+    }
+  
+    .portail-sidebar-layout {
+      height: 100%;
+      width: 100%;
+      box-sizing: border-box;
+
+      background-color: #3980AF;
+      
+      .portail-sidebar-title {
+        display: inline-block;
+        color: white;
+        width: 100%;
+        text-align: center;
+      }
+      
+      .v-button-borderless {
+        color: white;
+        border-radius: 0;
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 0 .5em;
+        text-align: right;
+        -moz-box-shadow: none;
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        &:hover {
+          color: #eee;
+        }
+        &.button-heading {
+          text-align: left;
+          border-bottom: 1px solid white;
+          background-color: rgba(255, 255, 255, 0);
+          -moz-box-shadow: 0px 2px 20px 1px rgba(0,0,0,.1);
+          -webkit-box-shadow: 0px 2px 2px 1px rgba(0,0,0,.1);
+          box-shadow: 0px 2px 2px 1px rgba(0, 0, 0, .1);
+          -webkit-transform: translate3d(0,0,0);
+          transform: translate3d(0,0,0);
+          -moz-transition: all .2s cubic-bezier(.4,0,.2,1);
+          -webkit-transition: all .2s cubic-bezier(.4,0,.2,1);
+          transition: all .2s cubic-bezier(.4,0,.2,1);
+          &:hover {
+            border-bottom-color: #eee;
+            -moz-box-shadow: 0 17px 50px 0 rgba(0,0,0,.19);
+            -webkit-box-shadow: 0 17px 50px 0 rgba(0,0,0,.19);
+            box-shadow: 0 17px 50px 0 rgba(0,0,0,.19);
+            position: relative;
+            z-index: 100;
+          }
+        }
+      }
+        
+    }
+
+    /*******************************************************************
+     * portail breadcrumb
+     *******************************************************************/    
+    .cycle {
+      display: inline-block;
+      background-color: lightgray;
+      color: white;
+      text-align: center;
+      line-height: 4em;
+      position: relative;
+      font-weight: bold;
+      padding: 0 1em;
+      margin: .7em;
+      font-size: 1.2em;
+    &.cycle-active {
+      background-color: #30c630;
+      &:before,
+      &:after{
+        border:0 solid #30c630;
+        content: "";
+        position:absolute;
+        top: 0;
+        border-width: 2em 1em;
+        width: 0;
+        height: 0;
+
+      }
+      &:before{
+        left:-20px;
+        border-left-color:transparent;
+      }
+      &:after{
+        left:100%;
+        border-color: transparent;
+        border-left-color: #30c630;
+      }
+    }
+    
+    &.cycle-current {
+      background-color: orange;
+      &:before,
+      &:after{
+        border:0 solid orange;
+        content: "";
+        position:absolute;
+        top: 0;
+        border-width: 2em 1em;
+        width: 0;
+        height: 0;
+      }
+      &:before{
+        left:-20px;
+        border-left-color:transparent;
+      }
+      &:after{
+        left:100%;
+        border-color: transparent;
+        border-left-color: orange;
+      }
+    }
+    
+    &:first-child{
+      padding-left:15px;
+      @include border-left-radius(10px);
+      &:before{
+        border:none;
+      }
+    }
+    &:last-child{
+      padding-right:15px;
+      @include border-right-radius(10px);
+      &:after{
+        border:none;
+      }
+    }
+    &:before,
+    &:after{
+      content: "";
+      position:absolute;
+      top: 0;
+      border:0 solid lightgray;
+      border-width: 2em 1em;
+      width: 0;
+      height: 0;
+    }
+    &:before{
+      left:-20px;
+      border-left-color:transparent;
+    }
+    &:after{
+      left:100%;
+      border-color: transparent;
+      border-left-color: lightgray;
+    }
+  }
+
+
+}
