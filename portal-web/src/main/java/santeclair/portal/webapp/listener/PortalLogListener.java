@@ -7,11 +7,9 @@ import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import santeclair.lunar.framework.osgi.BundleUtils;
 
-@Component
 public class PortalLogListener implements LogListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PortalLogListener.class);
@@ -51,8 +49,8 @@ public class PortalLogListener implements LogListener {
     private StringBuffer buildLogMessage(LogEntry entry) {
         StringBuffer sbf = new StringBuffer();
         if (entry != null) {
-           String bundleName = BundleUtils.bundleNameWithVersion(entry.getBundle());
-            if(StringUtils.isNotEmpty(bundleName)){
+            String bundleName = BundleUtils.bundleNameWithVersion(entry.getBundle());
+            if (StringUtils.isNotEmpty(bundleName)) {
                 sbf.append(bundleName).append(" - ");
             }
             sbf.append(entry.getMessage());
@@ -63,7 +61,7 @@ public class PortalLogListener implements LogListener {
                                 .append("=========================\n\n")
                                 .append(ExceptionUtils.getStackTrace(t));
             }
-        }else{
+        } else {
             LOGGER.warn("L'entry de log est null.");
         }
         return sbf;

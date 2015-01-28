@@ -1,5 +1,6 @@
 package santeclair.portal.webapp.listener.service;
 
+import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 
 public interface PortalServiceListener<T> extends ServiceListener {
@@ -18,21 +19,21 @@ public interface PortalServiceListener<T> extends ServiceListener {
      * 
      * @param serviceEvent ServiceEvent d'enregistrement du service.
      */
-    void serviceRegistered(T service);
+    void serviceRegistered(T service, ServiceEvent serviceEvent);
 
     /**
      * Cette méthode sera déclenchée lorsque le service se désenregistre du contexte OSGi.
      * 
      * @param serviceEvent ServiceEvent d'enregistrement du service.
      */
-    void serviceUnregistering(T service);
+    void serviceUnregistering(T service, ServiceEvent serviceEvent);
 
     /**
      * Cette méthode est déclenchée lorsque les propriétés d'un service enregistré dans le contexte OSGi change (changement du dictionnaire)
      * 
      * @param serviceEvent ServiceEvent d'enregistrement du service.
      */
-    void serviceModified(T service);
+    void serviceModified(T service, ServiceEvent serviceEvent);
 
     /**
      * Cette méthode est déclanché lorsque les propriétés d'un service enregistré dans le contexte OSGi change (changement du dictionnaire) et
@@ -40,6 +41,6 @@ public interface PortalServiceListener<T> extends ServiceListener {
      * 
      * @param serviceEvent
      */
-    void serviceModifiedEndmatch(T service);
+    void serviceModifiedEndmatch(T service, ServiceEvent serviceEvent);
 
 }

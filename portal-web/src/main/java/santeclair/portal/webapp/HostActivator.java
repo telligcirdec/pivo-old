@@ -22,8 +22,6 @@ public class HostActivator implements BundleActivator {
     private PortalBundleListener bundleListener;
     @Autowired
     private PortalFrameworkListner frameworkListner;
-    
-    @Autowired
     private LogReaderServiceListener logReaderServiceListener;
 
     private BundleContext bundleContext;
@@ -31,12 +29,16 @@ public class HostActivator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext)
                     throws InvalidSyntaxException {
-        LOGGER.debug("Starting HostActivator");
-
+        LOGGER.info("Starting HostActivator");
         this.bundleContext = bundleContext;
 
-        bundleContext.addServiceListener(logReaderServiceListener, logReaderServiceListener.getFilter());
-        
+        /*
+         * Ajout du listener de log au service de log
+         */
+        logReaderServiceListener = new LogReaderServiceListener(bundleContext);
+        String logReaderServiceListenerFilter = logReaderServiceListener.getFilter();
+        bundleContext.addServiceListener(logReaderServiceListener, logReaderServiceListenerFilter);
+
         bundleContext.addBundleListener(bundleListener);
         bundleContext.addFrameworkListener(frameworkListner);
     }
