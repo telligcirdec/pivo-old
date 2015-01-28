@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-15" ?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 
@@ -174,6 +175,18 @@
 			<artifactId>jsf-api</artifactId>
 		</dependency>
 
+		<!-- OSGi -->
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<optional>true</optional>
+		</dependency>
+
 		<!-- Implémentation Hibernate de JPA 2.0 -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -314,19 +327,19 @@
 			<artifactId>cron-parser</artifactId>
 			<optional>true</optional>
 		</dependency>
-		
-		<!--  Gestion du cache -->
+
+		<!-- Gestion du cache -->
 		<dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache-core</artifactId>
-        </dependency>
-		
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-core</artifactId>
+		</dependency>
+
 		<!-- Dozer : copy de bean -->
 		<dependency>
-		    <groupId>net.sf.dozer</groupId>
-		    <artifactId>dozer</artifactId>
-		</dependency>		
-		
+			<groupId>net.sf.dozer</groupId>
+			<artifactId>dozer</artifactId>
+		</dependency>
+
 
 		<!-- Dépendance pour les tests unitaires -->
 		<dependency>
