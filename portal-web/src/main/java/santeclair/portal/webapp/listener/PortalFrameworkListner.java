@@ -14,7 +14,7 @@ import santeclair.lunar.framework.osgi.BundleUtils;
 @Component
 public class PortalFrameworkListner implements FrameworkListener {
 
-    private static final Logger LOGGER_FRAMEWORK_EVENT = LoggerFactory.getLogger("FRAMEWORK EVENT");
+    private static final Logger LOGGER_FRAMEWORK_EVENT = LoggerFactory.getLogger("santeclair.portal.FRAMEWORK_EVENT");
 
     @Value("#{generalProperties['framework.listener.log.level']}")
     private String logLevel;

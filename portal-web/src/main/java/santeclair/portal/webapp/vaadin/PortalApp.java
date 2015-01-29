@@ -15,13 +15,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import santeclair.portal.webapp.HostActivator;
-import santeclair.portal.webapp.MainEventBus;
+import santeclair.portal.event.ModuleUiFactoryBundleStarted;
+import santeclair.portal.event.ModuleUiFactoryBundleStopped;
+import santeclair.portal.event.impl.RootEventBusImpl;
 import santeclair.portal.webapp.vaadin.view.LeftSideMenu;
 import santeclair.portal.webapp.vaadin.view.Main;
 import santeclair.portal.webapp.vaadin.view.Tabs;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
@@ -50,9 +52,9 @@ public class PortalApp extends UI {
 
     // Bundle systeme permettant de relier l'environnement Tomcat avec
     // l'environnement OSGi / Managé et injecté par Spring
-    private HostActivator hostActivator;
+    // private HostActivator hostActivator;
 
-    // Bus d'event permettant de gérer les événements (variable de classe -
+    // Bus d'event permettant de gérer les événements d'une session utilisateur (variable de classe -
     // prototype - un event bus par instance d'UI)
     private final EventBus portalAppEventBus = new EventBus();
 
@@ -63,7 +65,7 @@ public class PortalApp extends UI {
     // Container des onglets
     private Tabs tabs;
 
-    private MainEventBus mainEventBus;
+    private RootEventBusImpl rootEventBusImpl;
 
     /*
      * Début du Code UI
@@ -75,9 +77,9 @@ public class PortalApp extends UI {
         ApplicationContext context = WebApplicationContextUtils.
                         getRequiredWebApplicationContext(VaadinServlet.getCurrent().getServletContext());
         // Injection des singletons
-        mainEventBus = context.getBean(MainEventBus.class);
-        hostActivator = context.getBean(HostActivator.class);
-        
+        rootEventBusImpl = context.getBean(RootEventBusImpl.class);
+        // hostActivator = context.getBean(HostActivator.class);
+
         // initialisation de l'IHM
         this.setSizeFull();
         this.setErrorHandler();
@@ -105,7 +107,7 @@ public class PortalApp extends UI {
         setContent(main);
 
         LOGGER.debug("Fin Initialisation de l'UI");
-        mainEventBus.register(this);
+        rootEventBusImpl.register(this);
     }
 
     @Override
@@ -114,8 +116,20 @@ public class PortalApp extends UI {
         portalAppEventBus.unregister(main);
         portalAppEventBus.unregister(leftSideMenu);
         portalAppEventBus.unregister(tabs);
-        mainEventBus.unregister(this);
+        rootEventBusImpl.unregister(this);
         super.detach();
+    }
+
+    @Subscribe
+    public void moduleUiFactoryBundleStarted(ModuleUiFactoryBundleStarted<?> moduleUiFactoryBundleStarted) {
+        LOGGER.info("Démarrage d'un bundle contenant une factory de module ui");
+
+    }
+
+    @Subscribe
+    public void moduleUiFactoryBundleStopped(ModuleUiFactoryBundleStopped<?> moduleUiFactoryBundleStopped) {
+        LOGGER.info("Arrêt d'un bundle contenant une factory de module ui");
+
     }
 
     /*

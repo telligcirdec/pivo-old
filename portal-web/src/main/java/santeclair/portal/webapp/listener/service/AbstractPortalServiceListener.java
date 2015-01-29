@@ -13,10 +13,6 @@ public abstract class AbstractPortalServiceListener<T> implements PortalServiceL
 
     protected BundleContext bundleContext;
 
-    public AbstractPortalServiceListener(BundleContext bundleContext) {
-        this.bundleContext = bundleContext;
-    }
-
     @Override
     public void serviceChanged(ServiceEvent serviceEvent) {
         if (serviceEvent != null) {

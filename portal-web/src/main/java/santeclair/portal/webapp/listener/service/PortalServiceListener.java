@@ -1,5 +1,6 @@
 package santeclair.portal.webapp.listener.service;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 
@@ -42,5 +43,7 @@ public interface PortalServiceListener<T> extends ServiceListener {
      * @param serviceEvent
      */
     void serviceModifiedEndmatch(T service, ServiceEvent serviceEvent);
+
+    void setBundleContext(BundleContext bundleContext);
 
 }

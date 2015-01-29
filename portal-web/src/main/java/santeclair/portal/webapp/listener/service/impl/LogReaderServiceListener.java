@@ -5,16 +5,19 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.service.log.LogReaderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import santeclair.portal.webapp.listener.PortalLogListener;
 import santeclair.portal.webapp.listener.service.AbstractPortalServiceListener;
 
+@Component
 public class LogReaderServiceListener extends AbstractPortalServiceListener<LogReaderService> {
 
     private PortalLogListener portalLogListener = new PortalLogListener();
 
-    public LogReaderServiceListener(BundleContext bundleContext) {
-        super(bundleContext);
+    @Override
+    public void setBundleContext(BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LogReaderServiceListener.class);

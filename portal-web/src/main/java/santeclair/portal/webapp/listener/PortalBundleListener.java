@@ -14,7 +14,7 @@ import santeclair.lunar.framework.osgi.BundleUtils;
 public class PortalBundleListener implements BundleListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PortalBundleListener.class);
-    private static final Logger LOGGER_BUNDLE_EVENT = LoggerFactory.getLogger("BUNDLE EVENT");
+    private static final Logger LOGGER_BUNDLE_EVENT = LoggerFactory.getLogger("santeclair.portal.BUNDLE_EVENT");
 
     @Value("#{generalProperties['bundle.listener.log.level']}")
     private String logLevel;

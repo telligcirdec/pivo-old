@@ -13,7 +13,7 @@ import santeclair.lunar.framework.osgi.BundleUtils;
 public class PortalLogListener implements LogListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PortalLogListener.class);
-    private static final Logger LOGGER_OSGI = LoggerFactory.getLogger("OSGI LOG");
+    private static final Logger LOGGER_OSGI = LoggerFactory.getLogger("santeclair.portal.BUNDLE");
 
     @Override
     public void logged(LogEntry entry) {

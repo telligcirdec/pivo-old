@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<bundle.namespace>santeclair.portal.event</bundle.namespace>
+		<bundle.namespace>santeclair.portal.test</bundle.namespace>
 	</properties>
 
 	<parent>
@@ -12,11 +12,11 @@
 		<version>4.57.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>event-bridge-bundle</artifactId>
+	<artifactId>portal-test-bundle</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
-	<name>Event bridge bundle</name>
+	<name>Test ModuleUi bundle</name>
 
 	<!-- Paramétrage de la connexion au gestionnaire de source -->
 	<scm>
