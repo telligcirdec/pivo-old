@@ -1,10 +1,10 @@
-package santeclair.portal.webapp.vaadin;
+package santeclair.portal.webapp;
 
 import org.springframework.stereotype.Component;
 
 import com.google.common.eventbus.EventBus;
 
 @Component
-public class PortalEventBus extends EventBus {
+public class MainEventBus extends EventBus {
 
 }
