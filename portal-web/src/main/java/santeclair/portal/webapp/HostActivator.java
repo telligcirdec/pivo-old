@@ -46,7 +46,7 @@ public class HostActivator implements BundleActivator {
         bundleContext.addFrameworkListener(frameworkListner);
 
         // Enregistrement du service de gestion des événements globlaux
-        bundleContext.registerService(RootEventBusService.class, rootEventBusService, null);
+        bundleContext.registerService(RootEventBusService.class.getName(), rootEventBusService, null);
     }
 
     @Override

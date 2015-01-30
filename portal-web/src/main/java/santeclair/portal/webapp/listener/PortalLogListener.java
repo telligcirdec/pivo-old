@@ -7,9 +7,11 @@ import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import santeclair.lunar.framework.osgi.BundleUtils;
 
+@Component
 public class PortalLogListener implements LogListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PortalLogListener.class);
