@@ -2,6 +2,7 @@ package santeclair.portal.webapp.listener;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 import org.slf4j.Logger;
@@ -34,6 +35,10 @@ public class PortalFrameworkListner implements FrameworkListener {
         } else if (LOGGER_FRAMEWORK_EVENT.isErrorEnabled() && Level.ERROR.name().equalsIgnoreCase(logLevel)) {
             LOGGER_FRAMEWORK_EVENT.error(buildLogMessage(frameworkEvent));
         }
+    }
+
+    public void registerItself(BundleContext bundleContext) {
+        bundleContext.addFrameworkListener(this);
     }
 
     private String buildLogMessage(FrameworkEvent frameworkEvent) {

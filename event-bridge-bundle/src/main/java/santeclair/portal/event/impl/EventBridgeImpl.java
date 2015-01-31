@@ -1,36 +1,35 @@
 package santeclair.portal.event.impl;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.Validate;
-import org.apache.felix.ipojo.handlers.event.Subscriber;
-import org.osgi.service.event.Event;
+import org.apache.felix.ipojo.handlers.event.Publishes;
+import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
 import org.osgi.service.log.LogService;
 
-import santeclair.portal.event.RootEventBusService;
+import santeclair.portal.event.EventDictionaryConstant;
 
-@Component(publicFactory=false)
+@Component(publicFactory = false)
 @Instantiate
 public class EventBridgeImpl {
 
-    @Requires
+    @Requires(optional = true, exception = IllegalStateException.class)
     private LogService logService;
 
-    @Requires(optional=true)
-    private RootEventBusService rootEventBusService;
+    @Publishes(name = "rootPublisher", topics = EventDictionaryConstant.TOPIC_ROOT)
+    private Publisher rootPublisher;
 
     @Validate
     public void start() {
-        System.out.println("Mouahahaaaaaaaaaaaaaaaaaaaaahhhhhhhahaa   !!!!!!!!!");
         logService.log(LogService.LOG_DEBUG, "EventBridgeImpl started");
-    }
-
-    @Subscriber(name = "EVENT_BRIDGE", topics = "root")
-    public void receiveRoot(Event event) {
-        System.out.println("Mouahahaaaaaaaaaaaaaaaaaaaaahhhhhhhahaa   !!!!!!!!! 222222222222222222");
-        logService.log(LogService.LOG_DEBUG, "receiveRoot(" + event + ")");
-        // rootEventBusService.post();
+        Dictionary<String, String> eventProps = new Hashtable<>();
+        eventProps.put("test", "oh yeah !");
+        rootPublisher.send(eventProps);
+        logService.log(LogService.LOG_DEBUG, "event publish");
     }
 
 }

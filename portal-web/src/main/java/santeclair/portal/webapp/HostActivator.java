@@ -9,7 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import santeclair.portal.event.RootEventBusService;
+import santeclair.portal.webapp.event.impl.ModuleUiFactoryEventHandler;
+import santeclair.portal.webapp.event.impl.PortalEventHandler;
 import santeclair.portal.webapp.listener.PortalBundleListener;
 import santeclair.portal.webapp.listener.PortalFrameworkListner;
 import santeclair.portal.webapp.listener.service.impl.LogReaderServiceListener;
@@ -19,34 +20,54 @@ public class HostActivator implements BundleActivator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HostActivator.class);
 
+    /*
+     * Bundle listener
+     */
     @Autowired
     private PortalBundleListener bundleListener;
+
+    /*
+     * Framework listener
+     */
     @Autowired
     private PortalFrameworkListner frameworkListner;
-    @Autowired
-    private RootEventBusService rootEventBusService;
+
+    /*
+     * Services listener
+     */
     @Autowired
     private LogReaderServiceListener logReaderServiceListener;
+
+    /*
+     * Event Handler
+     */
+    @Autowired
+    private PortalEventHandler portalEventHandler;
+    @Autowired
+    private ModuleUiFactoryEventHandler moduleUiFactoryEventHandler;
 
     private BundleContext bundleContext;
 
     @Override
     public void start(BundleContext bundleContext)
                     throws InvalidSyntaxException {
-        LOGGER.info("Starting HostActivator");
+        LOGGER.info("Begin starting HostActivator");
         this.bundleContext = bundleContext;
 
         /*
          * Ajout du listener de log au service de log
          */
-        logReaderServiceListener.setBundleContext(bundleContext);
-        bundleContext.addServiceListener(logReaderServiceListener, logReaderServiceListener.getFilter());
+        logReaderServiceListener.registerItself(bundleContext);
 
-        bundleContext.addBundleListener(bundleListener);
-        bundleContext.addFrameworkListener(frameworkListner);
+        bundleListener.registerItself(bundleContext);
+        frameworkListner.registerItself(bundleContext);
 
-        // Enregistrement du service de gestion des événements globlaux
-        bundleContext.registerService(RootEventBusService.class.getName(), rootEventBusService, null);
+        // Enregistrement du handler des événements globlaux
+        portalEventHandler.registerItself(bundleContext);
+        // Enregistrement du handler des events module
+        moduleUiFactoryEventHandler.registerItself(bundleContext);
+
+        LOGGER.info("Ending starting HostActivator");
     }
 
     @Override

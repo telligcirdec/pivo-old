@@ -1,6 +1,7 @@
 package santeclair.portal.webapp.listener;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 import org.slf4j.Logger;
@@ -34,6 +35,10 @@ public class PortalBundleListener implements BundleListener {
         } else if (LOGGER_BUNDLE_EVENT.isErrorEnabled() && Level.ERROR.name().equalsIgnoreCase(logLevel)) {
             LOGGER_BUNDLE_EVENT.error(buildLogMessage(bundleEvent));
         }
+    }
+
+    public void registerItself(BundleContext bundleContext) {
+        bundleContext.addBundleListener(this);
     }
 
     private String buildLogMessage(BundleEvent bundleEvent) {

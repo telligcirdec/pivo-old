@@ -3,6 +3,7 @@ package santeclair.portal.webapp.listener.service;
 import java.lang.reflect.ParameterizedType;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,17 @@ public abstract class AbstractPortalServiceListener<T> implements PortalServiceL
 
         } else {
             LOGGER.warn("Le service event levé est null");
+        }
+    }
+
+    @Override
+    public void registerItself(BundleContext bundleContext) throws InvalidSyntaxException {
+        if (bundleContext != null) {
+            LOGGER.debug("Enregistrement du service {} dans le bundle context", this.getClass().getName());
+            bundleContext.addServiceListener(this, this.getFilter());
+            this.bundleContext = bundleContext;
+        } else {
+            LOGGER.error("Le bundle context est vide. Le service {} ne sera pas enregistré.", this.getClass().getName());
         }
     }
 

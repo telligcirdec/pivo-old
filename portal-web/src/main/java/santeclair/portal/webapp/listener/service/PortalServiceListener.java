@@ -1,6 +1,7 @@
 package santeclair.portal.webapp.listener.service;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 
@@ -44,6 +45,6 @@ public interface PortalServiceListener<T> extends ServiceListener {
      */
     void serviceModifiedEndmatch(T service, ServiceEvent serviceEvent);
 
-    void setBundleContext(BundleContext bundleContext);
+    void registerItself(BundleContext bundleContext) throws InvalidSyntaxException;
 
 }

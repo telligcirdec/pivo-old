@@ -1,6 +1,5 @@
 package santeclair.portal.webapp.listener.service.impl;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.service.log.LogReaderService;
 import org.slf4j.Logger;
@@ -16,11 +15,6 @@ public class LogReaderServiceListener extends AbstractPortalServiceListener<LogR
 
     @Autowired
     private PortalLogListener portalLogListener;
-
-    @Override
-    public void setBundleContext(BundleContext bundleContext) {
-        this.bundleContext = bundleContext;
-    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LogReaderServiceListener.class);
 
