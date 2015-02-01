@@ -9,9 +9,9 @@ import santeclair.portal.event.EventDictionaryConstant;
 import santeclair.portal.webapp.event.AbstractEventHandler;
 
 @Component
-public class PortalEventHandler extends AbstractEventHandler {
+public class RootEventHandlerImpl extends AbstractEventHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PortalEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RootEventHandlerImpl.class);
 
     @Override
     public void handleEvent(Event event) {

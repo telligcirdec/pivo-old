@@ -6,7 +6,6 @@ import java.util.Hashtable;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.EventConstants;
-import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,26 +13,32 @@ public abstract class AbstractEventHandler implements EventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventHandler.class);
 
-    public final void registerItself(BundleContext bundleContext) {
-        if (bundleContext != null) {
-            LOGGER.info("Registering event handler : {}", this.getClass().getName());
-            Dictionary<String, Object> props = new Hashtable<>();
-            props.put(EventConstants.EVENT_TOPIC, getTopics());
-            if (StringUtils.isNotBlank(getFilter())) {
-                props.put(EventConstants.EVENT_FILTER, getFilter());
-            }
-            bundleContext.registerService(EventHandler.class.getName(), this, props);
-            LOGGER.info("Event handler registered : {}", this.getClass().getName());
-        } else {
-            LOGGER.error("L'handler d'event {} ne sera pas enregistré => le bundle context est null.", this.getClass().getName());
-        }
-
+    @Override
+    public final void registerEventHandlerItself(BundleContext bundleContext) {
+        registerEventHandler(bundleContext, this);
     }
 
+    @Override
     public String getFilter() {
         return null;
     }
 
+    @Override
     public abstract String[] getTopics();
+
+    public static void registerEventHandler(BundleContext bundleContext, EventHandler eventHandler) {
+        if (bundleContext != null) {
+            LOGGER.info("Registering event handler : {}", eventHandler.getClass().getName());
+            Dictionary<String, Object> props = new Hashtable<>();
+            props.put(EventConstants.EVENT_TOPIC, eventHandler.getTopics());
+            if (StringUtils.isNotBlank(eventHandler.getFilter())) {
+                props.put(EventConstants.EVENT_FILTER, eventHandler.getFilter());
+            }
+            bundleContext.registerService(org.osgi.service.event.EventHandler.class.getName(), eventHandler, props);
+            LOGGER.info("Event handler registered : {}", eventHandler.getClass().getName());
+        } else {
+            LOGGER.error("L'handler d'event {} ne sera pas enregistré => le bundle context est null.", eventHandler.getClass().getName());
+        }
+    }
 
 }

@@ -47,7 +47,7 @@ public abstract class AbstractPortalServiceListener<T> implements PortalServiceL
     }
 
     @Override
-    public void registerItself(BundleContext bundleContext) throws InvalidSyntaxException {
+    public final void registerItself(BundleContext bundleContext) throws InvalidSyntaxException {
         if (bundleContext != null) {
             LOGGER.debug("Enregistrement du service {} dans le bundle context", this.getClass().getName());
             bundleContext.addServiceListener(this, this.getFilter());
@@ -59,22 +59,22 @@ public abstract class AbstractPortalServiceListener<T> implements PortalServiceL
 
     @Override
     public void serviceModified(T service, ServiceEvent serviceEvent) {
-        LOGGER.warn("Implementation par défaut. Ne fait rien.");
+        LOGGER.info("serviceModified method default behavior does nothing. Override this method to execute custom code.");
     }
 
     @Override
     public void serviceModifiedEndmatch(T service, ServiceEvent serviceEvent) {
-        LOGGER.warn("Implementation par défaut. Ne fait rien.");
+        LOGGER.info("serviceModifiedEndmatch method default behavior does nothing. Override this method to execute custom code.");
     }
 
     @Override
     public void serviceRegistered(T service, ServiceEvent serviceEvent) {
-        LOGGER.warn("Implementation par défaut. Ne fait rien.");
+        LOGGER.info("serviceRegistered method default behavior does nothing. Override this method to execute custom code.");
     }
 
     @Override
     public void serviceUnregistering(T service, ServiceEvent serviceEvent) {
-        LOGGER.warn("Implementation par défaut. Ne fait rien.");
+        LOGGER.info("serviceUnregistering method default behavior does nothing. Override this method to execute custom code.");
     }
 
     @Override

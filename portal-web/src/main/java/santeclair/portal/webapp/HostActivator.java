@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import santeclair.portal.webapp.event.impl.ModuleUiFactoryEventHandler;
-import santeclair.portal.webapp.event.impl.PortalEventHandler;
+import santeclair.portal.webapp.event.impl.ModuleUiFactoryEventHandlerImpl;
+import santeclair.portal.webapp.event.impl.RootEventHandlerImpl;
 import santeclair.portal.webapp.listener.PortalBundleListener;
 import santeclair.portal.webapp.listener.PortalFrameworkListner;
 import santeclair.portal.webapp.listener.service.impl.LogReaderServiceListener;
@@ -42,9 +42,9 @@ public class HostActivator implements BundleActivator {
      * Event Handler
      */
     @Autowired
-    private PortalEventHandler portalEventHandler;
+    private RootEventHandlerImpl rootEventHandlerImpl;
     @Autowired
-    private ModuleUiFactoryEventHandler moduleUiFactoryEventHandler;
+    private ModuleUiFactoryEventHandlerImpl moduleUiFactoryEventHandlerImpl;
 
     private BundleContext bundleContext;
 
@@ -54,18 +54,16 @@ public class HostActivator implements BundleActivator {
         LOGGER.info("Begin starting HostActivator");
         this.bundleContext = bundleContext;
 
-        /*
-         * Ajout du listener de log au service de log
-         */
+        // Ajout du listener de log au service de log
         logReaderServiceListener.registerItself(bundleContext);
 
         bundleListener.registerItself(bundleContext);
         frameworkListner.registerItself(bundleContext);
 
         // Enregistrement du handler des événements globlaux
-        portalEventHandler.registerItself(bundleContext);
+        rootEventHandlerImpl.registerEventHandlerItself(bundleContext);
         // Enregistrement du handler des events module
-        moduleUiFactoryEventHandler.registerItself(bundleContext);
+        moduleUiFactoryEventHandlerImpl.registerEventHandlerItself(bundleContext);
 
         LOGGER.info("Ending starting HostActivator");
     }
