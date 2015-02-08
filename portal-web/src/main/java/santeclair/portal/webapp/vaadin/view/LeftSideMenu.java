@@ -1,11 +1,15 @@
 package santeclair.portal.webapp.vaadin.view;
 
+import java.util.Iterator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.jouni.animator.AnimatorProxy;
 
 import santeclair.portal.vaadin.module.ModuleUiFactory;
+import santeclair.portal.webapp.vaadin.view.component.MainButonModuleUiFactory;
 
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.VerticalLayout;
 
@@ -29,8 +33,26 @@ public class LeftSideMenu extends CustomLayout {
         buttonContainer.addComponent(proxy);
     }
 
-    public void addModuleUiFactory(ModuleUiFactory<?> moduleUiFactory) {
+    public synchronized void addModuleUiFactory(ModuleUiFactory<?> moduleUiFactory) {
         LOGGER.debug("addButtonModuleUiFactory : {}", moduleUiFactory.getCode());
+        MainButonModuleUiFactory mainButonModuleUiFactory = new MainButonModuleUiFactory(moduleUiFactory);
+        if (buttonContainer.getComponentCount() > 0) {
+            Iterator<Component> ite = buttonContainer.iterator();
+            while (ite.hasNext()) {
+                Component mainButton = ite.next();
+                if (MainButonModuleUiFactory.class.isAssignableFrom(mainButton.getClass())) {
+                    mainButton.getClass();
+                } else {
+                    LOGGER.warn("Un composant haut niveu attaché au menu n'est pas du type : " + MainButonModuleUiFactory.class.getName());
+                }
+            }
+        } else {
+            buttonContainer.addComponent(mainButonModuleUiFactory);
+        }
+    }
+
+    public void removeModuleUiFactory(ModuleUiFactory<?> moduleUiFactory) {
+        LOGGER.debug("removeModuleUiFactory : {}", moduleUiFactory.getCode());
     }
 
 }

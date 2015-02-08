@@ -19,8 +19,8 @@ public class RootEventHandlerImpl extends AbstractEventHandler {
     }
 
     @Override
-    public String[] getTopics() {
-        return new String[]{EventDictionaryConstant.TOPIC_ROOT};
+    public String getTopic() {
+        return EventDictionaryConstant.TOPIC_ROOT;
     }
 
 }

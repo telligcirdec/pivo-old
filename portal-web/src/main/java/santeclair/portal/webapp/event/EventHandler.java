@@ -8,6 +8,6 @@ public interface EventHandler extends org.osgi.service.event.EventHandler {
 
     String getFilter();
 
-    String[] getTopics();
+    String getTopic();
 
 }

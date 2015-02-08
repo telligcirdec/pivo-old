@@ -8,8 +8,8 @@ public interface EventDictionaryConstant {
     /**
      * Nom du topic principal.
      */
-    public static final String TOPIC_ROOT = "root";
-    public static final String TOPIC_MODULE_UI_FACTORY = "moduleUiFactory";
+    public static final String TOPIC_ROOT = "santeclair/portal";
+    public static final String TOPIC_MODULE_UI_FACTORY = TOPIC_ROOT + "/module/ModuleUiFactoryEvent";
 
     /*
      * Properties keys

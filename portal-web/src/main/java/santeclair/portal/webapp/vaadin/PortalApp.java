@@ -127,8 +127,8 @@ public class PortalApp extends UI implements ModuleUiFactoryEventHandler {
     }
 
     @Override
-    public String[] getTopics() {
-        return new String[]{EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY};
+    public String getTopic() {
+        return EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY;
     }
 
     @Override
@@ -138,13 +138,14 @@ public class PortalApp extends UI implements ModuleUiFactoryEventHandler {
     }
 
     @Override
-    public void addModuleUiFactory(org.osgi.service.event.Event event, ModuleUiFactory<?> moduleUiFactory) {
+    public void addModuleUiFactory(org.osgi.service.event.Event event, final ModuleUiFactory<?> moduleUiFactory) {
         leftSideMenu.addModuleUiFactory(moduleUiFactory);
         if (!getPushConfiguration().getPushMode().equals(PushMode.DISABLED)) {
             access(new Runnable() {
                 @Override
                 public void run() {
-                    Notification notification = new Notification("Module loaded", "Module loaded", Type.TRAY_NOTIFICATION);
+                    String moduleName = moduleUiFactory.getName();
+                    Notification notification = new Notification(moduleName + " chargé", "Le module " + moduleName + " est désomeais disponible.", Type.TRAY_NOTIFICATION);
                     notification.show(Page.getCurrent());
                     push();
                 }
@@ -153,8 +154,19 @@ public class PortalApp extends UI implements ModuleUiFactoryEventHandler {
     }
 
     @Override
-    public void removeModuleUiFactory(org.osgi.service.event.Event event, ModuleUiFactory<?> moduleUiFactory) {
-
+    public void removeModuleUiFactory(org.osgi.service.event.Event event, final ModuleUiFactory<?> moduleUiFactory) {
+        leftSideMenu.removeaddModuleUiFactory(moduleUiFactory);
+        if (!getPushConfiguration().getPushMode().equals(PushMode.DISABLED)) {
+            access(new Runnable() {
+                @Override
+                public void run() {
+                    String moduleName = moduleUiFactory.getName();
+                    Notification notification = new Notification(moduleName + " déchargé", "Le module " + moduleName + " est désomeais indisponible.", Type.TRAY_NOTIFICATION);
+                    notification.show(Page.getCurrent());
+                    push();
+                }
+            });
+        }
     }
 
     private List<String> getCurrentUserRoles() {

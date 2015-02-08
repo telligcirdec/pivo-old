@@ -24,13 +24,13 @@ public abstract class AbstractEventHandler implements EventHandler {
     }
 
     @Override
-    public abstract String[] getTopics();
+    public abstract String getTopic();
 
     public static void registerEventHandler(BundleContext bundleContext, EventHandler eventHandler) {
         if (bundleContext != null) {
             LOGGER.info("Registering event handler : {}", eventHandler.getClass().getName());
             Dictionary<String, Object> props = new Hashtable<>();
-            props.put(EventConstants.EVENT_TOPIC, eventHandler.getTopics());
+            props.put(EventConstants.EVENT_TOPIC, eventHandler.getTopic());
             if (StringUtils.isNotBlank(eventHandler.getFilter())) {
                 props.put(EventConstants.EVENT_FILTER, eventHandler.getFilter());
             }

@@ -36,7 +36,6 @@ public class TestModuleUiFactory implements ModuleUiFactory<TestModuleUi> {
     private void start() {
         logService.log(LogService.LOG_DEBUG, "TestModuleUiFactory start");
         Dictionary<String, Object> eventProps = new Hashtable<>();
-        eventProps.put(EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME, EventDictionaryConstant.EVENT_STARTED);
         eventProps.put(EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_FACTORY, this);
         publisher.send(eventProps);
     }
@@ -45,7 +44,6 @@ public class TestModuleUiFactory implements ModuleUiFactory<TestModuleUi> {
     private void stop() {
         logService.log(LogService.LOG_DEBUG, "TestModuleUiFactory stop");
         Dictionary<String, Object> eventProps = new Hashtable<>();
-        eventProps.put(EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME, EventDictionaryConstant.EVENT_STOPPED);
         eventProps.put(EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_FACTORY, this);
         publisher.send(eventProps);
     }
@@ -73,7 +71,7 @@ public class TestModuleUiFactory implements ModuleUiFactory<TestModuleUi> {
     @Override
     public Integer displayOrder() {
         // TODO Auto-generated method stub
-        return null;
+        return Integer.MAX_VALUE;
     }
 
     @Override

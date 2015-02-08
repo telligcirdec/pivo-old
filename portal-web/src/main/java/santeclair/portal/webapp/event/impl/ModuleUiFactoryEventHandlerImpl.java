@@ -43,8 +43,8 @@ public class ModuleUiFactoryEventHandlerImpl extends AbstractEventHandler implem
     }
 
     @Override
-    public String[] getTopics() {
-        return new String[]{EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY};
+    public String getTopic() {
+        return EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY;
     }
 
     @Override
