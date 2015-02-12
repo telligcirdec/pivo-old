@@ -1,7 +1,5 @@
 package santeclair.portal.webapp.vaadin.view.component;
 
-import santeclair.portal.vaadin.module.ModuleUiFactory;
-
 import com.google.common.base.Preconditions;
 import com.vaadin.ui.Button;
 
@@ -9,41 +7,42 @@ public class MainButonModuleUiFactory extends Button implements Comparable<MainB
 
     private static final long serialVersionUID = 2401506522651257986L;
 
-    private final ModuleUiFactory<?> moduleUiFactory;
+    private final String moduleUiCode;
+    private final Integer displayOrder;
 
-    public MainButonModuleUiFactory(ModuleUiFactory<?> moduleUiFactory) {
-        Preconditions.checkNotNull(moduleUiFactory, "You must set a module ui factory to create a button on left side menu.");
-        this.moduleUiFactory = moduleUiFactory;
+    public MainButonModuleUiFactory(String moduleUiCode, Integer displayOrder) {
+        Preconditions.checkNotNull(moduleUiCode, "You must set a module ui factory code to create a button on left side menu.");
+        this.moduleUiCode = moduleUiCode;
+        this.displayOrder = displayOrder;
     }
 
-    public ModuleUiFactory<?> getModuleUiFactory() {
-        return moduleUiFactory;
+    public String getModuleUiCode() {
+        return moduleUiCode;
+    }
+
+    public Integer getDisplayOrder() {
+        return displayOrder;
     }
 
     @Override
     public int compareTo(MainButonModuleUiFactory mainButonModuleUiFactoryToCompare) {
-        ModuleUiFactory<?> moduleUiFactoryToCompare = mainButonModuleUiFactoryToCompare.getModuleUiFactory();
-        Integer displayOrderToCompare = moduleUiFactoryToCompare.displayOrder();
+        String moduleUiFactoryCodeToCompare = mainButonModuleUiFactoryToCompare.getModuleUiCode();
+        Integer displayOrderToCompare = mainButonModuleUiFactoryToCompare.getDisplayOrder();
+        Integer displayOrderSource = displayOrder;
         if (displayOrderToCompare == null || Integer.signum(displayOrderToCompare) < 1) {
             displayOrderToCompare = Integer.MAX_VALUE;
         }
-        ModuleUiFactory<?> moduleUiFactory = this.getModuleUiFactory();
-        Integer displayOrder = moduleUiFactory.displayOrder();
         if (displayOrder == null || Integer.signum(displayOrder) < 1) {
-            displayOrder = Integer.MAX_VALUE;
+            displayOrderSource = Integer.MAX_VALUE;
         }
-        if (displayOrder.equals(displayOrderToCompare)) {
-            return moduleUiFactory.getName().compareTo(moduleUiFactoryToCompare.getName());
+        if (displayOrderSource.equals(displayOrderToCompare)) {
+            return moduleUiCode.compareTo(moduleUiFactoryCodeToCompare);
         }
         return displayOrder.compareTo(displayOrderToCompare);
     }
 
     @Override
     public void buttonClick(ClickEvent event) {
-        if{
-            
-        }else{
-            
-        }
+
     }
 }

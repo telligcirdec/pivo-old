@@ -1,15 +1,21 @@
 package santeclair.portal.webapp.event;
 
+import java.lang.reflect.Method;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractEventHandler implements EventHandler {
+
+    private static final String EVENT_HANDLER_ID = "event.handler.id";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventHandler.class);
 
@@ -19,26 +25,56 @@ public abstract class AbstractEventHandler implements EventHandler {
     }
 
     @Override
-    public String getFilter() {
-        return null;
+    public void unregisterEventHandlerItSelf(BundleContext bundleContext) {
+        try {
+            unregisterEventHandler(bundleContext, this);
+        } catch (InvalidSyntaxException e) {
+            e.printStackTrace();
+        }
     }
-
-    @Override
-    public abstract String getTopic();
 
     public static void registerEventHandler(BundleContext bundleContext, EventHandler eventHandler) {
         if (bundleContext != null) {
-            LOGGER.info("Registering event handler : {}", eventHandler.getClass().getName());
-            Dictionary<String, Object> props = new Hashtable<>();
-            props.put(EventConstants.EVENT_TOPIC, eventHandler.getTopic());
-            if (StringUtils.isNotBlank(eventHandler.getFilter())) {
-                props.put(EventConstants.EVENT_FILTER, eventHandler.getFilter());
+            Method[] methodToChecks = eventHandler.getClass().getDeclaredMethods();
+            for (Method method : methodToChecks) {
+                if (method.isAnnotationPresent(Subscriber.class)) {
+                    Subscriber subscriber = method.getAnnotation(Subscriber.class);
+                    String topic = subscriber.topic();
+                    String filter = subscriber.filter();
+                    String eventHandlerId = Integer.toHexString(eventHandler.hashCode());
+                    LOGGER.info("Registering event handler method {} from class {} on topic {} with filter '{}' and event handler id {}", method.getName(), eventHandler.getClass()
+                                    .getName(),
+                                    topic, subscriber.filter(), eventHandlerId);
+                    Dictionary<String, Object> props = new Hashtable<>();
+                    props.put(EventConstants.EVENT_TOPIC, topic);
+                    props.put(EVENT_HANDLER_ID, eventHandlerId);
+                    if (StringUtils.isNotBlank(filter)) {
+                        props.put(EventConstants.EVENT_FILTER, filter);
+                    }
+                    AnnotedMethodEventHandler annotedMethodEventHandler = new AnnotedMethodEventHandler(eventHandler, method);
+                    bundleContext.registerService(org.osgi.service.event.EventHandler.class.getName(), annotedMethodEventHandler, props);
+                    LOGGER.info("Event handler registered : {}.{} on topic {} with filter {}.", eventHandler.getClass(), method.getName(), topic, subscriber.filter());
+                }
             }
-            bundleContext.registerService(org.osgi.service.event.EventHandler.class.getName(), eventHandler, props);
-            LOGGER.info("Event handler registered : {}", eventHandler.getClass().getName());
         } else {
             LOGGER.error("L'handler d'event {} ne sera pas enregistré => le bundle context est null.", eventHandler.getClass().getName());
         }
     }
 
+    public static void unregisterEventHandler(BundleContext bundleContext, EventHandler eventHandler) throws InvalidSyntaxException {
+        if (bundleContext != null) {
+            String eventHandlerId = Integer.toHexString(eventHandler.hashCode());
+
+            String filterStr = "(" + EVENT_HANDLER_ID + "=" + eventHandlerId + ")";
+            Filter filter = bundleContext.createFilter(filterStr);
+            ServiceReference<?>[] serviceReferences = bundleContext.getAllServiceReferences(null, filter.toString());
+            LOGGER.debug("{}Service references found : {}", "", serviceReferences);
+            for (ServiceReference<?> serviceReference : serviceReferences) {
+                LOGGER.info("Unregister event handler {} for event handler id : {}", serviceReference.getClass().getName(), eventHandlerId);
+                bundleContext.ungetService(serviceReference);
+            }
+        } else {
+            LOGGER.error("L'handler d'event {} ne sera pas enregistré => le bundle context est null.", eventHandler.getClass().getName());
+        }
+    }
 }

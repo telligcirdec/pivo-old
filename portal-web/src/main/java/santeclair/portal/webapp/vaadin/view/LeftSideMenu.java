@@ -33,9 +33,9 @@ public class LeftSideMenu extends CustomLayout {
         buttonContainer.addComponent(proxy);
     }
 
-    public synchronized void addModuleUiFactory(ModuleUiFactory<?> moduleUiFactory) {
-        LOGGER.debug("addButtonModuleUiFactory : {}", moduleUiFactory.getCode());
-        MainButonModuleUiFactory mainButonModuleUiFactory = new MainButonModuleUiFactory(moduleUiFactory);
+    public synchronized void addModuleUiFactory(String moduleUiCode, Integer displayOrder) {
+        LOGGER.debug("addButtonModuleUiFactory : {}", moduleUiCode);
+        MainButonModuleUiFactory mainButonModuleUiFactory = new MainButonModuleUiFactory(moduleUiCode, displayOrder);
         if (buttonContainer.getComponentCount() > 0) {
             Iterator<Component> ite = buttonContainer.iterator();
             while (ite.hasNext()) {

@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import santeclair.portal.webapp.event.impl.ModuleUiFactoryEventHandlerImpl;
-import santeclair.portal.webapp.event.impl.RootEventHandlerImpl;
+import santeclair.portal.webapp.event.impl.ModuleUiFactoryEventHandler;
+import santeclair.portal.webapp.event.impl.RootEventHandler;
 import santeclair.portal.webapp.listener.PortalBundleListener;
 import santeclair.portal.webapp.listener.PortalFrameworkListner;
 import santeclair.portal.webapp.listener.service.impl.LogReaderServiceListener;
@@ -42,9 +42,9 @@ public class HostActivator implements BundleActivator {
      * Event Handler
      */
     @Autowired
-    private RootEventHandlerImpl rootEventHandlerImpl;
+    private RootEventHandler rootEventHandler;
     @Autowired
-    private ModuleUiFactoryEventHandlerImpl moduleUiFactoryEventHandlerImpl;
+    private ModuleUiFactoryEventHandler moduleUiFactoryEventHandler;
 
     private BundleContext bundleContext;
 
@@ -61,9 +61,9 @@ public class HostActivator implements BundleActivator {
         frameworkListner.registerItself(bundleContext);
 
         // Enregistrement du handler des événements globlaux
-        rootEventHandlerImpl.registerEventHandlerItself(bundleContext);
+        rootEventHandler.registerEventHandlerItself(bundleContext);
         // Enregistrement du handler des events module
-        moduleUiFactoryEventHandlerImpl.registerEventHandlerItself(bundleContext);
+        moduleUiFactoryEventHandler.registerEventHandlerItself(bundleContext);
 
         LOGGER.info("Ending starting HostActivator");
     }

@@ -1,32 +1,26 @@
 package santeclair.portal.webapp.vaadin;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import santeclair.portal.event.EventDictionaryConstant;
-import santeclair.portal.vaadin.module.ModuleUiFactory;
 import santeclair.portal.webapp.HostActivator;
 import santeclair.portal.webapp.event.AbstractEventHandler;
-import santeclair.portal.webapp.event.ModuleUiFactoryEventHandlerHelper;
-import santeclair.portal.webapp.event.ModuleUiFactoryEventHandlerHelper.ModuleUiFactoryEventHandler;
+import santeclair.portal.webapp.event.EventArg;
+import santeclair.portal.webapp.event.EventHandler;
+import santeclair.portal.webapp.event.Subscriber;
 import santeclair.portal.webapp.vaadin.view.LeftSideMenu;
 import santeclair.portal.webapp.vaadin.view.Main;
 import santeclair.portal.webapp.vaadin.view.Tabs;
 
-import com.google.common.eventbus.EventBus;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
@@ -48,14 +42,10 @@ import com.vaadin.ui.UI;
 @Title("Portail Santeclair")
 @Theme("santeclair")
 @Push(value = PushMode.MANUAL, transport = Transport.WEBSOCKET)
-public class PortalApp extends UI implements ModuleUiFactoryEventHandler {
+public class PortalApp extends UI implements EventHandler {
 
     private static final long serialVersionUID = -5547062232353913227L;
     private static final Logger LOGGER = LoggerFactory.getLogger(PortalApp.class);
-
-    // Bus d'event permettant de gérer les événements d'une session utilisateur (variable de classe -
-    // prototype - un event bus par instance d'UI)
-    private final EventBus portalAppEventBus = new EventBus();
 
     // Container global
     private Main main;
@@ -92,9 +82,6 @@ public class PortalApp extends UI implements ModuleUiFactoryEventHandler {
 
         // Enregistrement des listeners d'event dans le portalEventBus
         LOGGER.info("Enregistrement des listeners d'event dans le portalEventBus");
-        portalAppEventBus.register(main);
-        portalAppEventBus.register(leftSideMenu);
-        portalAppEventBus.register(tabs);
 
         applicationContext = WebApplicationContextUtils.
                         getRequiredWebApplicationContext(VaadinServlet.getCurrent().getServletContext());
@@ -110,9 +97,8 @@ public class PortalApp extends UI implements ModuleUiFactoryEventHandler {
     @Override
     public void detach() {
         LOGGER.info("Detachement de l'UI");
-        portalAppEventBus.unregister(main);
-        portalAppEventBus.unregister(leftSideMenu);
-        portalAppEventBus.unregister(tabs);
+        HostActivator hostActivator = applicationContext.getBean(HostActivator.class);
+        unregisterEventHandlerItSelf(hostActivator.getBundleContext());
         super.detach();
     }
 
@@ -122,30 +108,22 @@ public class PortalApp extends UI implements ModuleUiFactoryEventHandler {
     }
 
     @Override
-    public String getFilter() {
-        return null;
+    public void unregisterEventHandlerItSelf(BundleContext bundleContext) {
+        try {
+            AbstractEventHandler.unregisterEventHandler(bundleContext, this);
+        } catch (InvalidSyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
-    public String getTopic() {
-        return EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY;
-    }
-
-    @Override
-    public void handleEvent(org.osgi.service.event.Event event) {
-        ModuleUiFactoryEventHandlerHelper moduleUiFactoryEventHandlerHelper = applicationContext.getBean(ModuleUiFactoryEventHandlerHelper.class);
-        moduleUiFactoryEventHandlerHelper.handleEvent(event, this);
-    }
-
-    @Override
-    public void addModuleUiFactory(org.osgi.service.event.Event event, final ModuleUiFactory<?> moduleUiFactory) {
-        leftSideMenu.addModuleUiFactory(moduleUiFactory);
-        if (!getPushConfiguration().getPushMode().equals(PushMode.DISABLED)) {
+    @Subscriber(topic = EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY, filter = "(" + EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME + "="
+                    + EventDictionaryConstant.EVENT_STARTED + ")")
+    public void addModuleUiFactory(org.osgi.service.event.Event event, @EventArg(name = EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE) final String moduleUiCode) {
+        if (getPushConfiguration() != null && getPushConfiguration().getPushMode() != null && !getPushConfiguration().getPushMode().equals(PushMode.DISABLED)) {
             access(new Runnable() {
                 @Override
                 public void run() {
-                    String moduleName = moduleUiFactory.getName();
-                    Notification notification = new Notification(moduleName + " chargé", "Le module " + moduleName + " est désomeais disponible.", Type.TRAY_NOTIFICATION);
+                    Notification notification = new Notification(moduleUiCode + " chargé", "Le module " + moduleUiCode + " est désomeais disponible.", Type.TRAY_NOTIFICATION);
                     notification.show(Page.getCurrent());
                     push();
                 }
@@ -153,15 +131,14 @@ public class PortalApp extends UI implements ModuleUiFactoryEventHandler {
         }
     }
 
-    @Override
-    public void removeModuleUiFactory(org.osgi.service.event.Event event, final ModuleUiFactory<?> moduleUiFactory) {
-        leftSideMenu.removeaddModuleUiFactory(moduleUiFactory);
-        if (!getPushConfiguration().getPushMode().equals(PushMode.DISABLED)) {
+    @Subscriber(topic = EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY, filter = "(" + EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME + "="
+                    + EventDictionaryConstant.EVENT_STOPPED + ")")
+    public void removeModuleUiFactory(org.osgi.service.event.Event event, @EventArg(name = EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE) final String moduleUiCode) {
+        if (getPushConfiguration() != null && getPushConfiguration().getPushMode() != null && !getPushConfiguration().getPushMode().equals(PushMode.DISABLED)) {
             access(new Runnable() {
                 @Override
                 public void run() {
-                    String moduleName = moduleUiFactory.getName();
-                    Notification notification = new Notification(moduleName + " déchargé", "Le module " + moduleName + " est désomeais indisponible.", Type.TRAY_NOTIFICATION);
+                    Notification notification = new Notification(moduleUiCode + " déchargé", "Le module " + moduleUiCode + " est désomeais indisponible.", Type.TRAY_NOTIFICATION);
                     notification.show(Page.getCurrent());
                     push();
                 }
@@ -169,18 +146,18 @@ public class PortalApp extends UI implements ModuleUiFactoryEventHandler {
         }
     }
 
-    private List<String> getCurrentUserRoles() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LOGGER.info("Portal authentication : " + authentication);
-        @SuppressWarnings("unchecked")
-        Collection<GrantedAuthority> grantedAuthorities = (Collection<GrantedAuthority>) authentication.getAuthorities();
-        LOGGER.debug("current user roles : " + grantedAuthorities);
-        List<String> roles = new ArrayList<>();
-        for (GrantedAuthority grantedAuthority : grantedAuthorities) {
-            roles.add(grantedAuthority.getAuthority());
-        }
-        return roles;
-    }
+    // private List<String> getCurrentUserRoles() {
+    // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    // LOGGER.info("Portal authentication : " + authentication);
+    // @SuppressWarnings("unchecked")
+    // Collection<GrantedAuthority> grantedAuthorities = (Collection<GrantedAuthority>) authentication.getAuthorities();
+    // LOGGER.debug("current user roles : " + grantedAuthorities);
+    // List<String> roles = new ArrayList<>();
+    // for (GrantedAuthority grantedAuthority : grantedAuthorities) {
+    // roles.add(grantedAuthority.getAuthority());
+    // }
+    // return roles;
+    // }
 
     private void setErrorHandler() {
         this.setErrorHandler(new DefaultErrorHandler() {
