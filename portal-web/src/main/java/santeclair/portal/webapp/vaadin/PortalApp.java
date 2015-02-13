@@ -104,7 +104,11 @@ public class PortalApp extends UI implements EventHandler {
 
     @Override
     public void registerEventHandlerItself(BundleContext bundleContext) {
-        AbstractEventHandler.registerEventHandler(bundleContext, this);
+        try {
+            AbstractEventHandler.registerEventHandler(bundleContext, this);
+        } catch (InvalidSyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

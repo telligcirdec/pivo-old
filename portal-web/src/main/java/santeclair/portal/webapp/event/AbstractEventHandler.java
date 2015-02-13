@@ -21,7 +21,12 @@ public abstract class AbstractEventHandler implements EventHandler {
 
     @Override
     public final void registerEventHandlerItself(BundleContext bundleContext) {
-        registerEventHandler(bundleContext, this);
+        try {
+            registerEventHandler(bundleContext, this);
+        } catch (InvalidSyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -33,14 +38,15 @@ public abstract class AbstractEventHandler implements EventHandler {
         }
     }
 
-    public static void registerEventHandler(BundleContext bundleContext, EventHandler eventHandler) {
+    public static void registerEventHandler(BundleContext bundleContext, EventHandler eventHandler) throws InvalidSyntaxException {
         if (bundleContext != null) {
             Method[] methodToChecks = eventHandler.getClass().getDeclaredMethods();
             for (Method method : methodToChecks) {
                 if (method.isAnnotationPresent(Subscriber.class)) {
                     Subscriber subscriber = method.getAnnotation(Subscriber.class);
                     String topic = subscriber.topic();
-                    String filter = subscriber.filter();
+                    String filterStr = subscriber.filter();
+                    
                     String eventHandlerId = Integer.toHexString(eventHandler.hashCode());
                     LOGGER.info("Registering event handler method {} from class {} on topic {} with filter '{}' and event handler id {}", method.getName(), eventHandler.getClass()
                                     .getName(),
@@ -48,8 +54,9 @@ public abstract class AbstractEventHandler implements EventHandler {
                     Dictionary<String, Object> props = new Hashtable<>();
                     props.put(EventConstants.EVENT_TOPIC, topic);
                     props.put(EVENT_HANDLER_ID, eventHandlerId);
-                    if (StringUtils.isNotBlank(filter)) {
-                        props.put(EventConstants.EVENT_FILTER, filter);
+                    if (StringUtils.isNotBlank(filterStr)) {
+                        Filter filter = bundleContext.createFilter(filterStr);
+                        props.put(EventConstants.EVENT_FILTER, filter.toString());
                     }
                     AnnotedMethodEventHandler annotedMethodEventHandler = new AnnotedMethodEventHandler(eventHandler, method);
                     bundleContext.registerService(org.osgi.service.event.EventHandler.class.getName(), annotedMethodEventHandler, props);

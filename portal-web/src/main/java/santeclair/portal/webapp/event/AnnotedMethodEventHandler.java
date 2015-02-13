@@ -1,10 +1,8 @@
 package santeclair.portal.webapp.event;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.osgi.service.event.Event;
 import org.slf4j.Logger;
@@ -17,9 +15,32 @@ public class AnnotedMethodEventHandler implements org.osgi.service.event.EventHa
     private final Object annotedEventHandlerObject;
     private final Method annotedMethod;
 
+    private Object[] argParameters;
+
     public AnnotedMethodEventHandler(Object annotedEventHandlerObject, Method annotedMethod) {
         this.annotedEventHandlerObject = annotedEventHandlerObject;
         this.annotedMethod = annotedMethod;
+        init();
+    }
+
+    private void init() {
+        Annotation[][] annotations = this.annotedMethod.getParameterAnnotations();
+        LOGGER.info("Parsing method parameters if needed (parameters.length => {})", annotations.length);
+        argParameters = new Object[annotations.length];
+        for (int i = 0; i < annotations.length; i++) {
+            Object argParameter = null;
+            Annotation[] annotationsOnParameter = annotations[i];
+            for (Annotation annotation : annotationsOnParameter) {
+                if (EventArg.class.isAssignableFrom(annotation.annotationType())) {
+                    argParameter = annotation;
+                }
+            }
+            if (Event.class.isAssignableFrom(annotedMethod.getParameterTypes()[i])) {
+                LOGGER.info("Parameter arg{} of type {} found.", i, Event.class.getName());
+                argParameter = Event.class;
+            }
+            argParameters[i] = argParameter;
+        }
     }
 
     @Override
@@ -27,37 +48,37 @@ public class AnnotedMethodEventHandler implements org.osgi.service.event.EventHa
         LOGGER.info("Begin handle event {}", event.toString());
         String className = annotedEventHandlerObject.getClass().getName();
         String topicName = event.getTopic();
-        Parameter[] parameters = this.annotedMethod.getParameters();
-        List<Object> parametersList = new ArrayList<>();
-        LOGGER.info("Parsing method parameters if needed (parameters.length => {})", parameters.length);
-        for (int i = 0; i < parameters.length; i++) {
-            Object arg = null;
-            Parameter parameter = parameters[i];
-            EventArg eventArg = parameter.getAnnotation(EventArg.class);
-            if (eventArg != null) {
-                String eventArgName = eventArg.name();
-                Boolean eventArgRequired = eventArg.required();
-                LOGGER.info("EvenArg annotation found on arg{} with name : {} en required : {}", i, eventArgName, eventArgRequired);
-                arg = event.getProperty(eventArgName);
-                LOGGER.debug("Arg value : {}", arg);
-                if (arg == null && eventArgRequired) {
-                    throw new IllegalArgumentException("An event on the topic " + topicName + " has been fired. "
-                                    + "Your listener method " + annotedMethod.getName() + " from your class " + className
-                                    + " has at least a parameter with annotation " + EventArg.class.getSimpleName() + " which name is " + eventArgName + " required. "
-                                    + "You must fired this event with the property " + eventArgName + " set with the value you deserve or set required to false.");
+        Object[] parameterValues = new Object[argParameters.length];
+        for (int i = 0; i < argParameters.length; i++) {
+            Object argParameter = argParameters[i];
+            Object parameterValue = null;
+            if (argParameter != null) {
+                Class<?> argParameterClass = argParameter.getClass();
+                if (EventArg.class.isAssignableFrom(argParameterClass)) {
+                    EventArg eventArg = EventArg.class.cast(argParameter);
+                    String eventArgName = eventArg.name();
+                    Boolean eventArgRequired = eventArg.required();
+                    LOGGER.info("EvenArg annotation found on arg{} with name : {} en required : {}", i, eventArgName, eventArgRequired);
+                    parameterValue = event.getProperty(eventArgName);
+                    LOGGER.debug("Parameter value : {}", parameterValue);
+                    if (parameterValue == null && eventArgRequired) {
+                        throw new IllegalArgumentException("An event on the topic " + topicName + " has been fired. "
+                                        + "Your listener method " + annotedMethod.getName() + " from your class " + className
+                                        + " has at least a parameter with annotation " + EventArg.class.getSimpleName() + " which name is " + eventArgName + " required. "
+                                        + "You must fired this event with the property " + eventArgName + " set with the value you deserve or set required to false.");
+                    }
+                } else if (Event.class.isAssignableFrom(argParameterClass)) {
+                    LOGGER.info("Parameter arg{} of type {} found.", i, Event.class.getName());
+                    parameterValue = event;
                 }
-            } else if (Event.class.isAssignableFrom(parameter.getType())) {
-                LOGGER.info("Parameter arg{} of type {} found.", i, Event.class.getName());
-                arg = event;
             }
-            parametersList.add(arg);
+            parameterValues[i] = parameterValue;
         }
         try {
-            LOGGER.debug("Method {}.{} invocation with parameters : {} ", className, annotedMethod, parametersList);
-            annotedMethod.invoke(annotedEventHandlerObject, parametersList.toArray());
+            LOGGER.debug("Method {}.{} invocation with parameters : {} ", className, annotedMethod, parameterValues);
+            annotedMethod.invoke(annotedEventHandlerObject, parameterValues);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             e.printStackTrace();
         }
-
     }
 }
