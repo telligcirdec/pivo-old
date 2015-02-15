@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import santeclair.portal.webapp.event.impl.ModuleUiFactoryEventHandler;
-import santeclair.portal.webapp.event.impl.RootEventHandler;
+import santeclair.portal.webapp.event.handler.impl.ModuleUiFactoryEventHandler;
+import santeclair.portal.webapp.event.handler.impl.RootEventHandler;
 import santeclair.portal.webapp.listener.PortalBundleListener;
 import santeclair.portal.webapp.listener.PortalFrameworkListner;
 import santeclair.portal.webapp.listener.service.impl.LogReaderServiceListener;

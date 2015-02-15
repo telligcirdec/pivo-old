@@ -1,19 +1,29 @@
 package santeclair.portal.test;
 
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_STARTED;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_STOPPED;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_HANDLER_ID;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_FACTORY;
+import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY;
+import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
+
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Invalidate;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.Validate;
 import org.apache.felix.ipojo.handlers.event.Publishes;
+import org.apache.felix.ipojo.handlers.event.Subscriber;
 import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
+import org.osgi.service.event.Event;
 import org.osgi.service.log.LogService;
 
-import santeclair.portal.event.EventDictionaryConstant;
 import santeclair.portal.vaadin.module.ModuleUiFactory;
 
 import com.vaadin.server.FontIcon;
@@ -29,27 +39,28 @@ public class TestModuleUiFactory implements ModuleUiFactory<TestModuleUi> {
     @Requires
     private LogService logService;
 
-    @Publishes(name = PUBLISHER_NAME, topics = EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY)
+    @Publishes(name = PUBLISHER_NAME, topics = TOPIC_MODULE_UI_FACTORY)
     private Publisher publisher;
 
     @Validate
     private void start() {
-        logService.log(LogService.LOG_DEBUG, "TestModuleUiFactory start");
-        Dictionary<String, Object> eventProps = new Hashtable<>();
-        eventProps.put(EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME, EventDictionaryConstant.EVENT_STARTED);
-        eventProps.put(EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE, this.getCode());
-        eventProps.put(EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_DISPLAY_ORDER, this.displayOrder());
-        publisher.send(eventProps);
+        fireStarter(null);
     }
 
     @Invalidate
     private void stop() {
         logService.log(LogService.LOG_DEBUG, "TestModuleUiFactory stop");
         Dictionary<String, Object> eventProps = new Hashtable<>();
-        eventProps.put(EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME, EventDictionaryConstant.EVENT_STOPPED);
-        eventProps.put(EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE, this.getCode());
-        eventProps.put(EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_DISPLAY_ORDER, this.displayOrder());
+        eventProps.put(PROPERTY_KEY_EVENT_NAME, EVENT_STOPPED);
+        eventProps.put(PROPERTY_KEY_MODULE_UI_FACTORY, this);
         publisher.send(eventProps);
+    }
+
+    @Subscriber(name = "portalStarted",
+                    topics = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_STARTED + ")(" + PROPERTY_KEY_EVENT_HANDLER_ID + "=*))")
+    public void receive(Event e) {
+        String portalPid = (String) e.getProperty(PROPERTY_KEY_EVENT_HANDLER_ID);
+        fireStarter(portalPid);
     }
 
     @Override
@@ -100,6 +111,17 @@ public class TestModuleUiFactory implements ModuleUiFactory<TestModuleUi> {
     public TestModuleUi buid(List<String> roles) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    private void fireStarter(String pid) {
+        logService.log(LogService.LOG_DEBUG, "TestModuleUiFactory start");
+        Dictionary<String, Object> eventProps = new Hashtable<>();
+        eventProps.put(PROPERTY_KEY_EVENT_NAME, EVENT_STARTED);
+        eventProps.put(PROPERTY_KEY_MODULE_UI_FACTORY, this);
+        if (StringUtils.isNotBlank(pid)) {
+            eventProps.put(PROPERTY_KEY_EVENT_HANDLER_ID, pid);
+        }
+        publisher.send(eventProps);
     }
 
 }

@@ -1,10 +1,21 @@
 package santeclair.portal.webapp.vaadin;
 
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_STARTED;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_STOPPED;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_HANDLER_ID;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
+import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY;
+import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
+
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -12,11 +23,12 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import santeclair.portal.event.EventDictionaryConstant;
+import santeclair.portal.vaadin.module.ModuleUiFactory;
 import santeclair.portal.webapp.HostActivator;
-import santeclair.portal.webapp.event.AbstractEventHandler;
-import santeclair.portal.webapp.event.EventArg;
-import santeclair.portal.webapp.event.EventHandler;
-import santeclair.portal.webapp.event.Subscriber;
+import santeclair.portal.webapp.event.handler.AbstractEventHandler;
+import santeclair.portal.webapp.event.handler.EventArg;
+import santeclair.portal.webapp.event.handler.PortalEventHandler;
+import santeclair.portal.webapp.event.handler.Subscriber;
 import santeclair.portal.webapp.vaadin.view.LeftSideMenu;
 import santeclair.portal.webapp.vaadin.view.Main;
 import santeclair.portal.webapp.vaadin.view.Tabs;
@@ -42,7 +54,7 @@ import com.vaadin.ui.UI;
 @Title("Portail Santeclair")
 @Theme("santeclair")
 @Push(value = PushMode.MANUAL, transport = Transport.WEBSOCKET)
-public class PortalApp extends UI implements EventHandler {
+public class PortalApp extends UI implements PortalEventHandler {
 
     private static final long serialVersionUID = -5547062232353913227L;
     private static final Logger LOGGER = LoggerFactory.getLogger(PortalApp.class);
@@ -54,22 +66,28 @@ public class PortalApp extends UI implements EventHandler {
     // Container des onglets
     private Tabs tabs;
 
-    private ApplicationContext applicationContext;
-
     /*
      * Début du Code UI
      */
     @Override
     public void init(VaadinRequest request) {
         LOGGER.info("Initialisation de l'UI");
+
+        ApplicationContext applicationContext = WebApplicationContextUtils.
+                        getRequiredWebApplicationContext(VaadinServlet.getCurrent().getServletContext());
+        HostActivator hostActivator = applicationContext.getBean(HostActivator.class);
+        BundleContext context = hostActivator.getBundleContext();
+
+        String pid = this.getEmbedId();
+
         // initialisation de l'IHM
         this.setSizeFull();
         this.setErrorHandler();
 
         // Création du composant contenant le menu à gauche avec les boutons
         LOGGER.info("Initialisation du menu gauche");
-        leftSideMenu = new LeftSideMenu();
-        leftSideMenu.init();
+        leftSideMenu = new LeftSideMenu(pid);
+        leftSideMenu.init(context);
 
         // Création du composant contenant les tabsheet
         LOGGER.info("Initialisation du container d'onglet");
@@ -83,11 +101,17 @@ public class PortalApp extends UI implements EventHandler {
         // Enregistrement des listeners d'event dans le portalEventBus
         LOGGER.info("Enregistrement des listeners d'event dans le portalEventBus");
 
-        applicationContext = WebApplicationContextUtils.
-                        getRequiredWebApplicationContext(VaadinServlet.getCurrent().getServletContext());
+        registerEventHandlerItself(context);
 
-        HostActivator hostActivator = applicationContext.getBean(HostActivator.class);
-        registerEventHandlerItself(hostActivator.getBundleContext());
+        ServiceReference<EventAdmin> ref = context.getServiceReference(EventAdmin.class);
+        if (ref != null) {
+            EventAdmin eventAdmin = context.getService(ref);
+            Dictionary<String, Object> properties = new Hashtable<>();
+            properties.put(PROPERTY_KEY_EVENT_NAME, EVENT_STARTED);
+            properties.put(PROPERTY_KEY_EVENT_HANDLER_ID, pid);
+            org.osgi.service.event.Event portalStartedEvent = new org.osgi.service.event.Event(TOPIC_PORTAL, properties);
+            eventAdmin.sendEvent(portalStartedEvent);
+        }
 
         this.setContent(main);
 
@@ -97,6 +121,8 @@ public class PortalApp extends UI implements EventHandler {
     @Override
     public void detach() {
         LOGGER.info("Detachement de l'UI");
+        ApplicationContext applicationContext = WebApplicationContextUtils.
+                        getRequiredWebApplicationContext(VaadinServlet.getCurrent().getServletContext());
         HostActivator hostActivator = applicationContext.getBean(HostActivator.class);
         unregisterEventHandlerItSelf(hostActivator.getBundleContext());
         super.detach();
@@ -120,14 +146,18 @@ public class PortalApp extends UI implements EventHandler {
         }
     }
 
-    @Subscriber(topic = EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY, filter = "(" + EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME + "="
-                    + EventDictionaryConstant.EVENT_STARTED + ")")
-    public void addModuleUiFactory(org.osgi.service.event.Event event, @EventArg(name = EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE) final String moduleUiCode) {
-        if (getPushConfiguration() != null && getPushConfiguration().getPushMode() != null && !getPushConfiguration().getPushMode().equals(PushMode.DISABLED)) {
+    @Subscriber(topic = TOPIC_MODULE_UI_FACTORY, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
+                    + EVENT_STARTED + ")")
+    public void addModuleUiFactory(org.osgi.service.event.Event event,
+                    @EventArg(name = EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_FACTORY) final ModuleUiFactory<?> moduleUiFactory,
+                    @EventArg(name = PROPERTY_KEY_EVENT_HANDLER_ID, required = false) final String eventHandlerID) {
+        if (getPushConfiguration() != null && getPushConfiguration().getPushMode() != null && !getPushConfiguration().getPushMode().equals(PushMode.DISABLED)
+                        && eventHandlerID == null) {
             access(new Runnable() {
                 @Override
                 public void run() {
-                    Notification notification = new Notification(moduleUiCode + " chargé", "Le module " + moduleUiCode + " est désomeais disponible.", Type.TRAY_NOTIFICATION);
+                    String moduleUiName = moduleUiFactory.getName();
+                    Notification notification = new Notification(moduleUiName + " chargé", "Le module " + moduleUiName + " est désomeais disponible.", Type.TRAY_NOTIFICATION);
                     notification.show(Page.getCurrent());
                     push();
                 }
@@ -135,14 +165,16 @@ public class PortalApp extends UI implements EventHandler {
         }
     }
 
-    @Subscriber(topic = EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY, filter = "(" + EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME + "="
-                    + EventDictionaryConstant.EVENT_STOPPED + ")")
-    public void removeModuleUiFactory(org.osgi.service.event.Event event, @EventArg(name = EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE) final String moduleUiCode) {
+    @Subscriber(topic = TOPIC_MODULE_UI_FACTORY, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
+                    + EVENT_STOPPED + ")")
+    public void removeModuleUiFactory(org.osgi.service.event.Event event,
+                    @EventArg(name = EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_FACTORY) final ModuleUiFactory<?> moduleUiFactory) {
         if (getPushConfiguration() != null && getPushConfiguration().getPushMode() != null && !getPushConfiguration().getPushMode().equals(PushMode.DISABLED)) {
             access(new Runnable() {
                 @Override
                 public void run() {
-                    Notification notification = new Notification(moduleUiCode + " déchargé", "Le module " + moduleUiCode + " est désomeais indisponible.", Type.TRAY_NOTIFICATION);
+                    String moduleUiName = moduleUiFactory.getName();
+                    Notification notification = new Notification(moduleUiName + " déchargé", "Le module " + moduleUiName + " est désomeais indisponible.", Type.TRAY_NOTIFICATION);
                     notification.show(Page.getCurrent());
                     push();
                 }
