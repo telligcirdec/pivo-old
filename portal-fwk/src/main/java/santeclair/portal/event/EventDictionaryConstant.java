@@ -26,6 +26,7 @@ public interface EventDictionaryConstant {
      */
     public static final String PROPERTY_KEY_EVENT_NAME = "property.key.event.name";
     public static final String PROPERTY_KEY_EVENT_HANDLER_ID = "property.key.event.handler.id";
+    public static final String PROPERTY_KEY_EVENT_CALLBACK = "property.key.event.callback";
 
     /**
      * Propriété du portail

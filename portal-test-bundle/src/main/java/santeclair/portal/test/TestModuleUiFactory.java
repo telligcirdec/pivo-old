@@ -2,12 +2,14 @@ package santeclair.portal.test;
 
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_STARTED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_STOPPED;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CALLBACK;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_HANDLER_ID;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_FACTORY;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
 
+import java.lang.reflect.Method;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -24,6 +26,8 @@ import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
 import org.osgi.service.event.Event;
 import org.osgi.service.log.LogService;
 
+import santeclair.portal.event.publisher.callback.Callback;
+import santeclair.portal.event.publisher.callback.PortalAppEventCallback;
 import santeclair.portal.vaadin.module.ModuleUiFactory;
 
 import com.vaadin.server.FontIcon;
@@ -57,10 +61,17 @@ public class TestModuleUiFactory implements ModuleUiFactory<TestModuleUi> {
     }
 
     @Subscriber(name = "portalStarted",
-                    topics = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_STARTED + ")(" + PROPERTY_KEY_EVENT_HANDLER_ID + "=*))")
-    public void receive(Event e) {
-        String portalPid = (String) e.getProperty(PROPERTY_KEY_EVENT_HANDLER_ID);
-        fireStarter(portalPid);
+                    topics = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_STARTED + ")(" + PROPERTY_KEY_EVENT_CALLBACK + "=*))")
+    public void portalStarted(Event e) {
+        Object test =  e.getProperty(PROPERTY_KEY_EVENT_CALLBACK);
+        Method[] methods = test.getClass().getDeclaredMethods();
+        for (Method method : methods) {
+            if(method.isAnnotationPresent(Callback.class)){
+                method.getAnnotation(Callb)
+            }
+        }
+        
+        portalAppEventCallback.addNewModuleUiFactory(this);
     }
 
     @Override

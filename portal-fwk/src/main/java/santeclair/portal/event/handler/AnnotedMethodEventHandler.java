@@ -1,14 +1,15 @@
-package santeclair.portal.webapp.event;
+package santeclair.portal.event.handler;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AnnotedMethodEventHandler implements org.osgi.service.event.EventHandler {
+public class AnnotedMethodEventHandler implements EventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AnnotedMethodEventHandler.class);
 
@@ -53,8 +54,7 @@ public class AnnotedMethodEventHandler implements org.osgi.service.event.EventHa
             Object argParameter = argParameters[i];
             Object parameterValue = null;
             if (argParameter != null) {
-                Class<?> argParameterClass = argParameter.getClass();
-                if (EventArg.class.isAssignableFrom(argParameterClass)) {
+                if (argParameter instanceof Annotation && EventArg.class.isAssignableFrom(((Annotation) argParameter).annotationType())) {
                     EventArg eventArg = EventArg.class.cast(argParameter);
                     String eventArgName = eventArg.name();
                     Boolean eventArgRequired = eventArg.required();
@@ -67,7 +67,8 @@ public class AnnotedMethodEventHandler implements org.osgi.service.event.EventHa
                                         + " has at least a parameter with annotation " + EventArg.class.getSimpleName() + " which name is " + eventArgName + " required. "
                                         + "You must fired this event with the property " + eventArgName + " set with the value you deserve or set required to false.");
                     }
-                } else if (Event.class.isAssignableFrom(argParameterClass)) {
+                }
+                if (argParameter instanceof Class && Event.class.isAssignableFrom((Class<?>) argParameter)) {
                     LOGGER.info("Parameter arg{} of type {} found.", i, Event.class.getName());
                     parameterValue = event;
                 }

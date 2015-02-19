@@ -1,4 +1,4 @@
-package santeclair.portal.webapp.event.handler;
+package santeclair.portal.event.handler;
 
 import static org.osgi.service.event.EventConstants.EVENT_FILTER;
 import static org.osgi.service.event.EventConstants.EVENT_TOPIC;

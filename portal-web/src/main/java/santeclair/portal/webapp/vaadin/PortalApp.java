@@ -2,7 +2,7 @@ package santeclair.portal.webapp.vaadin;
 
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_STARTED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_STOPPED;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_HANDLER_ID;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CALLBACK;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
@@ -23,12 +23,13 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import santeclair.portal.event.EventDictionaryConstant;
+import santeclair.portal.event.handler.AbstractEventHandler;
+import santeclair.portal.event.handler.EventArg;
+import santeclair.portal.event.handler.PortalEventHandler;
+import santeclair.portal.event.handler.Subscriber;
+import santeclair.portal.event.publisher.callback.PortalAppEventCallback;
 import santeclair.portal.vaadin.module.ModuleUiFactory;
 import santeclair.portal.webapp.HostActivator;
-import santeclair.portal.webapp.event.handler.AbstractEventHandler;
-import santeclair.portal.webapp.event.handler.EventArg;
-import santeclair.portal.webapp.event.handler.PortalEventHandler;
-import santeclair.portal.webapp.event.handler.Subscriber;
 import santeclair.portal.webapp.vaadin.view.LeftSideMenu;
 import santeclair.portal.webapp.vaadin.view.Main;
 import santeclair.portal.webapp.vaadin.view.Tabs;
@@ -54,7 +55,7 @@ import com.vaadin.ui.UI;
 @Title("Portail Santeclair")
 @Theme("santeclair")
 @Push(value = PushMode.MANUAL, transport = Transport.WEBSOCKET)
-public class PortalApp extends UI implements PortalEventHandler {
+public class PortalApp extends UI implements PortalEventHandler, PortalAppEventCallback {
 
     private static final long serialVersionUID = -5547062232353913227L;
     private static final Logger LOGGER = LoggerFactory.getLogger(PortalApp.class);
@@ -78,15 +79,13 @@ public class PortalApp extends UI implements PortalEventHandler {
         HostActivator hostActivator = applicationContext.getBean(HostActivator.class);
         BundleContext context = hostActivator.getBundleContext();
 
-        String pid = this.getEmbedId();
-
         // initialisation de l'IHM
         this.setSizeFull();
         this.setErrorHandler();
 
         // Création du composant contenant le menu à gauche avec les boutons
         LOGGER.info("Initialisation du menu gauche");
-        leftSideMenu = new LeftSideMenu(pid);
+        leftSideMenu = new LeftSideMenu();
         leftSideMenu.init(context);
 
         // Création du composant contenant les tabsheet
@@ -108,7 +107,7 @@ public class PortalApp extends UI implements PortalEventHandler {
             EventAdmin eventAdmin = context.getService(ref);
             Dictionary<String, Object> properties = new Hashtable<>();
             properties.put(PROPERTY_KEY_EVENT_NAME, EVENT_STARTED);
-            properties.put(PROPERTY_KEY_EVENT_HANDLER_ID, pid);
+            properties.put(PROPERTY_KEY_EVENT_CALLBACK, this);
             org.osgi.service.event.Event portalStartedEvent = new org.osgi.service.event.Event(TOPIC_PORTAL, properties);
             eventAdmin.sendEvent(portalStartedEvent);
         }
@@ -149,10 +148,8 @@ public class PortalApp extends UI implements PortalEventHandler {
     @Subscriber(topic = TOPIC_MODULE_UI_FACTORY, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_STARTED + ")")
     public void addModuleUiFactory(org.osgi.service.event.Event event,
-                    @EventArg(name = EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_FACTORY) final ModuleUiFactory<?> moduleUiFactory,
-                    @EventArg(name = PROPERTY_KEY_EVENT_HANDLER_ID, required = false) final String eventHandlerID) {
-        if (getPushConfiguration() != null && getPushConfiguration().getPushMode() != null && !getPushConfiguration().getPushMode().equals(PushMode.DISABLED)
-                        && eventHandlerID == null) {
+                    @EventArg(name = EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_FACTORY) final ModuleUiFactory<?> moduleUiFactory) {
+        if (getPushConfiguration() != null && getPushConfiguration().getPushMode() != null && !getPushConfiguration().getPushMode().equals(PushMode.DISABLED)) {
             access(new Runnable() {
                 @Override
                 public void run() {
@@ -180,6 +177,11 @@ public class PortalApp extends UI implements PortalEventHandler {
                 }
             });
         }
+    }
+
+    @Override
+    public void addNewModuleUiFactory(ModuleUiFactory<?> moduleUiFactory) {
+        leftSideMenu.addModuleUiFactory(moduleUiFactory);
     }
 
     // private List<String> getCurrentUserRoles() {

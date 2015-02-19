@@ -1,4 +1,4 @@
-package santeclair.portal.webapp.event.handler;
+package santeclair.portal.event.handler;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,8 +1,8 @@
-package santeclair.portal.webapp.event;
+package santeclair.portal.event.handler;
 
 import org.osgi.framework.BundleContext;
 
-public interface EventHandler {
+public interface PortalEventHandler {
 
     void registerEventHandlerItself(BundleContext bundleContext);
 
