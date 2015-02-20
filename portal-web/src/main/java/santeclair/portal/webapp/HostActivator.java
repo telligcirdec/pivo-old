@@ -9,9 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import santeclair.portal.webapp.listener.PortalBundleListener;
-import santeclair.portal.webapp.listener.PortalFrameworkListner;
-import santeclair.portal.webapp.listener.service.impl.LogReaderServiceListener;
+import santeclair.portal.listener.PortalBundleListener;
+import santeclair.portal.listener.PortalFrameworkListner;
+import santeclair.portal.listener.service.impl.EventAdminServiceListener;
+import santeclair.portal.listener.service.impl.LogReaderServiceListener;
 
 @Component
 public class HostActivator implements BundleActivator {
@@ -35,6 +36,8 @@ public class HostActivator implements BundleActivator {
      */
     @Autowired
     private LogReaderServiceListener logReaderServiceListener;
+    @Autowired
+    private EventAdminServiceListener eventAdminServiceListener;
 
     private BundleContext bundleContext;
 
@@ -46,7 +49,9 @@ public class HostActivator implements BundleActivator {
 
         // Ajout du listener de log au service de log
         logReaderServiceListener.registerItself(bundleContext);
-
+        // Ajout du listener sur le service de gestion des event
+        eventAdminServiceListener.registerItself(bundleContext);
+        
         bundleListener.registerItself(bundleContext);
         frameworkListner.registerItself(bundleContext);
 

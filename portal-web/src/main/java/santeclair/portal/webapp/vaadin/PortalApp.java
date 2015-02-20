@@ -2,20 +2,15 @@ package santeclair.portal.webapp.vaadin;
 
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_STARTED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_STOPPED;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CALLBACK;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
 
 import java.util.Date;
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -27,7 +22,9 @@ import santeclair.portal.event.handler.AbstractEventHandler;
 import santeclair.portal.event.handler.EventArg;
 import santeclair.portal.event.handler.PortalEventHandler;
 import santeclair.portal.event.handler.Subscriber;
-import santeclair.portal.event.publisher.callback.PortalAppEventCallback;
+import santeclair.portal.event.publisher.callback.PortalStartCallback;
+import santeclair.portal.listener.service.impl.EventAdminServiceListener;
+import santeclair.portal.listener.service.impl.EventAdminServiceListener.Publisher;
 import santeclair.portal.vaadin.module.ModuleUiFactory;
 import santeclair.portal.webapp.HostActivator;
 import santeclair.portal.webapp.vaadin.view.LeftSideMenu;
@@ -55,7 +52,7 @@ import com.vaadin.ui.UI;
 @Title("Portail Santeclair")
 @Theme("santeclair")
 @Push(value = PushMode.MANUAL, transport = Transport.WEBSOCKET)
-public class PortalApp extends UI implements PortalEventHandler, PortalAppEventCallback {
+public class PortalApp extends UI implements PortalEventHandler, PortalStartCallback {
 
     private static final long serialVersionUID = -5547062232353913227L;
     private static final Logger LOGGER = LoggerFactory.getLogger(PortalApp.class);
@@ -67,6 +64,8 @@ public class PortalApp extends UI implements PortalEventHandler, PortalAppEventC
     // Container des onglets
     private Tabs tabs;
 
+    private Publisher<PortalApp, PortalStartCallback> portalPublisher;
+
     /*
      * Début du Code UI
      */
@@ -77,6 +76,8 @@ public class PortalApp extends UI implements PortalEventHandler, PortalAppEventC
         ApplicationContext applicationContext = WebApplicationContextUtils.
                         getRequiredWebApplicationContext(VaadinServlet.getCurrent().getServletContext());
         HostActivator hostActivator = applicationContext.getBean(HostActivator.class);
+        EventAdminServiceListener eventAdminServiceListener = applicationContext.getBean(EventAdminServiceListener.class);
+
         BundleContext context = hostActivator.getBundleContext();
 
         // initialisation de l'IHM
@@ -102,18 +103,10 @@ public class PortalApp extends UI implements PortalEventHandler, PortalAppEventC
 
         registerEventHandlerItself(context);
 
-        ServiceReference<EventAdmin> ref = context.getServiceReference(EventAdmin.class);
-        if (ref != null) {
-            EventAdmin eventAdmin = context.getService(ref);
-            Dictionary<String, Object> properties = new Hashtable<>();
-            properties.put(PROPERTY_KEY_EVENT_NAME, EVENT_STARTED);
-            properties.put(PROPERTY_KEY_EVENT_CALLBACK, this);
-            org.osgi.service.event.Event portalStartedEvent = new org.osgi.service.event.Event(TOPIC_PORTAL, properties);
-            eventAdmin.sendEvent(portalStartedEvent);
-        }
-
+        portalPublisher = eventAdminServiceListener.registerPublisher(TOPIC_PORTAL, this);
         this.setContent(main);
 
+        portalPublisher.sendDataSynchronously(EVENT_STARTED, this);
         LOGGER.debug("Fin Initialisation de l'UI");
     }
 
@@ -123,7 +116,11 @@ public class PortalApp extends UI implements PortalEventHandler, PortalAppEventC
         ApplicationContext applicationContext = WebApplicationContextUtils.
                         getRequiredWebApplicationContext(VaadinServlet.getCurrent().getServletContext());
         HostActivator hostActivator = applicationContext.getBean(HostActivator.class);
+        EventAdminServiceListener eventAdminServiceListener = applicationContext.getBean(EventAdminServiceListener.class);
+
         unregisterEventHandlerItSelf(hostActivator.getBundleContext());
+        eventAdminServiceListener.unregisterPublisher(portalPublisher);
+
         super.detach();
     }
 

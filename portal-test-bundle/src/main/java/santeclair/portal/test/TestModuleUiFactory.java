@@ -2,7 +2,7 @@ package santeclair.portal.test;
 
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_STARTED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_STOPPED;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CALLBACK;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_DATA;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_HANDLER_ID;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_FACTORY;
@@ -22,10 +22,9 @@ import org.apache.felix.ipojo.annotations.Validate;
 import org.apache.felix.ipojo.handlers.event.Publishes;
 import org.apache.felix.ipojo.handlers.event.Subscriber;
 import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
-import org.osgi.service.event.Event;
 import org.osgi.service.log.LogService;
 
-import santeclair.portal.event.publisher.callback.PortalAppEventCallback;
+import santeclair.portal.event.publisher.callback.PortalStartCallback;
 import santeclair.portal.vaadin.module.ModuleUiFactory;
 
 import com.vaadin.server.FontIcon;
@@ -59,10 +58,10 @@ public class TestModuleUiFactory implements ModuleUiFactory<TestModuleUi> {
     }
 
     @Subscriber(name = "portalStarted",
-                    topics = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_STARTED + ")(" + PROPERTY_KEY_EVENT_CALLBACK + "=*))")
-    public void portalStarted(Event e) {
-        PortalAppEventCallback portalAppEventCallback = (PortalAppEventCallback) e.getProperty(PROPERTY_KEY_EVENT_CALLBACK);
-        portalAppEventCallback.addNewModuleUiFactory(this);
+                    topics = TOPIC_PORTAL, filter = "(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_STARTED + ")",
+                    dataKey = PROPERTY_KEY_EVENT_DATA, dataType = "santeclair.portal.event.publisher.callback.PortalStartCallback")
+    public void portalStarted(PortalStartCallback portalStartCallback) {
+        portalStartCallback.addNewModuleUiFactory(this);
     }
 
     @Override

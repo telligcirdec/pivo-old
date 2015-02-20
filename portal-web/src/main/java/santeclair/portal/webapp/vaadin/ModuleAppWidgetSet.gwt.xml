@@ -22,7 +22,7 @@
 	<!-- <set-configuration-property name="devModeRedirectEnabled" value="true" 
 		/> -->
 	<generate-with
-		class="santeclair.portal.webapp.vaadin.OptimizedConnectorBundleLoaderFactory">
+		class="santeclair.portal.vaadin.OptimizedConnectorBundleLoaderFactory">
 		<when-type-assignable
 			class="com.vaadin.client.metadata.ConnectorBundleLoader" />
 	</generate-with>
