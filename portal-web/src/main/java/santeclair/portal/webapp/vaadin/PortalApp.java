@@ -86,7 +86,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
         // Création du composant contenant le menu à gauche avec les boutons
         LOGGER.info("Initialisation du menu gauche");
-        leftSideMenu = new LeftSideMenu();
+        leftSideMenu = new LeftSideMenu(this);
         leftSideMenu.init(context);
 
         // Création du composant contenant les tabsheet
@@ -97,6 +97,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         // Création du container principal
         LOGGER.info("Création du container principal");
         main = new Main(leftSideMenu, tabs);
+        main.init();
 
         // Enregistrement des listeners d'event dans le portalEventBus
         LOGGER.info("Enregistrement des listeners d'event dans le portalEventBus");
@@ -146,34 +147,16 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
                     + EVENT_STARTED + ")")
     public void addModuleUiFactory(org.osgi.service.event.Event event,
                     @EventArg(name = EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_FACTORY) final ModuleUiFactory<?> moduleUiFactory) {
-        if (getPushConfiguration() != null && getPushConfiguration().getPushMode() != null && !getPushConfiguration().getPushMode().equals(PushMode.DISABLED)) {
-            access(new Runnable() {
-                @Override
-                public void run() {
-                    String moduleUiName = moduleUiFactory.getName();
-                    Notification notification = new Notification(moduleUiName + " chargé", "Le module " + moduleUiName + " est désomeais disponible.", Type.TRAY_NOTIFICATION);
-                    notification.show(Page.getCurrent());
-                    push();
-                }
-            });
-        }
+        String moduleUiName = moduleUiFactory.getName();
+        PushHelper.pushWithNotification(this, moduleUiName + " chargé", "Le module " + moduleUiName + " est désomeais disponible.");
     }
 
     @Subscriber(topic = TOPIC_MODULE_UI_FACTORY, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_STOPPED + ")")
     public void removeModuleUiFactory(org.osgi.service.event.Event event,
                     @EventArg(name = EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_FACTORY) final ModuleUiFactory<?> moduleUiFactory) {
-        if (getPushConfiguration() != null && getPushConfiguration().getPushMode() != null && !getPushConfiguration().getPushMode().equals(PushMode.DISABLED)) {
-            access(new Runnable() {
-                @Override
-                public void run() {
-                    String moduleUiName = moduleUiFactory.getName();
-                    Notification notification = new Notification(moduleUiName + " déchargé", "Le module " + moduleUiName + " est désomeais indisponible.", Type.TRAY_NOTIFICATION);
-                    notification.show(Page.getCurrent());
-                    push();
-                }
-            });
-        }
+        String moduleUiName = moduleUiFactory.getName();
+        PushHelper.pushWithNotification(this, moduleUiName + " déchargé", "Le module " + moduleUiName + " est désomeais indisponible.");
     }
 
     @Override

@@ -210,7 +210,7 @@
 									<includes>
 										<include>*</include>
 									</includes>
-									<targetPath>VAADIN/widgetsets/santeclair.portal.vaadin.ModuleAppWidgetSet/ckeditor/plugins</targetPath>
+									<targetPath>VAADIN/widgetsets/santeclair.portal.webapp.vaadin.ModuleAppWidgetSet/ckeditor/plugins</targetPath>
 								</resource>
 							</webResources>
 						</configuration>
@@ -245,7 +245,7 @@
 									<includes>
 										<include>**/*</include>
 									</includes>
-									<targetPath>VAADIN/widgetsets/santeclair.portal.vaadin.ModuleAppWidgetSet/ckeditor/plugins</targetPath>
+									<targetPath>VAADIN/widgetsets/santeclair.portal.webapp.vaadin.ModuleAppWidgetSet/ckeditor/plugins</targetPath>
 								</resource>
 							</webResources>
 						</configuration>
@@ -280,7 +280,7 @@
 									<includes>
 										<include>**/*</include>
 									</includes>
-									<targetPath>VAADIN/widgetsets/santeclair.portal.vaadin.ModuleAppWidgetSet/ckeditor/plugins</targetPath>
+									<targetPath>VAADIN/widgetsets/santeclair.portal.webapp.vaadin.ModuleAppWidgetSet/ckeditor/plugins</targetPath>
 								</resource>
 							</webResources>
 						</configuration>
@@ -315,7 +315,7 @@
 									<includes>
 										<include>**/*</include>
 									</includes>
-									<targetPath>VAADIN/widgetsets/santeclair.portal.vaadin.ModuleAppWidgetSet/ckeditor/plugins</targetPath>
+									<targetPath>VAADIN/widgetsets/santeclair.portal.webapp.vaadin.ModuleAppWidgetSet/ckeditor/plugins</targetPath>
 								</resource>
 							</webResources>
 						</configuration>
@@ -349,6 +349,12 @@
 			<groupId>santeclair</groupId>
 			<artifactId>lunar-fwk</artifactId>
 			<scope>runtime</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>jsf-api</artifactId>
+					<groupId>com.sun.faces</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- -->
@@ -453,18 +459,12 @@
 
 		<!-- Spring -->
 		<dependency>
-			<groupId>ru.xpoft.vaadin</groupId>
-			<artifactId>spring-vaadin-integration</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -474,7 +474,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -488,7 +487,14 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
