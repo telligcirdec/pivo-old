@@ -1698,7 +1698,7 @@
  * @param {value} $var - the value to search for
  * @param {bool} $recursive (false) - should any contained lists be checked for the value
  * 
- * @return {bool} true if the value is found from the list, false otherwise
+ * @return {bool}??true if the value is found from the list, false otherwise
  * 
  * @group lists
  */
@@ -1951,7 +1951,7 @@
  * 
  * @param {color} $color ($v-background-color) - The base color for the gradient color stops
  * @param {list} $gradient ($v-gradient) - Valo-specific gradient value. See the documentation for $v-gradient.
- * @param {color} $fallback (null) - A fallback color for browser which do not support linear gradients (IE8 and IE9 in particular). If null, the base $color is used instead.
+ * @param {color}??$fallback (null) - A fallback color for browser which do not support linear gradients (IE8 and IE9 in particular). If null, the base $color is used instead.
  * @param {string} $direction (to bottom) - the direction of the linear gradient. The color stops are by default so that a lighter shade is at the start and a darker shade is at the end.
  */
 
@@ -1960,7 +1960,7 @@
  *
  * @group style
  *
- * @param {list} $border ($v-border) - CSS border value which can contain any of the color keywords
+ * @param {list}??$border ($v-border) - CSS border value which can contain any of the color keywords
  * @param {color} $color ($v-background-color) - the base color to which the color keywords are applied to
  * @param {color} $context (null) - context/surrounding color where the border is expected to appear. The color of the final border is the darker of the two parameters passed to this function.
  * @param {number} $strength (1) - adjustment for the border contrast
@@ -1973,7 +1973,7 @@
  * 
  * @param {string} $to-align (()) - The selector to match the elements which you wish to align vertically. The targeted elements should be inline or inline-block elements.
  * @param {string} $align (middle) - The vertical-align value, e.g. top, middle, bottom
- * @param {string} $pseudo-element (after) - Which pseudo element to use for the vertical align guide
+ * @param {string}??$pseudo-element (after) - Which pseudo element to use for the vertical align guide
  * 
  * @group util
  */
@@ -2229,18 +2229,10 @@
  */
 
 /**
- *
- *
- * @param {string} $primary-stylename (v-absolutelayout) - 
- *
- * @group absolutelayout
- */
-
-/**
  * Outputs the selectors and properties for the Accordion component.
  *
  * @param {string} $primary-stylename (v-accordion) - the primary style name for the selectors
- * @param {bool} $include-additional-styles - should the mixin output all the different style variations of the component
+ * @param {bool}??$include-additional-styles - should the mixin output all the different style variations of the component
  * @group accordion
  */
 
@@ -2248,7 +2240,7 @@
  * Outputs the selectors and properties for the Button component.
  *
  * @param {string} $primary-stylename (v-button) - the primary style name for the selectors
- * @param {bool} $include-additional-styles - should the mixin output all the different style variations of the component
+ * @param {bool}??$include-additional-styles - should the mixin output all the different style variations of the component
  *
  * @group button
  */
@@ -2271,7 +2263,7 @@
  * Outputs the selectors and properties for the CheckBox component.
  *
  * @param {string} $primary-stylename (v-checkbox) - the primary style name for the selectors
- * @param {bool} $include-additional-styles - should the mixin output all the different style variations of the component
+ * @param {bool}??$include-additional-styles - should the mixin output all the different style variations of the component
  *
  * @group checkbox
  */
@@ -2289,7 +2281,7 @@
  * Outputs the selectors and properties for the ComboBox component.
  *
  * @param {string} $primary-stylename (v-filterselect) - the primary style name for the selectors
- * @param {bool} $include-additional-styles - should the mixin output all the different style variations of the component
+ * @param {bool}??$include-additional-styles - should the mixin output all the different style variations of the component
  *
  * @group combobox
  */
@@ -2302,26 +2294,10 @@
  */
 
 /**
- *
- *
- * @param {string} $primary-stylename (v-customcomponent) - 
- *
- * @group customcomponent
- */
-
-/**
- *
- *
- * @param {string} $primary-stylename (v-customlayout) - 
- *
- * @group customlayout
- */
-
-/**
  * Outputs the selectors and properties for the DateField component.
  *
  * @param {string} $primary-stylename (v-datefield) - the primary style name for the selectors
- * @param {bool} $include-additional-styles - should the mixin output all the different style variations of the component
+ * @param {bool}??$include-additional-styles - should the mixin output all the different style variations of the component
  *
  * @group datefield
  */
@@ -2335,148 +2311,18 @@
  */
 
 /**
- *
- *
- * @param {string} $primary-stylename (v-form) - 
- *
- * @group form
- */
-
-/**
  * Outputs the selectors and properties for the FormLayout component.
  *
  * @param {string} $primary-stylename (v-formlayout) - the primary style name for the selectors
- * @param {bool} $include-additional-styles - should the mixin output all the different style variations of the component
+ * @param {bool}??$include-additional-styles - should the mixin output all the different style variations of the component
  *
  * @group formlayout
- */
-
-/**
- *
- * @group table
- */
-
-@-webkit-keyframes valo-grid-editor-footer-animate-in {
-		0% {
-		margin-top: -26px;
-	}
-	}
-
-@-moz-keyframes valo-grid-editor-footer-animate-in {
-		0% {
-		margin-top: -26px;
-	}
-	}
-
-@keyframes valo-grid-editor-footer-animate-in {
-		0% {
-		margin-top: -26px;
-	}
-	}
-
-@-webkit-keyframes valo-grid-editor-footer-animate-in-alt {
-		0% {
-		margin-bottom: -26px;
-	}
-		100% {
-		margin-bottom: 0px;
-	}
-	}
-
-@-moz-keyframes valo-grid-editor-footer-animate-in-alt {
-		0% {
-		margin-bottom: -26px;
-	}
-		100% {
-		margin-bottom: 0px;
-	}
-	}
-
-@keyframes valo-grid-editor-footer-animate-in-alt {
-		0% {
-		margin-bottom: -26px;
-	}
-		100% {
-		margin-bottom: 0px;
-	}
-	}
-
-/**
- *
- *
- * @param {string} $primary-stylename (v-gridlayout) - 
- *
- * @group gridlayout
  */
 
 /**
  * The font weight for headers.
  * 
  * @group label
- */
-
-/**
- *
- * @group link
- */
-
-/**
- *
- *
- * @param {string} $primary-stylename (v-loginform) - 
- *
- * @group loginform
- */
-
-/**
- *
- *
- * @param {string} $primary-stylename (v-menubar) - 
- * @param {bool} $include-additional-styles - 
- *
- * @group menubar
- */
-
-/**
- *
- *
- * @param {string} $primary-stylename (v-nativebutton) - 
- *
- * @group nativebutton
- */
-
-/**
- *
- *
- * @param {string} $primary-stylename (v-select) - 
- *
- * @group nativeselect
- */
-
-/**
- *
- * @group notification
- */
-
-/**
- *
- *
- * @param {string} $primary-stylename (v-select-optiongroup) - 
- * @param {bool} $include-additional-styles - 
- *
- * @group optiongroup
- */
-
-/**
- *
- *
- *
- * @group orderedlayout
- */
-
-/**
- *
- * @group panel
  */
 
 @-webkit-keyframes v-popupview-animate-in {
@@ -2499,35 +2345,6 @@
 	}
 
 /**
- *
- * @group progressbar
- */
-
-/**
- *
- * @group richtextarea
- */
-
-/**
- *
- * @group slider
- */
-
-/**
- *
- *
- * @param {string} $primary-stylename (v-splitpanel) - 
- * @param {bool} $include-additional-styles - 
- *
- * @group splitpanel
- */
-
-/**
- *
- * @group table
- */
-
-/**
  * Should the tabsheet content changes be animated.
  * 
  * @group tabsheet
@@ -2542,46 +2359,9 @@
  * Outputs the selectors and properties for the TextArea component.
  *
  * @param {string} $primary-stylename (v-textarea) - the primary style name for the selectors
- * @param {bool} $include-additional-styles - should the mixin output all the different style variations of the component
+ * @param {bool}??$include-additional-styles - should the mixin output all the different style variations of the component
  *
  * @group textarea
- */
-
-/**
- *
- * @group tree
- */
-
-/**
- *
- *
- * @param {string} $primary-stylename (v-treetable) - 
- *
- * @group treetable
- */
-
-/**
- *
- *
- * @param {string} $primary-stylename (v-select-twincol) - 
- *
- * @group twin-column-select
- */
-
-/**
- *
- *
- * @param {string} $primary-stylename (v-upload) -
- *
- * @group upload
- */
-
-/**
- *
- */
-
-/**
- * @group window
  */
 
 @-webkit-keyframes valo-modal-window-indication {
@@ -2633,12 +2413,8 @@
 	}
 	}
 
-/**
- * @group valo-menu
- */
-
 .v-vaadin-version:after {
-	content: "7.4.0";
+	content: "7.3.1";
 }
 
 .v-widget {
@@ -2726,11 +2502,6 @@
 	-webkit-overflow-scrolling: none;
 }
 
-.v-webkit.v-ios .v-browserframe {
-	-webkit-overflow-scrolling: touch;
-	overflow: auto;
-}
-
 .v-assistive-device-only {
 	position: absolute;
 	top: -2000px;
@@ -2796,10 +2567,6 @@ div.v-layout.v-horizontal.v-widget {
 
 .v-horizontal > .v-slot, .v-horizontal > .v-expand > .v-slot {
 	height: 100%;
-}
-
-.v-horizontal > .v-expand > .v-slot {
-	position: relative;
 }
 
 .v-vertical > .v-spacing, .v-vertical > .v-expand > .v-spacing {
@@ -3381,11 +3148,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #2e6a91;
 }
 
-.santeclair a.v-disabled {
-	opacity: 0.3;
-	filter: alpha(opacity=30.0) ;
-}
-
 .santeclair .v-disabled {
 	cursor: default !important;
 }
@@ -3944,11 +3706,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #2e6a91;
 }
 
-.santeclair .v-button-link.v-disabled {
-	opacity: 0.3;
-	filter: alpha(opacity=30.0) ;
-}
-
 .santeclair .v-button-tiny {
 	height: 20px;
 	padding: 0 9px;
@@ -4046,8 +3803,6 @@ div.v-layout.v-horizontal.v-widget {
 
 .santeclair .v-button-icon-align-top .v-icon {
 	display: block;
-	margin-left: auto;
-	margin-right: auto;
 }
 
 .santeclair .v-button-icon-align-top .v-icon  + span:not(:empty) {
@@ -4154,6 +3909,28 @@ div.v-layout.v-horizontal.v-widget {
 	height: 13px;
 }
 
+:root .santeclair .v-checkbox > input ~ label:before:after {
+	border: inherit;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	left: 0px;
+}
+
+:root .santeclair .v-checkbox > input ~ label:before:hover:after {
+	background-color: rgba(191, 191, 191, 0.1);
+}
+
+:root .santeclair .v-checkbox > input ~ label:before:focus:after {
+	border-color: #224E6A;
+	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+}
+
+:root .santeclair .v-checkbox > input ~ label:before:active:after {
+	background-color: rgba(128, 128, 128, 0.2);
+}
+
 :root .santeclair .v-checkbox > input ~ label:after {
 	content: "\f00c";
 	font-family: FontAwesome;
@@ -4171,24 +3948,23 @@ div.v-layout.v-horizontal.v-widget {
 	color: #FFA500;
 }
 
-.santeclair .v-checkbox > .v-icon, .santeclair .v-checkbox > label .v-icon {
-	margin: 0 4px 0 2px;
-	min-width: 1em;
-	cursor: pointer;
+:root .santeclair .v-checkbox > input[disabled]  ~ label, :root .santeclair .v-checkbox > input[disabled]  ~ label .v-icon, :root .santeclair .v-checkbox > input[disabled]  ~ .v-icon {
+	cursor: default;
 }
 
-.santeclair .v-checkbox.v-disabled  > label, .santeclair .v-checkbox.v-disabled  > .v-icon {
-	cursor: default;
+:root .santeclair .v-checkbox > input[disabled]  ~ label:before, :root .santeclair .v-checkbox > input[disabled]  ~ label:after {
 	opacity: 0.3;
 	filter: alpha(opacity=30.0) ;
 }
 
-.santeclair .v-checkbox.v-disabled  > label > .v-icon {
-	cursor: default;
+:root .santeclair .v-checkbox > input[disabled]:active ~ label:after {
+	background: transparent;
 }
 
-:root .santeclair .v-checkbox.v-disabled > input:active ~ label:after {
-	background: transparent;
+.santeclair .v-checkbox > .v-icon, .santeclair .v-checkbox > label .v-icon {
+	margin: 0 4px 0 2px;
+	min-width: 1em;
+	cursor: pointer;
 }
 
 .santeclair .v-checkbox-small {
@@ -4266,6 +4042,28 @@ div.v-layout.v-horizontal.v-widget {
 	height: 11px;
 }
 
+:root .santeclair .v-checkbox-small > input ~ label:before:after {
+	border: inherit;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	left: 0px;
+}
+
+:root .santeclair .v-checkbox-small > input ~ label:before:hover:after {
+	background-color: rgba(191, 191, 191, 0.1);
+}
+
+:root .santeclair .v-checkbox-small > input ~ label:before:focus:after {
+	border-color: #224E6A;
+	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+}
+
+:root .santeclair .v-checkbox-small > input ~ label:before:active:after {
+	background-color: rgba(128, 128, 128, 0.2);
+}
+
 :root .santeclair .v-checkbox-small > input ~ label:after {
 	content: "\f00c";
 	font-family: FontAwesome;
@@ -4283,24 +4081,23 @@ div.v-layout.v-horizontal.v-widget {
 	color: #FFA500;
 }
 
-.santeclair .v-checkbox-small > .v-icon, .santeclair .v-checkbox-small > label .v-icon {
-	margin: 0 4px 0 2px;
-	min-width: 1em;
-	cursor: pointer;
+:root .santeclair .v-checkbox-small > input[disabled]  ~ label, :root .santeclair .v-checkbox-small > input[disabled]  ~ label .v-icon, :root .santeclair .v-checkbox-small > input[disabled]  ~ .v-icon {
+	cursor: default;
 }
 
-.santeclair .v-checkbox-small.v-disabled  > label, .santeclair .v-checkbox-small.v-disabled  > .v-icon {
-	cursor: default;
+:root .santeclair .v-checkbox-small > input[disabled]  ~ label:before, :root .santeclair .v-checkbox-small > input[disabled]  ~ label:after {
 	opacity: 0.3;
 	filter: alpha(opacity=30.0) ;
 }
 
-.santeclair .v-checkbox-small.v-disabled  > label > .v-icon {
-	cursor: default;
+:root .santeclair .v-checkbox-small > input[disabled]:active ~ label:after {
+	background: transparent;
 }
 
-:root .santeclair .v-checkbox-small.v-disabled > input:active ~ label:after {
-	background: transparent;
+.santeclair .v-checkbox-small > .v-icon, .santeclair .v-checkbox-small > label .v-icon {
+	margin: 0 4px 0 2px;
+	min-width: 1em;
+	cursor: pointer;
 }
 
 .santeclair .v-checkbox-large {
@@ -4378,6 +4175,28 @@ div.v-layout.v-horizontal.v-widget {
 	height: 16px;
 }
 
+:root .santeclair .v-checkbox-large > input ~ label:before:after {
+	border: inherit;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	left: 0px;
+}
+
+:root .santeclair .v-checkbox-large > input ~ label:before:hover:after {
+	background-color: rgba(191, 191, 191, 0.1);
+}
+
+:root .santeclair .v-checkbox-large > input ~ label:before:focus:after {
+	border-color: #224E6A;
+	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+}
+
+:root .santeclair .v-checkbox-large > input ~ label:before:active:after {
+	background-color: rgba(128, 128, 128, 0.2);
+}
+
 :root .santeclair .v-checkbox-large > input ~ label:after {
 	content: "\f00c";
 	font-family: FontAwesome;
@@ -4395,24 +4214,23 @@ div.v-layout.v-horizontal.v-widget {
 	color: #FFA500;
 }
 
-.santeclair .v-checkbox-large > .v-icon, .santeclair .v-checkbox-large > label .v-icon {
-	margin: 0 5px 0 3px;
-	min-width: 1em;
-	cursor: pointer;
+:root .santeclair .v-checkbox-large > input[disabled]  ~ label, :root .santeclair .v-checkbox-large > input[disabled]  ~ label .v-icon, :root .santeclair .v-checkbox-large > input[disabled]  ~ .v-icon {
+	cursor: default;
 }
 
-.santeclair .v-checkbox-large.v-disabled  > label, .santeclair .v-checkbox-large.v-disabled  > .v-icon {
-	cursor: default;
+:root .santeclair .v-checkbox-large > input[disabled]  ~ label:before, :root .santeclair .v-checkbox-large > input[disabled]  ~ label:after {
 	opacity: 0.3;
 	filter: alpha(opacity=30.0) ;
 }
 
-.santeclair .v-checkbox-large.v-disabled  > label > .v-icon {
-	cursor: default;
+:root .santeclair .v-checkbox-large > input[disabled]:active ~ label:after {
+	background: transparent;
 }
 
-:root .santeclair .v-checkbox-large.v-disabled > input:active ~ label:after {
-	background: transparent;
+.santeclair .v-checkbox-large > .v-icon, .santeclair .v-checkbox-large > label .v-icon {
+	margin: 0 5px 0 3px;
+	min-width: 1em;
+	cursor: pointer;
 }
 
 .santeclair .v-filterselect {
@@ -4447,8 +4265,8 @@ div.v-layout.v-horizontal.v-widget {
 	border: 1px solid #999999;
 	background: #ffffff;
 	color: #474747;
-	-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
-	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
+	-webkit-box-shadow: inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
+	box-shadow: inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
 	-webkit-transition: box-shadow 180ms, border 180ms;
 	-moz-transition: box-shadow 180ms, border 180ms;
 	transition: box-shadow 180ms, border 180ms;
@@ -4475,8 +4293,8 @@ div.v-layout.v-horizontal.v-widget {
 	-moz-transition: none;
 	transition: none;
 	border-color: #224E6A;
-	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), 0 1px 0 rgba(255, 255, 255, 0.1);
-	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), 0 1px 0 rgba(255, 255, 255, 0.1);
+	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
+	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
 	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
 	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
 }
@@ -4510,10 +4328,11 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-touch-callout: none;
 	cursor: pointer;
 	position: absolute;
-	width: 26px;
 	top: 1px;
 	right: 1px;
 	bottom: 1px;
+	width: 26px;
+	cursor: pointer;
 	border-left: 1px solid #999999;
 	color: #a3a3a3;
 	border-radius: 0 3px 3px 0;
@@ -4940,8 +4759,12 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-touch-callout: none;
 	cursor: pointer;
 	position: absolute;
+	top: 1px;
+	right: 1px;
+	bottom: 1px;
 	width: 20px;
-	border-radius: 0 4px 4px 0;
+	cursor: pointer;
+	border-radius: 0 3px 3px 0;
 }
 
 .santeclair .v-filterselect-tiny [class$="button"]:before {
@@ -5067,8 +4890,12 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-touch-callout: none;
 	cursor: pointer;
 	position: absolute;
+	top: 1px;
+	right: 1px;
+	bottom: 1px;
 	width: 22px;
-	border-radius: 0 4px 4px 0;
+	cursor: pointer;
+	border-radius: 0 3px 3px 0;
 }
 
 .santeclair .v-filterselect-compact [class$="button"]:before, .santeclair .v-filterselect-small [class$="button"]:before {
@@ -5199,8 +5026,12 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-touch-callout: none;
 	cursor: pointer;
 	position: absolute;
+	top: 1px;
+	right: 1px;
+	bottom: 1px;
 	width: 31px;
-	border-radius: 0 4px 4px 0;
+	cursor: pointer;
+	border-radius: 0 3px 3px 0;
 }
 
 .santeclair .v-filterselect-large [class$="button"]:before {
@@ -5327,8 +5158,12 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-touch-callout: none;
 	cursor: pointer;
 	position: absolute;
+	top: 1px;
+	right: 1px;
+	bottom: 1px;
 	width: 42px;
-	border-radius: 0 4px 4px 0;
+	cursor: pointer;
+	border-radius: 0 3px 3px 0;
 }
 
 .santeclair .v-filterselect-huge [class$="button"]:before {
@@ -5510,32 +5345,25 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .santeclair [class*="margin-top"] > tbody > [class*="firstrow"] > td {
-	padding-top: 26px;
+	padding-top: 0;
 }
 
 .santeclair [class*="margin-bottom"] > tbody > [class*="lastrow"] > td {
-	padding-bottom: 26px;
+	padding-bottom: 0;
 }
 
 .santeclair [class*="margin-left"] > tbody > [class*="row"] > [class*="captioncell"] {
-	padding-left: 26px;
-}
-
-.santeclair [class*="margin-left"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h2, .santeclair [class*="margin-left"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h3, .santeclair [class*="margin-left"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h4 {
-	left: 26px;
+	padding-left: 0;
 }
 
 .santeclair [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"] {
-	padding-right: 26px;
-}
-
-.santeclair [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h2, .santeclair [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h3, .santeclair [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h4 {
-	right: 26px;
+	padding-right: 0;
 }
 
 .santeclair .v-formlayout > table {
 	border-spacing: 0;
 	position: relative;
+	padding: 0 9px;
 }
 
 .santeclair .v-formlayout.v-has-width > table, .santeclair .v-formlayout.v-has-width .v-formlayout-contentcell {
@@ -5566,8 +5394,6 @@ div.v-layout.v-horizontal.v-widget {
 .santeclair .v-formlayout-contentcell  > .v-label-h2, .santeclair .v-formlayout-contentcell  > .v-label-h3, .santeclair .v-formlayout-contentcell  > .v-label-h4 {
 	position: absolute;
 	left: 0;
-	right: 0;
-	width: auto !important;
 	margin-top: -0.5em;
 	padding-bottom: 0.5em;
 	border-bottom: 0px solid #999999;
@@ -5577,7 +5403,7 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0;
 }
 
-.santeclair .v-formlayout.light  > table > tbody > tr > td {
+.santeclair .v-formlayout.light  > table > tbody > [class*="row"] > td {
 	padding-top: 0;
 	height: 26px;
 	border-bottom: 0px solid #999999;
@@ -5587,15 +5413,11 @@ div.v-layout.v-horizontal.v-widget {
 	border-bottom: none;
 }
 
-.santeclair .v-formlayout.light  > table > tbody > tr > [class*="captioncell"] {
+.santeclair .v-formlayout.light  > table > tbody > [class*="row"] > [class*="captioncell"] {
 	color: gray;
 	text-align: right;
 	padding-left: 9px;
 	line-height: 26px;
-}
-
-.santeclair .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"] {
-	padding-right: 0;
 }
 
 .santeclair .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-textfield, .santeclair .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-textarea, .santeclair .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-filterselect, .santeclair .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-datefield, .santeclair .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-filterselect-input, .santeclair .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-datefield-textfield {
@@ -5668,8 +5490,6 @@ div.v-layout.v-horizontal.v-widget {
 
 .santeclair .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h2, .santeclair .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h3, .santeclair .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h4 {
 	border-bottom: none;
-	left: 0;
-	right: 0;
 }
 
 .santeclair .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h3, .santeclair .v-formlayout.light  > table > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h4 {
@@ -5697,20 +5517,18 @@ div.v-layout.v-horizontal.v-widget {
 	margin-left: 5px;
 }
 
-.santeclair .v-grid {
+.santeclair .v-escalator {
 	position: relative;
+	background-color: white;
 }
 
-.santeclair .v-grid-scroller {
+.santeclair .v-escalator-scroller {
 	position: absolute;
-	z-index: 1;
-	outline: none;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
+	overflow: auto;
+	z-index: 20;
 }
 
-.santeclair .v-grid-scroller-horizontal {
+.santeclair .v-escalator-scroller-horizontal {
 	left: 0;
 	right: 0;
 	bottom: 0;
@@ -5718,7 +5536,7 @@ div.v-layout.v-horizontal.v-widget {
 	-ms-overflow-y: hidden;
 }
 
-.santeclair .v-grid-scroller-vertical {
+.santeclair .v-escalator-scroller-vertical {
 	right: 0;
 	top: 0;
 	bottom: 0;
@@ -5726,534 +5544,74 @@ div.v-layout.v-horizontal.v-widget {
 	-ms-overflow-x: hidden;
 }
 
-.santeclair .v-grid-tablewrapper {
+.santeclair .v-escalator-tablewrapper {
 	position: absolute;
 	overflow: hidden;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	z-index: 5;
 }
 
-.santeclair .v-grid-tablewrapper > table {
+.santeclair .v-escalator-tablewrapper > table {
 	border-spacing: 0;
 	table-layout: fixed;
 	width: inherit;
 }
 
-.santeclair .v-grid-header-deco, .santeclair .v-grid-footer-deco {
-	position: absolute;
-	right: 0;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-}
-
-.santeclair .v-grid-horizontal-scrollbar-deco {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-}
-
-.santeclair .v-grid-header, .santeclair .v-grid-body, .santeclair .v-grid-footer {
+.santeclair .v-escalator-header, .santeclair .v-escalator-body, .santeclair .v-escalator-footer {
 	position: absolute;
 	left: 0;
 	width: inherit;
 	z-index: 10;
 }
 
-.santeclair .v-grid-header, .santeclair .v-grid-header-deco {
+.santeclair .v-escalator-header {
 	top: 0;
 }
 
-.santeclair .v-grid-footer, .santeclair .v-grid-footer-deco {
+.santeclair .v-escalator-footer {
 	bottom: 0;
 }
 
-.santeclair .v-grid-body {
+.santeclair .v-escalator-body {
 	z-index: 0;
 	top: 0;
 }
 
-.santeclair .v-grid-body .v-grid-row {
+.santeclair .v-escalator-body .v-escalator-row {
 	position: absolute;
 	top: 0;
 	left: 0;
 }
 
-.santeclair .v-grid-row {
+.santeclair .v-escalator-row {
 	display: block;
 }
 
-.v-ie8 .santeclair .v-grid-row, .v-ie9 .santeclair .v-grid-row {
+.v-ie8 .santeclair .v-escalator-row {
 	float: left;
 	clear: left;
 	margin-top: 0;
 }
 
-.santeclair .v-grid-row  > td, .santeclair .v-grid-row  > th {
+.santeclair .v-escalator-row  > td, .santeclair .v-escalator-row  > th {
 	background-color: white;
 }
 
-.santeclair .v-grid-row {
+.santeclair .v-escalator-row {
 	width: inherit;
 }
 
-.santeclair .v-grid-cell {
+.santeclair .v-escalator-cell {
 	display: block;
 	float: left;
+	border: 1px solid #aaa;
 	padding: 2px;
 	white-space: nowrap;
-	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	overflow: hidden;
-	font-size: 13px;
 }
 
-.santeclair .v-grid-cell.frozen {
+.santeclair .v-escalator-cell.frozen {
 	position: relative;
-	z-index: 1;
-}
-
-.santeclair .v-grid {
-	outline: none;
-}
-
-.santeclair .v-grid-scroller-vertical, .santeclair .v-grid-scroller-horizontal {
-	border: 0px solid #999999;
-}
-
-.santeclair .v-grid-scroller-vertical {
-	border-left: none;
-}
-
-.santeclair .v-grid-scroller-horizontal {
-	border-top: none;
-}
-
-.santeclair .v-grid-tablewrapper {
-	border: 0px solid #999999;
-}
-
-.santeclair .v-grid-cell {
-	background-color: white;
-	padding: 0 9px;
-	line-height: 26px;
-	text-overflow: ellipsis;
-}
-
-.santeclair .v-grid-cell  > * {
-	line-height: 1.55;
-	vertical-align: middle;
-}
-
-.santeclair .v-grid-cell  > div {
-	display: inline-block;
-}
-
-.santeclair .v-grid-cell.frozen {
-	-webkit-box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1);
-	box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1);
-	border-right: 0px solid #999999;
-}
-
-.santeclair .v-grid-cell.frozen  + th, .santeclair .v-grid-cell.frozen  + td {
-	border-left: none;
-}
-
-.santeclair .v-grid-row > td, .santeclair .v-grid-editor-cells > div {
-	border-left: 0px solid #999999;
-	border-bottom: 0px solid #999999;
-}
-
-.santeclair .v-grid-row > td:first-child, .santeclair .v-grid-editor-cells > div:first-child {
-	border-left: none;
-}
-
-.santeclair .v-grid-row-stripe > td {
-	background-color: #f5f5f5;
-}
-
-.santeclair .v-grid-row-selected > td {
-	background: #FFA500;
-}
-
-.santeclair .v-grid-row-focused > td {
-	
-}
-
-.santeclair .v-grid-header th {
-	position: relative;
-	background-color: #ffffff;
-	font-size: 11px;
-	font-weight: inherit;
-	border-left: 0px solid #999999;
-	border-bottom: 0px solid #999999;
-	
-	text-align: left;
-}
-
-.santeclair .v-grid-header th:first-child {
-	border-left: none;
-}
-
-.santeclair .v-grid-header .sort-asc, .santeclair .v-grid-header .sort-desc {
-	padding-right: 22px;
-}
-
-.santeclair .v-grid-header .sort-asc:after, .santeclair .v-grid-header .sort-desc:after {
-	font-family: FontAwesome, sans-serif;
-	content: "\f0de" " " attr(sort-order);
-	position: absolute;
-	right: 9px;
-	font-size: 9px;
-}
-
-.santeclair .v-grid-header .sort-desc:after {
-	content: "\f0dd" " " attr(sort-order);
-}
-
-.santeclair .v-grid-footer td {
-	background-color: #ffffff;
-	font-size: 11px;
-	font-weight: inherit;
-	border-left: 0px solid #999999;
-	border-top: 0px solid #999999;
-	border-bottom: none;
-	
-}
-
-.santeclair .v-grid-footer td:first-child {
-	border-left: none;
-}
-
-.santeclair .v-grid-header-deco {
-	border-top: 0px solid #999999;
-	border-right: 0px solid #999999;
-	background-color: #ffffff;
-}
-
-.santeclair .v-grid-footer-deco {
-	border-bottom: 0px solid #999999;
-	border-right: 0px solid #999999;
-	background-color: #ffffff;
-}
-
-.santeclair .v-grid-horizontal-scrollbar-deco {
-	background-color: #ffffff;
-	border: 0px solid #999999;
-	border-top: none;
-}
-
-.santeclair .v-grid-cell-focused {
-	position: relative;
-}
-
-.santeclair .v-grid-cell-focused:before {
-	content: "";
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	border: 2px solid #FFA500;
-	display: none;
-	pointer-events: none;
-}
-
-.ie8 .santeclair .v-grid-cell-focused:before, .ie9 .santeclair .v-grid-cell-focused:before, .ie10 .santeclair .v-grid-cell-focused:before {
-	content: url(data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg==);
-}
-
-.santeclair .v-grid:focus .v-grid-cell-focused:before {
-	display: block;
-}
-
-.santeclair .v-grid.v-disabled:focus .v-grid-cell-focused:before {
-	display: none;
-}
-
-.santeclair .v-grid-editor {
-	position: absolute;
-	z-index: 20;
-	overflow: hidden;
-	left: 0;
-	right: 0;
-	border: 0px solid #999999;
-	margin-top: 0px;
-	-webkit-box-shadow: 0 0 9px rgba(0, 0, 0, 0.2);
-	box-shadow: 0 0 9px rgba(0, 0, 0, 0.2);
-}
-
-.santeclair .v-grid-editor-cells {
-	position: relative;
-	white-space: nowrap;
-}
-
-.santeclair .v-grid-editor-cells  > div {
-	display: inline-block;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	vertical-align: middle;
-	background: white;
-}
-
-.santeclair .v-grid-editor-cells  > div:first-child {
-	border-left: none;
-}
-
-.santeclair .v-grid-editor-cells  > div  > * {
-	vertical-align: middle;
-	display: inline-block;
-}
-
-.santeclair .v-grid-editor-cells  > div .v-textfield, .santeclair .v-grid-editor-cells  > div .v-datefield, .santeclair .v-grid-editor-cells  > div .v-filterselect {
-	min-width: 100%;
-	max-width: 100%;
-	min-height: 100%;
-	max-height: 100%;
-}
-
-.santeclair .v-grid-editor-cells  > div .v-select, .santeclair .v-grid-editor-cells  > div .v-select-select {
-	min-width: 100%;
-	max-width: 100%;
-}
-
-.santeclair .v-grid-editor-cells .error::before {
-	position: absolute;
-	display: block;
-	height: 0;
-	width: 0;
-	content: "";
-	border-top: 5px solid red;
-	border-right: 5px solid transparent;
-}
-
-.santeclair .v-grid-editor-cells .error, .santeclair .v-grid-editor-cells .error > input {
-	background-color: #fee;
-}
-
-.santeclair .v-grid-editor-footer {
-	display: table;
-	height: 26px;
-	border-top: 0px solid #999999;
-	margin-top: 0px;
-	background: white;
-	padding: 0 5px;
-}
-
-.santeclair .v-grid-editor-footer  + .v-grid-editor-cells > div {
-	border-bottom: none;
-	border-top: 0px solid #999999;
-}
-
-.santeclair .v-grid-editor-footer:first-child {
-	border-top: none;
-	margin-top: 0;
-	border-bottom: 0px solid #999999;
-	margin-bottom: 0px;
-}
-
-.santeclair .v-grid-editor-message, .santeclair .v-grid-editor-buttons {
-	display: table-cell;
-	white-space: nowrap;
-	vertical-align: middle;
-}
-
-.santeclair .v-grid-editor-message {
-	width: 100%;
-	position: relative;
-}
-
-.santeclair .v-grid-editor-message  > div {
-	position: absolute;
-	width: 100%;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	line-height: 26px;
-	top: 0;
-}
-
-.santeclair .v-grid-editor-save {
-	margin-right: 4px;
-}
-
-.santeclair .v-grid-cell > .v-progressbar {
-	width: 100%;
-}
-
-.santeclair .v-grid {
-	-webkit-user-select: text;
-	-moz-user-select: text;
-	-ms-user-select: text;
-	user-select: text;
-	background-color: #ffffff;
-}
-
-.santeclair .v-grid-header .v-grid-cell {
-	background-color: #ffffff;
-	background-image: -webkit-linear-gradient(top, white 2%, #f4f4f4 98%);
-	background-image: linear-gradient(to bottom,white 2%, #f4f4f4 98%);
-	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-.santeclair .v-grid-footer .v-grid-cell {
-	background-color: #ffffff;
-	background-image: -webkit-linear-gradient(top, white 2%, #f4f4f4 98%);
-	background-image: linear-gradient(to bottom,white 2%, #f4f4f4 98%);
-	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-.santeclair .v-grid-header-deco {
-	background-color: #ffffff;
-	background-image: -webkit-linear-gradient(top, white 2%, #f4f4f4 98%);
-	background-image: linear-gradient(to bottom,white 2%, #f4f4f4 98%);
-}
-
-.santeclair .v-grid-footer-deco, .santeclair .v-grid-horizontal-scrollbar-deco {
-	background-color: #ffffff;
-	background-image: -webkit-linear-gradient(top, white 2%, #f4f4f4 98%);
-	background-image: linear-gradient(to bottom,white 2%, #f4f4f4 98%);
-}
-
-.santeclair .v-grid-row-selected  > .v-grid-cell {
-	background-color: #FFA500;
-	background-image: -webkit-linear-gradient(top, #ffac00 2%, #f49600 98%);
-	background-image: linear-gradient(to bottom,#ffac00 2%, #f49600 98%);
-	color: #3b2a0d;
-	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
-	border-color: #ce8809;
-}
-
-.santeclair .v-grid-row-selected  > .v-grid-cell-focused:before {
-	border-color: #ffc966;
-}
-
-.santeclair .v-grid-editor {
-	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
-	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
-	border-color: #224E6A;
-}
-
-.santeclair .v-grid-editor-footer {
-	font-size: 12px;
-	padding: 0 5px;
-	background: #D2EDFF;
-	-webkit-animation: valo-grid-editor-footer-animate-in 200ms 120ms backwards;
-	-moz-animation: valo-grid-editor-footer-animate-in 200ms 120ms backwards;
-	animation: valo-grid-editor-footer-animate-in 200ms 120ms backwards;
-}
-
-.santeclair .v-grid-editor-footer:first-child {
-	-webkit-animation: valo-grid-editor-footer-animate-in-alt 200ms 120ms backwards;
-	-moz-animation: valo-grid-editor-footer-animate-in-alt 200ms 120ms backwards;
-	animation: valo-grid-editor-footer-animate-in-alt 200ms 120ms backwards;
-}
-
-.santeclair .v-grid-editor-cells {
-	z-index: 1;
-}
-
-.santeclair .v-grid-editor-cells > div:before {
-	content: "";
-	display: inline-block;
-	height: 100%;
-	vertical-align: middle;
-}
-
-.santeclair .v-grid-editor-cells > div .error::before {
-	border-top: 7px solid #ed473b;
-	border-right: 7px solid transparent;
-}
-
-.santeclair .v-grid-editor-cells > div .error, .santeclair .v-grid-editor-cells > div .error > input {
-	background-color: #fffbfb;
-}
-
-.santeclair .v-grid-editor-cells > div .v-textfield, .santeclair .v-grid-editor-cells > div .v-textfield-focus, .santeclair .v-grid-editor-cells > div .v-datefield, .santeclair .v-grid-editor-cells > div .v-datefield .v-textfield-focus, .santeclair .v-grid-editor-cells > div .v-filterselect-input, .santeclair .v-grid-editor-cells > div .v-filterselect-input:focus {
-	border: none;
-	border-radius: 0;
-	background: transparent;
-	-webkit-box-shadow: none;
-	box-shadow: none;
-}
-
-.santeclair .v-grid-editor-cells > div .v-textfield-focus, .santeclair .v-grid-editor-cells > div .v-datefield .v-textfield-focus, .santeclair .v-grid-editor-cells > div .v-filterselect-input:focus {
-	position: relative;
-}
-
-.santeclair .v-grid-editor-cells > div .v-select {
-	padding-left: 5px;
-	padding-right: 5px;
-}
-
-.santeclair .v-grid-editor-cells > div .v-checkbox {
-	margin: 0 5px;
-}
-
-.santeclair .v-grid-editor-cells > div .v-checkbox label {
-	white-space: nowrap;
-}
-
-.santeclair .v-grid-editor-message > div:before {
-	display: inline-block;
-	color: #ed473b;
-	font-weight: 600;
-	width: 13px;
-	text-align: center;
-	content: "!";
-}
-
-.santeclair .v-grid-editor-save, .santeclair .v-grid-editor-cancel {
-	cursor: pointer;
-	color: #224E6A;
-	text-decoration: underline;
-	font-weight: inherit;
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
-	font-weight: 500;
-	text-decoration: none;
-	border: none;
-	background: transparent;
-	padding: 1em 5px;
-	margin: 0;
-	outline: none;
-}
-
-.santeclair .v-grid-editor-save:hover, .santeclair .v-grid-editor-cancel:hover {
-	color: #2e6a91;
-}
-
-.santeclair .v-grid-editor-save.v-disabled, .santeclair .v-grid-editor-cancel.v-disabled {
-	opacity: 0.3;
-	filter: alpha(opacity=30.0) ;
-}
-
-.santeclair .v-grid-scroller::-webkit-scrollbar {
-	border: none;
-}
-
-.santeclair .v-grid-scroller::-webkit-scrollbar-thumb {
-	border-radius: 10px;
-	border: 4px solid transparent;
-	background: rgba(0, 0, 0, 0.3);
-	-webkit-background-clip: content-box;
-	background-clip: content-box;
-}
-
-.santeclair .v-grid-scroller-vertical::-webkit-scrollbar-thumb {
-	min-height: 30px;
-}
-
-.santeclair .v-grid-scroller-horizontal::-webkit-scrollbar-thumb {
-	min-width: 30px;
+	z-index: 0;
 }
 
 .santeclair .v-textfield {
@@ -6277,8 +5635,8 @@ div.v-layout.v-horizontal.v-widget {
 	border: 1px solid #999999;
 	background: #ffffff;
 	color: #474747;
-	-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
-	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
+	-webkit-box-shadow: inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
+	box-shadow: inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
 	-webkit-transition: box-shadow 180ms, border 180ms;
 	-moz-transition: box-shadow 180ms, border 180ms;
 	transition: box-shadow 180ms, border 180ms;
@@ -6302,8 +5660,8 @@ div.v-layout.v-horizontal.v-widget {
 	-moz-transition: none;
 	transition: none;
 	border-color: #224E6A;
-	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), 0 1px 0 rgba(255, 255, 255, 0.1);
-	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), 0 1px 0 rgba(255, 255, 255, 0.1);
+	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
+	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
 	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
 	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
 }
@@ -6744,8 +6102,8 @@ div.v-layout.v-horizontal.v-widget {
 	border: 1px solid #999999;
 	background: #ffffff;
 	color: #474747;
-	-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
-	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
+	-webkit-box-shadow: inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
+	box-shadow: inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
 	-webkit-transition: box-shadow 180ms, border 180ms;
 	-moz-transition: box-shadow 180ms, border 180ms;
 	transition: box-shadow 180ms, border 180ms;
@@ -6772,8 +6130,8 @@ div.v-layout.v-horizontal.v-widget {
 	-moz-transition: none;
 	transition: none;
 	border-color: #224E6A;
-	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), 0 1px 0 rgba(255, 255, 255, 0.1);
-	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), 0 1px 0 rgba(255, 255, 255, 0.1);
+	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
+	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
 	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
 	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
 }
@@ -7033,8 +6391,8 @@ div.v-layout.v-horizontal.v-widget {
 	border: 1px solid #999999;
 	background: #ffffff;
 	color: #474747;
-	-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
-	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
+	-webkit-box-shadow: inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
+	box-shadow: inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
 	-webkit-transition: box-shadow 180ms, border 180ms;
 	-moz-transition: box-shadow 180ms, border 180ms;
 	transition: box-shadow 180ms, border 180ms;
@@ -7061,8 +6419,8 @@ div.v-layout.v-horizontal.v-widget {
 	-moz-transition: none;
 	transition: none;
 	border-color: #224E6A;
-	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), 0 1px 0 rgba(255, 255, 255, 0.1);
-	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), 0 1px 0 rgba(255, 255, 255, 0.1);
+	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
+	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5), inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
 	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
 	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
 }
@@ -7081,19 +6439,20 @@ div.v-layout.v-horizontal.v-widget {
 	cursor: pointer;
 	-webkit-appearance: none;
 	background: transparent;
+	border: none;
 	padding: 0;
 	position: absolute;
 	z-index: 10;
-	width: 26px;
-	line-height: 24px;
-	text-align: center;
-	font: inherit;
-	outline: none;
-	margin: 0;
 	top: 1px;
 	bottom: 1px;
 	left: 1px;
-	border: none;
+	width: 26px;
+	line-height: 24px;
+	text-align: center;
+	cursor: pointer;
+	font: inherit;
+	outline: none;
+	margin: 0;
 	border-right: 1px solid #999999;
 	color: #a3a3a3;
 	border-radius: 3px 0 0 3px;
@@ -7196,8 +6555,6 @@ div.v-layout.v-horizontal.v-widget {
 	-ms-backface-visibility: hidden;
 	backface-visibility: hidden;
 	margin-top: 4px !important;
-	margin-bottom: 4px !important;
-	margin-right: 4px !important;
 	cursor: default;
 	width: auto;
 }
@@ -7289,11 +6646,6 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #224E6A;
 }
 
-.santeclair .v-datefield-popup .v-datefield-calendarpanel-day.v-datefield-calendarpanel-day-outside-range, .santeclair .v-datefield-popup .v-datefield-calendarpanel-day.v-datefield-calendarpanel-day-outside-range:hover {
-	color: #a3a3a3;
-	cursor: not-allowed;
-}
-
 .santeclair .v-datefield-popup .v-datefield-calendarpanel-weekdays {
 	height: 18px;
 	color: rgba(135, 135, 135, 0.85);
@@ -7308,7 +6660,7 @@ div.v-layout.v-horizontal.v-widget {
 	white-space: nowrap;
 }
 
-.santeclair .v-datefield-popup td[class*="year"] button, .santeclair .v-datefield-popup td[class*="month"] button {
+.santeclair .v-datefield-popup td[class$="year"] button, .santeclair .v-datefield-popup td[class$="month"] button {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-ms-appearance: none;
@@ -7328,7 +6680,7 @@ div.v-layout.v-horizontal.v-widget {
 	vertical-align: middle;
 }
 
-.santeclair .v-datefield-popup td[class*="year"] button:before, .santeclair .v-datefield-popup td[class*="month"] button:before {
+.santeclair .v-datefield-popup td[class$="year"] button:before, .santeclair .v-datefield-popup td[class$="month"] button:before {
 	color: #a3a3a3;
 	font-size: 17px;
 	line-height: 20px;
@@ -7337,18 +6689,13 @@ div.v-layout.v-horizontal.v-widget {
 	transition: color 200ms;
 }
 
-.santeclair .v-datefield-popup td[class*="year"] button:hover:before, .santeclair .v-datefield-popup td[class*="month"] button:hover:before {
+.santeclair .v-datefield-popup td[class$="year"] button:hover, .santeclair .v-datefield-popup td[class$="month"] button:hover {
+	opacity: 1;
+	filter: none ;
+}
+
+.santeclair .v-datefield-popup td[class$="year"] button:hover:before, .santeclair .v-datefield-popup td[class$="month"] button:hover:before {
 	color: #224E6A;
-}
-
-.santeclair .v-datefield-popup td[class*="year"] button.outside-range, .santeclair .v-datefield-popup td[class*="month"] button.outside-range {
-	cursor: default;
-	opacity: 0.3;
-	filter: alpha(opacity=30.0) ;
-}
-
-.santeclair .v-datefield-popup td[class*="year"] button.outside-range:hover:before, .santeclair .v-datefield-popup td[class*="month"] button.outside-range:hover:before {
-	color: #a3a3a3;
 }
 
 .santeclair .v-datefield-popup .v-button-prevyear:before {
@@ -7482,11 +6829,6 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #224E6A;
 }
 
-.santeclair .v-datefield-calendarpanel-day.v-datefield-calendarpanel-day-outside-range, .santeclair .v-datefield-calendarpanel-day.v-datefield-calendarpanel-day-outside-range:hover {
-	color: #a3a3a3;
-	cursor: not-allowed;
-}
-
 .santeclair .v-datefield-calendarpanel-weekdays {
 	height: 18px;
 	color: rgba(135, 135, 135, 0.85);
@@ -7501,7 +6843,7 @@ div.v-layout.v-horizontal.v-widget {
 	white-space: nowrap;
 }
 
-.santeclair td[class*="year"] button, .santeclair td[class*="month"] button {
+.santeclair td[class$="year"] button, .santeclair td[class$="month"] button {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-ms-appearance: none;
@@ -7521,7 +6863,7 @@ div.v-layout.v-horizontal.v-widget {
 	vertical-align: middle;
 }
 
-.santeclair td[class*="year"] button:before, .santeclair td[class*="month"] button:before {
+.santeclair td[class$="year"] button:before, .santeclair td[class$="month"] button:before {
 	color: #a3a3a3;
 	font-size: 17px;
 	line-height: 20px;
@@ -7530,18 +6872,13 @@ div.v-layout.v-horizontal.v-widget {
 	transition: color 200ms;
 }
 
-.santeclair td[class*="year"] button:hover:before, .santeclair td[class*="month"] button:hover:before {
+.santeclair td[class$="year"] button:hover, .santeclair td[class$="month"] button:hover {
+	opacity: 1;
+	filter: none ;
+}
+
+.santeclair td[class$="year"] button:hover:before, .santeclair td[class$="month"] button:hover:before {
 	color: #224E6A;
-}
-
-.santeclair td[class*="year"] button.outside-range, .santeclair td[class*="month"] button.outside-range {
-	cursor: default;
-	opacity: 0.3;
-	filter: alpha(opacity=30.0) ;
-}
-
-.santeclair td[class*="year"] button.outside-range:hover:before, .santeclair td[class*="month"] button.outside-range:hover:before {
-	color: #a3a3a3;
 }
 
 .santeclair .v-button-prevyear:before {
@@ -7699,9 +7036,13 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0;
 	position: absolute;
 	z-index: 10;
+	top: 0;
+	bottom: 0;
+	left: 0;
 	width: 20px;
 	line-height: 20px;
 	text-align: center;
+	cursor: pointer;
 	font: inherit;
 	outline: none;
 	margin: 0;
@@ -7814,9 +7155,13 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0;
 	position: absolute;
 	z-index: 10;
+	top: 0;
+	bottom: 0;
+	left: 0;
 	width: 22px;
 	line-height: 22px;
 	text-align: center;
+	cursor: pointer;
 	font: inherit;
 	outline: none;
 	margin: 0;
@@ -7934,9 +7279,13 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0;
 	position: absolute;
 	z-index: 10;
+	top: 0;
+	bottom: 0;
+	left: 0;
 	width: 31px;
 	line-height: 31px;
 	text-align: center;
+	cursor: pointer;
 	font: inherit;
 	outline: none;
 	margin: 0;
@@ -8050,9 +7399,13 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0;
 	position: absolute;
 	z-index: 10;
+	top: 0;
+	bottom: 0;
+	left: 0;
 	width: 42px;
 	line-height: 42px;
 	text-align: center;
+	cursor: pointer;
 	font: inherit;
 	outline: none;
 	margin: 0;
@@ -8177,11 +7530,6 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #224E6A;
 }
 
-.santeclair .v-inline-datefield-calendarpanel-day.v-inline-datefield-calendarpanel-day-outside-range, .santeclair .v-inline-datefield-calendarpanel-day.v-inline-datefield-calendarpanel-day-outside-range:hover {
-	color: #a3a3a3;
-	cursor: not-allowed;
-}
-
 .santeclair .v-inline-datefield-calendarpanel-weekdays {
 	height: 18px;
 	color: rgba(135, 135, 135, 0.85);
@@ -8196,7 +7544,7 @@ div.v-layout.v-horizontal.v-widget {
 	white-space: nowrap;
 }
 
-.santeclair td[class*="year"] button, .santeclair td[class*="month"] button {
+.santeclair td[class$="year"] button, .santeclair td[class$="month"] button {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-ms-appearance: none;
@@ -8216,7 +7564,7 @@ div.v-layout.v-horizontal.v-widget {
 	vertical-align: middle;
 }
 
-.santeclair td[class*="year"] button:before, .santeclair td[class*="month"] button:before {
+.santeclair td[class$="year"] button:before, .santeclair td[class$="month"] button:before {
 	color: #a3a3a3;
 	font-size: 17px;
 	line-height: 20px;
@@ -8225,18 +7573,13 @@ div.v-layout.v-horizontal.v-widget {
 	transition: color 200ms;
 }
 
-.santeclair td[class*="year"] button:hover:before, .santeclair td[class*="month"] button:hover:before {
+.santeclair td[class$="year"] button:hover, .santeclair td[class$="month"] button:hover {
+	opacity: 1;
+	filter: none ;
+}
+
+.santeclair td[class$="year"] button:hover:before, .santeclair td[class$="month"] button:hover:before {
 	color: #224E6A;
-}
-
-.santeclair td[class*="year"] button.outside-range, .santeclair td[class*="month"] button.outside-range {
-	cursor: default;
-	opacity: 0.3;
-	filter: alpha(opacity=30.0) ;
-}
-
-.santeclair td[class*="year"] button.outside-range:hover:before, .santeclair td[class*="month"] button.outside-range:hover:before {
-	color: #a3a3a3;
 }
 
 .santeclair .v-button-prevyear:before {
@@ -8669,6 +8012,12 @@ div.v-layout.v-horizontal.v-widget {
 	cursor: default;
 }
 
+.santeclair .v-menubar-popup.v-menubar-popup-animate-out {
+	-webkit-animation: none;
+	-moz-animation: none;
+	animation: none;
+}
+
 .santeclair .v-menubar-small {
 	height: 22px;
 	padding: 0 10px;
@@ -8840,6 +8189,28 @@ div.v-layout.v-horizontal.v-widget {
 	height: 13px;
 }
 
+:root .santeclair .v-radiobutton > input ~ label:before:after {
+	border: inherit;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	left: 0px;
+}
+
+:root .santeclair .v-radiobutton > input ~ label:before:hover:after {
+	background-color: rgba(191, 191, 191, 0.1);
+}
+
+:root .santeclair .v-radiobutton > input ~ label:before:focus:after {
+	border-color: #224E6A;
+	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+}
+
+:root .santeclair .v-radiobutton > input ~ label:before:active:after {
+	background-color: rgba(128, 128, 128, 0.2);
+}
+
 :root .santeclair .v-radiobutton > input ~ label:after {
 	content: "\f00c";
 	font-family: FontAwesome;
@@ -8857,24 +8228,23 @@ div.v-layout.v-horizontal.v-widget {
 	color: #FFA500;
 }
 
-.santeclair .v-radiobutton > .v-icon, .santeclair .v-radiobutton > label .v-icon {
-	margin: 0 4px 0 2px;
-	min-width: 1em;
-	cursor: pointer;
+:root .santeclair .v-radiobutton > input[disabled]  ~ label, :root .santeclair .v-radiobutton > input[disabled]  ~ label .v-icon, :root .santeclair .v-radiobutton > input[disabled]  ~ .v-icon {
+	cursor: default;
 }
 
-.santeclair .v-radiobutton.v-disabled  > label, .santeclair .v-radiobutton.v-disabled  > .v-icon {
-	cursor: default;
+:root .santeclair .v-radiobutton > input[disabled]  ~ label:before, :root .santeclair .v-radiobutton > input[disabled]  ~ label:after {
 	opacity: 0.3;
 	filter: alpha(opacity=30.0) ;
 }
 
-.santeclair .v-radiobutton.v-disabled  > label > .v-icon {
-	cursor: default;
+:root .santeclair .v-radiobutton > input[disabled]:active ~ label:after {
+	background: transparent;
 }
 
-:root .santeclair .v-radiobutton.v-disabled > input:active ~ label:after {
-	background: transparent;
+.santeclair .v-radiobutton > .v-icon, .santeclair .v-radiobutton > label .v-icon {
+	margin: 0 4px 0 2px;
+	min-width: 1em;
+	cursor: pointer;
 }
 
 :root .santeclair .v-radiobutton > input:checked ~ label:after {
@@ -8985,6 +8355,28 @@ div.v-layout.v-horizontal.v-widget {
 	height: 11px;
 }
 
+:root .santeclair .v-select-optiongroup-small .v-checkbox > input ~ label:before:after {
+	border: inherit;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	left: 0px;
+}
+
+:root .santeclair .v-select-optiongroup-small .v-checkbox > input ~ label:before:hover:after {
+	background-color: rgba(191, 191, 191, 0.1);
+}
+
+:root .santeclair .v-select-optiongroup-small .v-checkbox > input ~ label:before:focus:after {
+	border-color: #224E6A;
+	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+}
+
+:root .santeclair .v-select-optiongroup-small .v-checkbox > input ~ label:before:active:after {
+	background-color: rgba(128, 128, 128, 0.2);
+}
+
 :root .santeclair .v-select-optiongroup-small .v-checkbox > input ~ label:after {
 	content: "\f00c";
 	font-family: FontAwesome;
@@ -9002,24 +8394,23 @@ div.v-layout.v-horizontal.v-widget {
 	color: #FFA500;
 }
 
-.santeclair .v-select-optiongroup-small .v-checkbox > .v-icon, .santeclair .v-select-optiongroup-small .v-checkbox > label .v-icon {
-	margin: 0 4px 0 2px;
-	min-width: 1em;
-	cursor: pointer;
+:root .santeclair .v-select-optiongroup-small .v-checkbox > input[disabled]  ~ label, :root .santeclair .v-select-optiongroup-small .v-checkbox > input[disabled]  ~ label .v-icon, :root .santeclair .v-select-optiongroup-small .v-checkbox > input[disabled]  ~ .v-icon {
+	cursor: default;
 }
 
-.santeclair .v-select-optiongroup-small .v-checkbox.v-disabled  > label, .santeclair .v-select-optiongroup-small .v-checkbox.v-disabled  > .v-icon {
-	cursor: default;
+:root .santeclair .v-select-optiongroup-small .v-checkbox > input[disabled]  ~ label:before, :root .santeclair .v-select-optiongroup-small .v-checkbox > input[disabled]  ~ label:after {
 	opacity: 0.3;
 	filter: alpha(opacity=30.0) ;
 }
 
-.santeclair .v-select-optiongroup-small .v-checkbox.v-disabled  > label > .v-icon {
-	cursor: default;
+:root .santeclair .v-select-optiongroup-small .v-checkbox > input[disabled]:active ~ label:after {
+	background: transparent;
 }
 
-:root .santeclair .v-select-optiongroup-small .v-checkbox.v-disabled > input:active ~ label:after {
-	background: transparent;
+.santeclair .v-select-optiongroup-small .v-checkbox > .v-icon, .santeclair .v-select-optiongroup-small .v-checkbox > label .v-icon {
+	margin: 0 4px 0 2px;
+	min-width: 1em;
+	cursor: pointer;
 }
 
 .santeclair .v-select-optiongroup-small .v-radiobutton {
@@ -9096,6 +8487,28 @@ div.v-layout.v-horizontal.v-widget {
 	height: 11px;
 }
 
+:root .santeclair .v-select-optiongroup-small .v-radiobutton > input ~ label:before:after {
+	border: inherit;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	left: 0px;
+}
+
+:root .santeclair .v-select-optiongroup-small .v-radiobutton > input ~ label:before:hover:after {
+	background-color: rgba(191, 191, 191, 0.1);
+}
+
+:root .santeclair .v-select-optiongroup-small .v-radiobutton > input ~ label:before:focus:after {
+	border-color: #224E6A;
+	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+}
+
+:root .santeclair .v-select-optiongroup-small .v-radiobutton > input ~ label:before:active:after {
+	background-color: rgba(128, 128, 128, 0.2);
+}
+
 :root .santeclair .v-select-optiongroup-small .v-radiobutton > input ~ label:after {
 	content: "\f00c";
 	font-family: FontAwesome;
@@ -9113,24 +8526,23 @@ div.v-layout.v-horizontal.v-widget {
 	color: #FFA500;
 }
 
-.santeclair .v-select-optiongroup-small .v-radiobutton > .v-icon, .santeclair .v-select-optiongroup-small .v-radiobutton > label .v-icon {
-	margin: 0 4px 0 2px;
-	min-width: 1em;
-	cursor: pointer;
+:root .santeclair .v-select-optiongroup-small .v-radiobutton > input[disabled]  ~ label, :root .santeclair .v-select-optiongroup-small .v-radiobutton > input[disabled]  ~ label .v-icon, :root .santeclair .v-select-optiongroup-small .v-radiobutton > input[disabled]  ~ .v-icon {
+	cursor: default;
 }
 
-.santeclair .v-select-optiongroup-small .v-radiobutton.v-disabled  > label, .santeclair .v-select-optiongroup-small .v-radiobutton.v-disabled  > .v-icon {
-	cursor: default;
+:root .santeclair .v-select-optiongroup-small .v-radiobutton > input[disabled]  ~ label:before, :root .santeclair .v-select-optiongroup-small .v-radiobutton > input[disabled]  ~ label:after {
 	opacity: 0.3;
 	filter: alpha(opacity=30.0) ;
 }
 
-.santeclair .v-select-optiongroup-small .v-radiobutton.v-disabled  > label > .v-icon {
-	cursor: default;
+:root .santeclair .v-select-optiongroup-small .v-radiobutton > input[disabled]:active ~ label:after {
+	background: transparent;
 }
 
-:root .santeclair .v-select-optiongroup-small .v-radiobutton.v-disabled > input:active ~ label:after {
-	background: transparent;
+.santeclair .v-select-optiongroup-small .v-radiobutton > .v-icon, .santeclair .v-select-optiongroup-small .v-radiobutton > label .v-icon {
+	margin: 0 4px 0 2px;
+	min-width: 1em;
+	cursor: pointer;
 }
 
 :root .santeclair .v-select-optiongroup-small .v-radiobutton > input:checked ~ label:after {
@@ -9241,6 +8653,28 @@ div.v-layout.v-horizontal.v-widget {
 	height: 16px;
 }
 
+:root .santeclair .v-select-optiongroup-large .v-checkbox > input ~ label:before:after {
+	border: inherit;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	left: 0px;
+}
+
+:root .santeclair .v-select-optiongroup-large .v-checkbox > input ~ label:before:hover:after {
+	background-color: rgba(191, 191, 191, 0.1);
+}
+
+:root .santeclair .v-select-optiongroup-large .v-checkbox > input ~ label:before:focus:after {
+	border-color: #224E6A;
+	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+}
+
+:root .santeclair .v-select-optiongroup-large .v-checkbox > input ~ label:before:active:after {
+	background-color: rgba(128, 128, 128, 0.2);
+}
+
 :root .santeclair .v-select-optiongroup-large .v-checkbox > input ~ label:after {
 	content: "\f00c";
 	font-family: FontAwesome;
@@ -9258,24 +8692,23 @@ div.v-layout.v-horizontal.v-widget {
 	color: #FFA500;
 }
 
-.santeclair .v-select-optiongroup-large .v-checkbox > .v-icon, .santeclair .v-select-optiongroup-large .v-checkbox > label .v-icon {
-	margin: 0 5px 0 3px;
-	min-width: 1em;
-	cursor: pointer;
+:root .santeclair .v-select-optiongroup-large .v-checkbox > input[disabled]  ~ label, :root .santeclair .v-select-optiongroup-large .v-checkbox > input[disabled]  ~ label .v-icon, :root .santeclair .v-select-optiongroup-large .v-checkbox > input[disabled]  ~ .v-icon {
+	cursor: default;
 }
 
-.santeclair .v-select-optiongroup-large .v-checkbox.v-disabled  > label, .santeclair .v-select-optiongroup-large .v-checkbox.v-disabled  > .v-icon {
-	cursor: default;
+:root .santeclair .v-select-optiongroup-large .v-checkbox > input[disabled]  ~ label:before, :root .santeclair .v-select-optiongroup-large .v-checkbox > input[disabled]  ~ label:after {
 	opacity: 0.3;
 	filter: alpha(opacity=30.0) ;
 }
 
-.santeclair .v-select-optiongroup-large .v-checkbox.v-disabled  > label > .v-icon {
-	cursor: default;
+:root .santeclair .v-select-optiongroup-large .v-checkbox > input[disabled]:active ~ label:after {
+	background: transparent;
 }
 
-:root .santeclair .v-select-optiongroup-large .v-checkbox.v-disabled > input:active ~ label:after {
-	background: transparent;
+.santeclair .v-select-optiongroup-large .v-checkbox > .v-icon, .santeclair .v-select-optiongroup-large .v-checkbox > label .v-icon {
+	margin: 0 5px 0 3px;
+	min-width: 1em;
+	cursor: pointer;
 }
 
 .santeclair .v-select-optiongroup-large .v-radiobutton {
@@ -9352,6 +8785,28 @@ div.v-layout.v-horizontal.v-widget {
 	height: 16px;
 }
 
+:root .santeclair .v-select-optiongroup-large .v-radiobutton > input ~ label:before:after {
+	border: inherit;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	left: 0px;
+}
+
+:root .santeclair .v-select-optiongroup-large .v-radiobutton > input ~ label:before:hover:after {
+	background-color: rgba(191, 191, 191, 0.1);
+}
+
+:root .santeclair .v-select-optiongroup-large .v-radiobutton > input ~ label:before:focus:after {
+	border-color: #224E6A;
+	-webkit-box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+	box-shadow: 0 0 0 2px rgba(34, 78, 106, 0.5);
+}
+
+:root .santeclair .v-select-optiongroup-large .v-radiobutton > input ~ label:before:active:after {
+	background-color: rgba(128, 128, 128, 0.2);
+}
+
 :root .santeclair .v-select-optiongroup-large .v-radiobutton > input ~ label:after {
 	content: "\f00c";
 	font-family: FontAwesome;
@@ -9369,24 +8824,23 @@ div.v-layout.v-horizontal.v-widget {
 	color: #FFA500;
 }
 
-.santeclair .v-select-optiongroup-large .v-radiobutton > .v-icon, .santeclair .v-select-optiongroup-large .v-radiobutton > label .v-icon {
-	margin: 0 5px 0 3px;
-	min-width: 1em;
-	cursor: pointer;
+:root .santeclair .v-select-optiongroup-large .v-radiobutton > input[disabled]  ~ label, :root .santeclair .v-select-optiongroup-large .v-radiobutton > input[disabled]  ~ label .v-icon, :root .santeclair .v-select-optiongroup-large .v-radiobutton > input[disabled]  ~ .v-icon {
+	cursor: default;
 }
 
-.santeclair .v-select-optiongroup-large .v-radiobutton.v-disabled  > label, .santeclair .v-select-optiongroup-large .v-radiobutton.v-disabled  > .v-icon {
-	cursor: default;
+:root .santeclair .v-select-optiongroup-large .v-radiobutton > input[disabled]  ~ label:before, :root .santeclair .v-select-optiongroup-large .v-radiobutton > input[disabled]  ~ label:after {
 	opacity: 0.3;
 	filter: alpha(opacity=30.0) ;
 }
 
-.santeclair .v-select-optiongroup-large .v-radiobutton.v-disabled  > label > .v-icon {
-	cursor: default;
+:root .santeclair .v-select-optiongroup-large .v-radiobutton > input[disabled]:active ~ label:after {
+	background: transparent;
 }
 
-:root .santeclair .v-select-optiongroup-large .v-radiobutton.v-disabled > input:active ~ label:after {
-	background: transparent;
+.santeclair .v-select-optiongroup-large .v-radiobutton > .v-icon, .santeclair .v-select-optiongroup-large .v-radiobutton > label .v-icon {
+	margin: 0 5px 0 3px;
+	min-width: 1em;
+	cursor: pointer;
 }
 
 :root .santeclair .v-select-optiongroup-large .v-radiobutton > input:checked ~ label:after {
@@ -9447,11 +8901,6 @@ div.v-layout.v-horizontal.v-widget {
 
 .santeclair .v-link:hover {
 	color: #2e6a91;
-}
-
-.santeclair .v-link.v-disabled {
-	opacity: 0.3;
-	filter: alpha(opacity=30.0) ;
 }
 
 .santeclair .v-link a {
@@ -9549,7 +8998,6 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .santeclair .v-window-outerheader {
-	cursor: move;
 	position: absolute;
 	z-index: 2;
 	top: 0;
@@ -9574,6 +9022,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .santeclair .v-window-header {
+	cursor: move;
 	line-height: 25px;
 	padding-left: 9px;
 	margin-right: 52px;
@@ -9581,14 +9030,6 @@ div.v-layout.v-horizontal.v-widget {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	color: #598099;
-}
-
-.santeclair .v-window-restorebox-disabled  ~ .v-window-closebox ~ .v-window-header, .santeclair .v-window-maximizebox-disabled  ~ .v-window-closebox ~ .v-window-header {
-	margin-right: 26px;
-}
-
-.santeclair .v-window-restorebox-disabled  ~ .v-window-closebox-disabled ~ .v-window-header, .santeclair .v-window-maximizebox-disabled  ~ .v-window-closebox-disabled ~ .v-window-header {
-	margin-right: 9px;
 }
 
 .santeclair .v-window-closebox, .santeclair .v-window-maximizebox, .santeclair .v-window-restorebox {
@@ -9645,11 +9086,11 @@ div.v-layout.v-horizontal.v-widget {
 	border-bottom-left-radius: 0;
 }
 
-.santeclair .v-window-closebox-disabled, .santeclair .v-window-resizebox-disabled, .santeclair .v-window-restorebox-disabled, .santeclair .v-window-maximizebox-disabled {
+.santeclair .v-window-restorebox-disabled, .santeclair .v-window-maximizebox-disabled {
 	display: none;
 }
 
-.santeclair .v-window-closebox-disabled  + .v-window-closebox, .santeclair .v-window-resizebox-disabled  + .v-window-closebox, .santeclair .v-window-restorebox-disabled  + .v-window-closebox, .santeclair .v-window-maximizebox-disabled  + .v-window-closebox {
+.santeclair .v-window-restorebox-disabled  + .v-window-closebox, .santeclair .v-window-maximizebox-disabled  + .v-window-closebox {
 	width: 26px;
 	padding-right: 0;
 	border-bottom-left-radius: 4px;
@@ -9707,16 +9148,8 @@ div.v-layout.v-horizontal.v-widget {
 	padding-left: 9px;
 }
 
-.santeclair .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-left"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h2, .santeclair .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-left"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h3, .santeclair .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-left"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h4 {
-	left: 9px;
-}
-
 .santeclair .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"] {
 	padding-right: 9px;
-}
-
-.santeclair .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h2, .santeclair .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h3, .santeclair .v-window-contents  > .v-scrollable  > .v-formlayout [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"]  > .v-label-h4 {
-	right: 9px;
 }
 
 .santeclair .v-window-contents  > .v-scrollable:focus {
@@ -9763,6 +9196,10 @@ div.v-layout.v-horizontal.v-widget {
 
 .v-ie8 .santeclair .v-window-resizebox, .v-ie9 .santeclair .v-window-resizebox {
 	cursor: se-resize;
+}
+
+.santeclair .v-window-resizebox-disabled {
+	display: none;
 }
 
 .santeclair .v-window-modalitycurtain:active  ~ .v-window {
@@ -10077,14 +9514,9 @@ div.v-layout.v-horizontal.v-widget {
 .santeclair .v-table-footer-container, .santeclair .v-table-caption-container {
 	overflow: hidden;
 	line-height: 1;
-	min-height: 26px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-}
-
-.v-ie8 .santeclair .v-table-footer-container, .v-ie8 .santeclair .v-table-caption-container {
-	min-height: 11px;
 }
 
 .santeclair .v-table-footer-container {
@@ -10120,7 +9552,6 @@ div.v-layout.v-horizontal.v-widget {
 	border-left: 1px solid #999999;
 	overflow: hidden;
 	height: 26px;
-	vertical-align: middle;
 }
 
 .santeclair .v-table-cell-content:first-child {
@@ -10224,12 +9655,12 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .santeclair .v-table-header-cell-asc .v-table-sort-indicator:before {
-	content: "\f0de";
+	content: "\f0dd";
 	font-family: FontAwesome;
 }
 
 .santeclair .v-table-header-cell-desc .v-table-sort-indicator:before {
-	content: "\f0dd";
+	content: "\f0de";
 	font-family: FontAwesome;
 }
 
@@ -10433,27 +9864,44 @@ div.v-layout.v-horizontal.v-widget {
 	outline: none;
 }
 
-.santeclair .v-table-row-drag-middle .v-table-cell-content {
-	background-color: #d2dbe1;
-	color: #353e45;
+.santeclair .v-table-row-drag-middle td:first-child:before {
+	content: "";
+	display: block;
+	position: absolute;
+	z-index: 1;
+	height: 27px;
+	left: 0;
+	right: 0;
+	background: #224E6A;
+	opacity: 0.2;
+	filter: alpha(opacity=20) ;
 }
 
-.santeclair .v-table-row-drag-bottom td.v-table-cell-content {
-	border-bottom: 2px solid #224E6A;
-	height: 24px;
+.santeclair .v-table-row-drag-top td:first-child:before, .santeclair .v-table-row-drag-bottom td:first-child:after {
+	content: "\2022";
+	display: block;
+	position: absolute;
+	height: 2px;
+	left: 0;
+	right: 0;
+	background: #224E6A;
+	font-size: 26px;
+	line-height: 2px;
+	color: #224E6A;
+	text-indent: -3px;
+	text-shadow: 0 0 1px white, 0 0 1px white;
 }
 
-.santeclair .v-table-row-drag-bottom .v-table-cell-wrapper {
-	margin-bottom: -2px;
-}
-
-.santeclair .v-table-row-drag-top td.v-table-cell-content {
-	border-top: 2px solid #224E6A;
-	height: 25px;
-}
-
-.santeclair .v-table-row-drag-top .v-table-cell-wrapper {
+.santeclair .v-table-row-drag-top td:first-child:before {
 	margin-top: -1px;
+}
+
+.v-ff .santeclair .v-table-row-drag-top td:first-child:before, .v-ff .santeclair .v-table-row-drag-bottom td:first-child:after {
+	line-height: 1px;
+}
+
+.v-ie .santeclair .v-table-row-drag-top td:first-child:before, .v-ie .santeclair .v-table-row-drag-bottom td:first-child:after {
+	line-height: 0;
 }
 
 .santeclair .v-table-no-stripes .v-table-row, .santeclair .v-table-no-stripes .v-table-row-odd {
@@ -10472,10 +9920,6 @@ div.v-layout.v-horizontal.v-widget {
 .santeclair .v-table-no-horizontal-lines .v-table-cell-content {
 	border-top: none;
 	border-bottom: none;
-}
-
-.santeclair .v-table-no-horizontal-lines .v-table-row-drag-top .v-table-cell-content, .santeclair .v-table-no-horizontal-lines .v-table-row-drag-bottom .v-table-cell-content {
-	height: 25px;
 }
 
 .santeclair .v-table-no-header .v-table-header-wrap {
@@ -10548,6 +9992,10 @@ div.v-layout.v-horizontal.v-widget {
 	margin-top: -11px;
 }
 
+.santeclair .v-table-compact .v-table-row-drag-middle td:first-child:before, .santeclair .v-table-small .v-table-row-drag-middle td:first-child:before {
+	height: 23px;
+}
+
 .santeclair .v-table-compact.v-treetable .v-table-cell-wrapper, .santeclair .v-table-small.v-treetable .v-table-cell-wrapper {
 	padding-left: 0;
 	padding-right: 0;
@@ -10568,10 +10016,6 @@ div.v-layout.v-horizontal.v-widget {
 	padding-right: 5px;
 }
 
-.santeclair .v-table-compact .v-table-row-drag-top .v-table-cell-content, .santeclair .v-table-compact .v-table-row-drag-bottom .v-table-cell-content, .santeclair .v-table-small .v-table-row-drag-top .v-table-cell-content, .santeclair .v-table-small .v-table-row-drag-bottom .v-table-cell-content {
-	height: 21px;
-}
-
 .santeclair .v-table-small {
 	font-size: 12px;
 }
@@ -10586,10 +10030,6 @@ div.v-layout.v-horizontal.v-widget {
 	box-sizing: content-box;
 	padding-left: 0;
 	padding-right: 0;
-}
-
-.santeclair .v-treetable [class*="caption-container"], .santeclair .v-treetable [class*="footer-container"] {
-	min-height: 11px;
 }
 
 .santeclair .v-treetable [class*="cell-wrapper"] {
@@ -11257,7 +10697,6 @@ div.v-layout.v-horizontal.v-widget {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	border-bottom: 2px solid transparent;
-	position: relative;
 	-webkit-transition: border-bottom 200ms, color 200ms;
 	-moz-transition: border-bottom 200ms, color 200ms;
 	transition: border-bottom 200ms, color 200ms;
@@ -11280,6 +10719,7 @@ div.v-layout.v-horizontal.v-widget {
 	filter: alpha(opacity=30.0) ;
 	cursor: default;
 	color: inherit !important;
+	border-bottom: none;
 }
 
 .santeclair .v-tabsheet-tabitemcell:first-child .v-caption, .santeclair .v-tabsheet-tabitemcell[aria-hidden="true"] + td .v-caption {
@@ -11299,23 +10739,14 @@ div.v-layout.v-horizontal.v-widget {
 	color: #FFA500;
 }
 
-.santeclair .v-tabsheet-tabitemcell .v-caption-closable {
-	padding-right: 17px;
-}
-
-.santeclair .v-tabsheet-tabitemcell.icons-on-top .v-caption-closable {
-	padding-right: 3px;
-}
-
 .santeclair .v-tabsheet-tabitemcell .v-tabsheet-caption-close {
-	position: absolute;
-	right: 0;
-	top: 50%;
-	margin: -7px 0 0;
+	display: inline-block;
 	font-size: 14px;
 	line-height: 14px;
 	width: 14px;
+	vertical-align: middle;
 	text-align: center;
+	margin: 0 -3px 0 7px;
 	border-radius: 2px;
 	color: #2f9ee8;
 }
@@ -11489,9 +10920,9 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .santeclair .v-tabsheet-framed  > .v-tabsheet-tabcontainer .v-caption {
+	position: relative;
 	margin-left: 3px;
 	padding: 0 9px;
-	background-color: #D2EDFF;
 	border: 0px solid transparent;
 	line-height: 26px;
 	border-radius: 4px 4px 0 0;
@@ -11504,20 +10935,6 @@ div.v-layout.v-horizontal.v-widget {
 .santeclair .v-tabsheet-framed  > .v-tabsheet-tabcontainer .v-caption:hover {
 	background-color: #c3e7ff;
 	border-bottom-color: #999999;
-}
-
-.santeclair .v-tabsheet-framed  > .v-tabsheet-tabcontainer .v-caption.v-disabled:hover {
-	background-color: #D2EDFF;
-}
-
-.santeclair .v-tabsheet-framed  > .v-tabsheet-tabcontainer .v-caption-closable {
-	padding-right: 23px;
-}
-
-.santeclair .v-tabsheet-framed  > .v-tabsheet-tabcontainer .v-tabsheet-caption-close {
-	top: 3px;
-	right: 3px;
-	margin-top: 0;
 }
 
 .santeclair .v-tabsheet-framed  > .v-tabsheet-tabcontainer td:first-child .v-caption, .santeclair .v-tabsheet-framed  > .v-tabsheet-tabcontainer [aria-hidden="true"] + td .v-caption {
@@ -11533,6 +10950,17 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #999999;
 	border-bottom: none;
 	padding-bottom: 0px;
+}
+
+.santeclair .v-tabsheet-framed  > .v-tabsheet-tabcontainer .v-caption-closable {
+	padding-right: 23px;
+}
+
+.santeclair .v-tabsheet-framed  > .v-tabsheet-tabcontainer .v-tabsheet-caption-close {
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	margin: 0;
 }
 
 .santeclair .v-tabsheet-framed  > .v-tabsheet-content {
@@ -11551,8 +10979,8 @@ div.v-layout.v-horizontal.v-widget {
 	padding-top: 4px;
 }
 
-.santeclair .v-tabsheet-framed.icons-on-top  > .v-tabsheet-tabcontainer .v-tabsheet-tabitem-selected .v-caption {
-	padding-bottom: 4px;
+.santeclair .v-tabsheet-framed.icons-on-top .v-caption-closable {
+	padding-right: 9px;
 }
 
 .santeclair .v-tabsheet-centered-tabs  > .v-tabsheet-tabcontainer {
@@ -11567,27 +10995,22 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0 7px;
 }
 
-.santeclair .v-tabsheet-icons-on-top  > .v-tabsheet-tabcontainer .v-caption {
+.santeclair .v-tabsheet-icons-on-top  > div > .v-tabsheet-tabs .v-caption {
 	padding-top: 4px;
 	padding-bottom: 4px;
 	line-height: 1.2;
 }
 
-.santeclair .v-tabsheet-icons-on-top  > .v-tabsheet-tabcontainer .v-icon {
+.santeclair .v-tabsheet-icons-on-top  > div > .v-tabsheet-tabs .v-tabsheet-tabitem-selected .v-caption {
+	padding-bottom: 4px;
+}
+
+.santeclair .v-tabsheet-icons-on-top  > div > .v-tabsheet-tabs .v-icon {
 	display: block;
 }
 
-.santeclair .v-tabsheet-icons-on-top  > .v-tabsheet-tabcontainer .v-icon  + .v-captiontext.v-captiontext {
+.santeclair .v-tabsheet-icons-on-top  > div > .v-tabsheet-tabs .v-icon  + .v-captiontext.v-captiontext {
 	margin-left: 0;
-}
-
-.santeclair .v-tabsheet-icons-on-top  > .v-tabsheet-tabcontainer .v-caption-closable {
-	padding-right: 9px;
-}
-
-.santeclair .v-tabsheet-icons-on-top  > .v-tabsheet-tabcontainer .v-tabsheet-caption-close {
-	top: 3px;
-	margin-top: 0;
 }
 
 .santeclair .v-tabsheet-compact-tabbar  > .v-tabsheet-tabcontainer-compact-tabbar .v-caption {
@@ -12844,11 +12267,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #2e6a91;
 }
 
-.santeclair .v-popupview.v-disabled {
-	opacity: 0.3;
-	filter: alpha(opacity=30.0) ;
-}
-
 .santeclair .v-popupview-popup {
 	padding: 3px 3px;
 	border-radius: 4px;
@@ -12940,8 +12358,8 @@ div.v-layout.v-horizontal.v-widget {
 	border: 1px solid #999999;
 	background: #ffffff;
 	color: #474747;
-	-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
-	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
+	-webkit-box-shadow: inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
+	box-shadow: inset 0 1px 0 #f7f7f7, 0 1px 0 rgba(255, 255, 255, 0.1);
 	-webkit-transition: box-shadow 180ms, border 180ms;
 	-moz-transition: box-shadow 180ms, border 180ms;
 	transition: box-shadow 180ms, border 180ms;
@@ -13097,14 +12515,10 @@ div.v-layout.v-horizontal.v-widget {
 	white-space: normal;
 }
 
-.santeclair .v-upload-immediate .v-button {
-	width: 100%;
-}
-
 .santeclair .v-upload-immediate input[type="file"] {
 	opacity: 0;
 	filter: alpha(opacity=0) ;
-	z-index: -1;
+	z-index: 2;
 	position: absolute;
 	right: 0;
 	height: 26px;
@@ -13135,21 +12549,21 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .santeclair .v-Notification-animate-in {
-	-webkit-animation: valo-animate-in-fade 180ms 10ms backwards;
-	-moz-animation: valo-animate-in-fade 180ms 10ms backwards;
-	animation: valo-animate-in-fade 180ms 10ms backwards;
+	-webkit-animation: valo-animate-in-fade 180ms;
+	-moz-animation: valo-animate-in-fade 180ms;
+	animation: valo-animate-in-fade 180ms;
 }
 
 .santeclair .v-Notification-animate-in.v-position-top {
-	-webkit-animation: valo-animate-in-slide-down 400ms 10ms backwards;
-	-moz-animation: valo-animate-in-slide-down 400ms 10ms backwards;
-	animation: valo-animate-in-slide-down 400ms 10ms backwards;
+	-webkit-animation: valo-animate-in-slide-down 400ms;
+	-moz-animation: valo-animate-in-slide-down 400ms;
+	animation: valo-animate-in-slide-down 400ms;
 }
 
 .santeclair .v-Notification-animate-in.v-position-bottom {
-	-webkit-animation: valo-animate-in-slide-up 400ms 10ms backwards;
-	-moz-animation: valo-animate-in-slide-up 400ms 10ms backwards;
-	animation: valo-animate-in-slide-up 400ms 10ms backwards;
+	-webkit-animation: valo-animate-in-slide-up 400ms;
+	-moz-animation: valo-animate-in-slide-up 400ms;
+	animation: valo-animate-in-slide-up 400ms;
 }
 
 .santeclair .v-Notification-animate-out {
@@ -13240,9 +12654,9 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .santeclair .v-Notification-system.v-position-top[class*="animate-in"] {
-	-webkit-animation: valo-animate-in-slide-down 300ms 10ms backwards;
-	-moz-animation: valo-animate-in-slide-down 300ms 10ms backwards;
-	animation: valo-animate-in-slide-down 300ms 10ms backwards;
+	-webkit-animation: valo-animate-in-slide-down 300ms;
+	-moz-animation: valo-animate-in-slide-down 300ms;
+	animation: valo-animate-in-slide-down 300ms;
 }
 
 .santeclair .v-Notification-system.v-position-top[class*="animate-out"] {
@@ -13256,9 +12670,9 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .santeclair .v-Notification-system.v-position-bottom[class*="animate-in"] {
-	-webkit-animation: valo-animate-in-slide-up 300ms 10ms backwards;
-	-moz-animation: valo-animate-in-slide-up 300ms 10ms backwards;
-	animation: valo-animate-in-slide-up 300ms 10ms backwards;
+	-webkit-animation: valo-animate-in-slide-up 300ms;
+	-moz-animation: valo-animate-in-slide-up 300ms;
+	animation: valo-animate-in-slide-up 300ms;
 }
 
 .santeclair .v-Notification-system.v-position-bottom[class*="animate-out"] {
@@ -13352,9 +12766,9 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .santeclair .v-Notification.bar.v-position-top[class*="animate-in"] {
-	-webkit-animation: valo-animate-in-slide-down 300ms 10ms backwards;
-	-moz-animation: valo-animate-in-slide-down 300ms 10ms backwards;
-	animation: valo-animate-in-slide-down 300ms 10ms backwards;
+	-webkit-animation: valo-animate-in-slide-down 300ms;
+	-moz-animation: valo-animate-in-slide-down 300ms;
+	animation: valo-animate-in-slide-down 300ms;
 }
 
 .santeclair .v-Notification.bar.v-position-top[class*="animate-out"] {
@@ -13368,9 +12782,9 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .santeclair .v-Notification.bar.v-position-bottom[class*="animate-in"] {
-	-webkit-animation: valo-animate-in-slide-up 300ms 10ms backwards;
-	-moz-animation: valo-animate-in-slide-up 300ms 10ms backwards;
-	animation: valo-animate-in-slide-up 300ms 10ms backwards;
+	-webkit-animation: valo-animate-in-slide-up 300ms;
+	-moz-animation: valo-animate-in-slide-up 300ms;
+	animation: valo-animate-in-slide-up 300ms;
 }
 
 .santeclair .v-Notification.bar.v-position-bottom[class*="animate-out"] {
@@ -13688,7 +13102,6 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0 26px 0 13px;
 	cursor: pointer;
 	position: relative;
-	overflow: hidden;
 	text-shadow: 0 2px 0 rgba(0, 0, 0, 0.05);
 	-webkit-transition: background-color 300ms, color 60ms;
 	-moz-transition: background-color 300ms, color 60ms;
@@ -13870,32 +13283,32 @@ div.v-layout.v-horizontal.v-widget {
 	outline: none;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part {
 	background-color: #00548c;
 	min-width: 52px;
 	max-width: 78px;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-title {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part .valo-menu-title {
 	font-size: 10px;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-title .v-label-undef-w {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part .valo-menu-title .v-label-undef-w {
 	white-space: normal;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .v-menubar-user-menu {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part .v-menubar-user-menu {
 	margin-left: 0;
 	margin-right: 0;
 	font-size: 9px;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .v-menubar-user-menu img.v-icon {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part .v-menubar-user-menu img.v-icon {
 	width: 20px;
 	height: 20px;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part [class*="subtitle"] {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part [class*="subtitle"] {
 	margin: 7px 0 0;
 	padding: 5px 17px 5px 7px;
 	line-height: 1;
@@ -13907,15 +13320,15 @@ div.v-layout.v-horizontal.v-widget {
 	box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part [class*="subtitle"] [class*="badge"] {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part [class*="subtitle"] [class*="badge"] {
 	right: 7px;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part [class*="subtitle"]  + .valo-menu-item {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part [class*="subtitle"]  + .valo-menu-item {
 	border-top: none;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item {
 	display: block;
 	font-size: 21px;
 	line-height: 1;
@@ -13924,11 +13337,11 @@ div.v-layout.v-horizontal.v-widget {
 	border-top: 0px solid #0f5e92;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item:first-child {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item:first-child {
 	border-top: none;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item [class*="caption"] {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item [class*="caption"] {
 	display: block;
 	width: auto;
 	margin: 0.3em 0 0;
@@ -13937,27 +13350,27 @@ div.v-layout.v-horizontal.v-widget {
 	line-height: 1.3;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item .v-icon {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item .v-icon {
 	margin: 0;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item span.v-icon {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item span.v-icon {
 	opacity: 0.8;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item.selected {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item.selected {
 	background: #004b7c;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item.selected .v-icon {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item.selected .v-icon {
 	opacity: 1;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item.selected [class*="badge"] {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item.selected [class*="badge"] {
 	border-color: #004b7c;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item [class*="badge"] {
+.santeclair .v-ui[width-range~="801px-1100px"] .valo-menu-part .valo-menu-item [class*="badge"] {
 	padding-left: 3px;
 	padding-right: 3px;
 	top: 5px;
@@ -13965,33 +13378,33 @@ div.v-layout.v-horizontal.v-widget {
 	border: 2px solid #00548c;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="0-800px"] {
+.santeclair .v-ui[width-range~="0-800px"] {
 	padding-top: 26px;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="0-800px"] .v-loading-indicator {
+.santeclair .v-ui[width-range~="0-800px"] .v-loading-indicator {
 	top: 26px;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="0-800px"]  > .v-widget {
+.santeclair .v-ui[width-range~="0-800px"]  > .v-widget {
 	position: relative !important;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu {
+.santeclair .v-ui[width-range~="0-800px"] .valo-menu {
 	border-right: none;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu-part {
+.santeclair .v-ui[width-range~="0-800px"] .valo-menu-part {
 	overflow: visible;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu-toggle {
+.santeclair .v-ui[width-range~="0-800px"] .valo-menu-toggle {
 	display: inline-block;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu-title {
+.santeclair .v-ui[width-range~="0-800px"] .valo-menu-title {
 	position: fixed;
 	z-index: 100;
 	top: 0;
@@ -14000,10 +13413,9 @@ div.v-layout.v-horizontal.v-widget {
 	height: 26px !important;
 	padding-top: 0;
 	padding-bottom: 0;
-	-webkit-backface-visibility: hidden;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu .v-menubar-user-menu {
+.santeclair .v-ui[width-range~="0-800px"] .valo-menu .v-menubar-user-menu {
 	position: fixed;
 	z-index: 100;
 	top: 0;
@@ -14013,15 +13425,14 @@ div.v-layout.v-horizontal.v-widget {
 	height: 26px;
 	color: #704e10;
 	max-width: 30%;
-	-webkit-backface-visibility: hidden;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu .v-menubar-user-menu .v-menubar-menuitem {
+.santeclair .v-ui[width-range~="0-800px"] .valo-menu .v-menubar-user-menu .v-menubar-menuitem {
 	line-height: 25px;
 	white-space: nowrap;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu .v-menubar-user-menu img.v-icon {
+.santeclair .v-ui[width-range~="0-800px"] .valo-menu .v-menubar-user-menu img.v-icon {
 	display: inline-block;
 	margin: 0 4px 0 0;
 	width: 13px;
@@ -14030,7 +13441,7 @@ div.v-layout.v-horizontal.v-widget {
 	border: none;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menuitems {
+.santeclair .v-ui[width-range~="0-800px"] .valo-menuitems {
 	height: 100%;
 	background-color: #00548c;
 	background-image: -webkit-linear-gradient(right, #004777 0%, #00548c 7px);
@@ -14058,7 +13469,7 @@ div.v-layout.v-horizontal.v-widget {
 	transition: all 300ms;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="0-800px"] .valo-menu-visible .valo-menuitems {
+.santeclair .v-ui[width-range~="0-800px"] .valo-menu-visible .valo-menuitems {
 	-webkit-transform: translatex(0%);
 	-moz-transform: translatex(0%);
 	-ms-transform: translatex(0%);
@@ -14066,11 +13477,11 @@ div.v-layout.v-horizontal.v-widget {
 	transform: translatex(0%);
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="0-500px"] .valo-menu-toggle .v-button-caption {
+.santeclair .v-ui[width-range~="0-500px"] .valo-menu-toggle .v-button-caption {
 	display: none;
 }
 
-.santeclair .v-ui.valo-menu-responsive[width-range~="0-500px"] .valo-menu .v-menubar-user-menu .v-menubar-menuitem-caption {
+.santeclair .v-ui[width-range~="0-500px"] .valo-menu .v-menubar-user-menu .v-menubar-menuitem-caption {
 	display: inline-block;
 	width: 13px;
 	overflow: hidden;
