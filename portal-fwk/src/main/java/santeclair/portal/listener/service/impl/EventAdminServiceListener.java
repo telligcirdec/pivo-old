@@ -57,17 +57,17 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
 
     public interface Publisher<SOURCE, DATA> {
 
-        public void send(String eventName, Dictionary<String, Object> dictionary, boolean synchronous);
+        public void publishEvent(String eventName, Dictionary<String, Object> dictionary, boolean synchronous);
 
-        public void sendSynchronously(String eventName, Dictionary<String, Object> dictionary);
+        public void publishEventSynchronously(String eventName, Dictionary<String, Object> dictionary);
 
-        public void sendAsynchronously(String eventName, Dictionary<String, Object> dictionary);
+        public void publishEventAsynchronously(String eventName, Dictionary<String, Object> dictionary);
 
-        public void sendData(String eventName, DATA data, boolean synchronous);
+        public void publishEventData(String eventName, DATA data, boolean synchronous);
 
-        public void sendDataSynchronously(String eventName, DATA data);
+        public void publishEventDataSynchronously(String eventName, DATA data);
 
-        public void sendDataAsynchronously(String eventName, DATA data);
+        public void publishEventDataAsynchronously(String eventName, DATA data);
 
     }
 
@@ -84,7 +84,7 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
         }
 
         @Override
-        public void send(final String eventName, Dictionary<String, Object> dictionary, boolean synchronous) {
+        public void publishEvent(final String eventName, Dictionary<String, Object> dictionary, boolean synchronous) {
             Preconditions.checkArgument(StringUtils.isNotBlank(eventName), "You must set an eventName to send an event");
             LOGGER.info("Publishing event via send");
             dictionary = dictionary == null ? new Hashtable<String, Object>() : dictionary;
@@ -105,33 +105,33 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
         }
 
         @Override
-        public void sendData(String eventName, DATA data, boolean synchronous) {
+        public void publishEventData(String eventName, DATA data, boolean synchronous) {
             Preconditions.checkArgument(data != null, "To send a data event, data must be set to a value different from null");
             LOGGER.info("Publishing event via sendData");
             Dictionary<String, Object> dictionary = new Hashtable<>();
             dictionary.put(PROPERTY_KEY_EVENT_DATA, data);
             dictionary.put(PROPERTY_KEY_EVENT_DATA_TYPE, data.getClass().getName());
-            send(eventName, dictionary, synchronous);
+            publishEvent(eventName, dictionary, synchronous);
         }
 
         @Override
-        public void sendSynchronously(String eventName, Dictionary<String, Object> dictionary) {
-            send(eventName, dictionary, true);
+        public void publishEventSynchronously(String eventName, Dictionary<String, Object> dictionary) {
+            publishEvent(eventName, dictionary, true);
         }
 
         @Override
-        public void sendAsynchronously(String eventName, Dictionary<String, Object> dictionary) {
-            send(eventName, dictionary, false);
+        public void publishEventAsynchronously(String eventName, Dictionary<String, Object> dictionary) {
+            publishEvent(eventName, dictionary, false);
         }
 
         @Override
-        public void sendDataSynchronously(String eventName, DATA data) {
-            sendData(eventName, data, true);
+        public void publishEventDataSynchronously(String eventName, DATA data) {
+            publishEventData(eventName, data, true);
         }
 
         @Override
-        public void sendDataAsynchronously(String eventName, DATA data) {
-            sendData(eventName, data, false);
+        public void publishEventDataAsynchronously(String eventName, DATA data) {
+            publishEventData(eventName, data, false);
         }
 
     }

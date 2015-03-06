@@ -22,6 +22,7 @@ import santeclair.portal.vaadin.module.ModuleUiFactory;
 import santeclair.portal.webapp.vaadin.PushHelper;
 import santeclair.portal.webapp.vaadin.view.component.MainButonModuleUiFactory;
 
+import com.vaadin.navigator.Navigator;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.UI;
@@ -33,11 +34,13 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
     private static final long serialVersionUID = -4748523363216844520L;
     private final VerticalLayout buttonContainer;
     private final UI ui;
+    private final Navigator navigator;
 
-    public LeftSideMenu(UI ui) {
+    public LeftSideMenu(final UI ui, final Navigator navigator) {
         super("sidebarLayout");
         buttonContainer = new VerticalLayout();
         this.ui = ui;
+        this.navigator = navigator;
     }
 
     public void init(BundleContext bundleContext) {
@@ -53,7 +56,7 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
                     + EVENT_STARTED + ")")
     public synchronized void addModuleUiFactory(@EventArg(name = PROPERTY_KEY_MODULE_UI_FACTORY) final ModuleUiFactory<?> moduleUiFactory) {
         LOGGER.debug("global addModuleUiFactory");
-        MainButonModuleUiFactory mainButonModuleUiFactory = new MainButonModuleUiFactory(moduleUiFactory);
+        MainButonModuleUiFactory mainButonModuleUiFactory = new MainButonModuleUiFactory(moduleUiFactory, navigator);
         TreeSet<Component> butonModuleUiFactories = new TreeSet<>();
         butonModuleUiFactories.add(mainButonModuleUiFactory);
         for (Component component : buttonContainer) {

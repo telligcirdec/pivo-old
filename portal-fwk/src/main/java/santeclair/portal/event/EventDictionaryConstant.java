@@ -3,7 +3,9 @@ package santeclair.portal.event;
 public interface EventDictionaryConstant {
 
     /*
-     * Topics name
+     *  =========================
+     *  = Topics name
+     *  =========================
      */
     /**
      * Nom du topic principal.
@@ -17,6 +19,10 @@ public interface EventDictionaryConstant {
      * Nom du topic ou sont firé les event en rapport avec les factories de modules ui
      */
     public static final String TOPIC_MODULE_UI_FACTORY = TOPIC_PORTAL + "/module/ModuleUiFactoryEvent";
+    /**
+     * Nom du topic ou sont firé les event en rapport avec les buttons permettant le démarrage des modules
+     */
+    public static final String TOPIC_MAIN_BUTTON_MODULE_UI_FACTORY = TOPIC_PORTAL + "/MainButonModuleUiFactory";
 
     /*
      * Properties keys
@@ -49,5 +55,6 @@ public interface EventDictionaryConstant {
      */
     public static final String EVENT_STARTED = "started";
     public static final String EVENT_STOPPED = "stopped";
+    public static final String EVENT_ON_CLICK = "on_click";
 
 }

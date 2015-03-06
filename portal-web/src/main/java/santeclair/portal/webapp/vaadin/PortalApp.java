@@ -35,6 +35,9 @@ import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
+import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.DefaultErrorHandler;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
@@ -52,7 +55,7 @@ import com.vaadin.ui.UI;
 @Title("Portail Santeclair")
 @Theme("santeclair")
 @Push(value = PushMode.MANUAL, transport = Transport.WEBSOCKET)
-public class PortalApp extends UI implements PortalEventHandler, PortalStartCallback {
+public class PortalApp extends UI implements PortalEventHandler, PortalStartCallback, ViewDisplay {
 
     private static final long serialVersionUID = -5547062232353913227L;
     private static final Logger LOGGER = LoggerFactory.getLogger(PortalApp.class);
@@ -63,6 +66,8 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
     private LeftSideMenu leftSideMenu;
     // Container des onglets
     private Tabs tabs;
+
+    private Navigator navigator;
 
     private Publisher<PortalApp, PortalStartCallback> portalPublisher;
 
@@ -84,15 +89,20 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         this.setSizeFull();
         this.setErrorHandler();
 
-        // Création du composant contenant le menu à gauche avec les boutons
-        LOGGER.info("Initialisation du menu gauche");
-        leftSideMenu = new LeftSideMenu(this);
-        leftSideMenu.init(context);
+        navigator = new Navigator(this, (ViewDisplay) this);
 
         // Création du composant contenant les tabsheet
         LOGGER.info("Initialisation du container d'onglet");
         tabs = new Tabs();
         tabs.init();
+
+        navigator.addView("", tabs);
+        navigator.addView("container", tabs);
+
+        // Création du composant contenant le menu à gauche avec les boutons
+        LOGGER.info("Initialisation du menu gauche");
+        leftSideMenu = new LeftSideMenu(this, navigator);
+        leftSideMenu.init(context);
 
         // Création du container principal
         LOGGER.info("Création du container principal");
@@ -107,7 +117,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         portalPublisher = eventAdminServiceListener.registerPublisher(TOPIC_PORTAL, this);
         this.setContent(main);
 
-        portalPublisher.sendDataSynchronously(EVENT_STARTED, this);
+        portalPublisher.publishEventDataSynchronously(EVENT_STARTED, this);
         LOGGER.debug("Fin Initialisation de l'UI");
     }
 
@@ -217,6 +227,11 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
             }
         }
         return null;
+    }
+
+    @Override
+    public void showView(View view) {
+        LOGGER.debug("view : " + view);
     }
 
 }

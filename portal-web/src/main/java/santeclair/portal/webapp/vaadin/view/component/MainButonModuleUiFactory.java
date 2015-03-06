@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import santeclair.portal.vaadin.module.ModuleUiFactory;
 
 import com.google.common.base.Preconditions;
+import com.vaadin.navigator.Navigator;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -18,10 +19,13 @@ public class MainButonModuleUiFactory extends Button implements Comparable<MainB
     private static final String MAIN_BUTTON_MODULE_UI_STYLE_NAME = "button-heading";
 
     private final ModuleUiFactory<?> moduleUiFactory;
+    private final Navigator navigator;
 
-    public MainButonModuleUiFactory(ModuleUiFactory<?> moduleUiFactory) {
+    public MainButonModuleUiFactory(final ModuleUiFactory<?> moduleUiFactory, final Navigator navigator) {
         Preconditions.checkNotNull(moduleUiFactory, "You must set a module ui factory to create a button on left side menu.");
         this.moduleUiFactory = moduleUiFactory;
+        this.navigator = navigator;
+
         this.setStyleName(ValoTheme.BUTTON_BORDERLESS);
         this.addStyleName(MAIN_BUTTON_MODULE_UI_STYLE_NAME);
         this.setCaption(moduleUiFactory.getName());
@@ -51,7 +55,7 @@ public class MainButonModuleUiFactory extends Button implements Comparable<MainB
     @Override
     public void buttonClick(ClickEvent event) {
         LOGGER.debug("Click event : {}", event);
-
+        navigator.navigateTo("container/new/modules/" + moduleUiFactory.getCode());
     }
 
     public ModuleUiFactory<?> getModuleUiFactory() {
