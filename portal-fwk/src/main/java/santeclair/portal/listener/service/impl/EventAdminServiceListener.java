@@ -5,6 +5,7 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_SOURCE;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -55,7 +56,7 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
         }
     }
 
-    public interface Publisher<SOURCE, DATA> {
+    public interface Publisher<SOURCE, DATA> extends Serializable {
 
         public void publishEvent(String eventName, Dictionary<String, Object> dictionary, boolean synchronous);
 
@@ -69,9 +70,20 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
 
         public void publishEventDataAsynchronously(String eventName, DATA data);
 
+        public void publishEventDataAndDictionnary(String eventName, DATA data, Dictionary<String, Object> props, boolean synchronous);
+
+        public void publishEventDataAndDictionnarySynchronously(String eventName, DATA data, Dictionary<String, Object> props);
+
+        public void publishEventDataAndDictionnaryAsynchronously(String eventName, DATA data, Dictionary<String, Object> props);
+
     }
 
     private class PublisherImpl<SOURCE, DATA> implements Publisher<SOURCE, DATA> {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -1356857447344703240L;
 
         private final EventAdminServiceListener eventAdminServiceListener;
         private final String topic;
@@ -106,12 +118,8 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
 
         @Override
         public void publishEventData(String eventName, DATA data, boolean synchronous) {
-            Preconditions.checkArgument(data != null, "To send a data event, data must be set to a value different from null");
             LOGGER.info("Publishing event via sendData");
-            Dictionary<String, Object> dictionary = new Hashtable<>();
-            dictionary.put(PROPERTY_KEY_EVENT_DATA, data);
-            dictionary.put(PROPERTY_KEY_EVENT_DATA_TYPE, data.getClass().getName());
-            publishEvent(eventName, dictionary, synchronous);
+            publishEvent(eventName, addDataToDictionary(data, null), synchronous);
         }
 
         @Override
@@ -132,6 +140,29 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
         @Override
         public void publishEventDataAsynchronously(String eventName, DATA data) {
             publishEventData(eventName, data, false);
+        }
+
+        @Override
+        public void publishEventDataAndDictionnary(String eventName, DATA data, Dictionary<String, Object> props, boolean synchronous) {
+            publishEvent(eventName, addDataToDictionary(data, props), synchronous);
+        }
+
+        @Override
+        public void publishEventDataAndDictionnarySynchronously(String eventName, DATA data, Dictionary<String, Object> props) {
+            publishEvent(eventName, addDataToDictionary(data, props), true);
+        }
+
+        @Override
+        public void publishEventDataAndDictionnaryAsynchronously(String eventName, DATA data, Dictionary<String, Object> props) {
+            publishEvent(eventName, addDataToDictionary(data, props), false);
+        }
+
+        private Dictionary<String, Object> addDataToDictionary(DATA data, Dictionary<String, Object> props) {
+            Preconditions.checkArgument(data != null, "To send a data event, data must be set to a value different from null");
+            props = props != null ? props : new Hashtable<String, Object>();
+            props.put(PROPERTY_KEY_EVENT_DATA, data);
+            props.put(PROPERTY_KEY_EVENT_DATA_TYPE, data.getClass().getName());
+            return props;
         }
 
     }

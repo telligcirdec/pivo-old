@@ -14,7 +14,7 @@ public interface EventDictionaryConstant {
     /**
      * Nom du topic portail
      */
-    public static final String TOPIC_PORTAL = TOPIC_ROOT + "/santeclair";
+    public static final String TOPIC_PORTAL = TOPIC_ROOT + "/portal";
     /**
      * Nom du topic ou sont firé les event en rapport avec les factories de modules ui
      */
@@ -39,15 +39,15 @@ public interface EventDictionaryConstant {
     /**
      * Propriété du portail
      */
-    // public static final String PROPERTY_KEY_PORTAL_PID = "property.key.portal.pid";
+    public static final String PROPERTY_KEY_PORTAL_USER_ROLES = "property.key.portal.user.roles";
 
     /**
      * Propriété autour des modules ui
      */
-    public static final String PROPERTY_KEY_MODULE_UI_FACTORY = "property.key.module.ui.factory";
     public static final String PROPERTY_KEY_MODULE_UI_CODE = "property.key.module.ui.code";
     public static final String PROPERTY_KEY_MODULE_UI_NAME = "property.key.module.ui.name";
     public static final String PROPERTY_KEY_MODULE_UI_ICON = "property.key.module.ui.icon";
+    public static final String PROPERTY_KEY_MODULE_UI_VIEWS = "property.key.module.ui.views";
     public static final String PROPERTY_KEY_MODULE_UI_DISPLAY_ORDER = "property.key.module.ui.display.order";
 
     /*

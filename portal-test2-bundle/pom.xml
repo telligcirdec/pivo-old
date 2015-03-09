@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<bundle.namespace>santeclair.portal.bundle.test</bundle.namespace>
+		<bundle.namespace>santeclair.portal.test2</bundle.namespace>
 	</properties>
 
 	<parent>
@@ -12,7 +12,7 @@
 		<version>4.57.0.PORTAL-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>portal-test-bundle</artifactId>
+	<artifactId>portal-test2-bundle</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
@@ -167,7 +167,7 @@
 						<Export-Package>!${bundle.namespace}.*.impl.*,${bundle.namespace}.*;version="${project.version}"</Export-Package>
 						<Private-Package>${bundle.namespace}.*.impl.*</Private-Package>
 						<Import-Package>
-							*
+							santeclair.portal.test2,*
 						</Import-Package>
 					</instructions>
 				</configuration>
@@ -181,6 +181,9 @@
 						<goals>
 							<goal>ipojo-bundle</goal>
 						</goals>
+						<configuration>
+							<metadata>src/main/resources/metadata.xml</metadata>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

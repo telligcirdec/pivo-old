@@ -3,10 +3,15 @@ package santeclair.portal.webapp.vaadin;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_STARTED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_STOPPED;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_NAME;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_USER_ROLES;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.osgi.framework.BundleContext;
@@ -17,7 +22,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import santeclair.portal.event.EventDictionaryConstant;
 import santeclair.portal.event.handler.AbstractEventHandler;
 import santeclair.portal.event.handler.EventArg;
 import santeclair.portal.event.handler.PortalEventHandler;
@@ -25,7 +29,6 @@ import santeclair.portal.event.handler.Subscriber;
 import santeclair.portal.event.publisher.callback.PortalStartCallback;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener.Publisher;
-import santeclair.portal.vaadin.module.ModuleUiFactory;
 import santeclair.portal.webapp.HostActivator;
 import santeclair.portal.webapp.vaadin.view.LeftSideMenu;
 import santeclair.portal.webapp.vaadin.view.Main;
@@ -39,6 +42,7 @@ import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.DefaultErrorHandler;
+import com.vaadin.server.FontIcon;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -117,7 +121,9 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         portalPublisher = eventAdminServiceListener.registerPublisher(TOPIC_PORTAL, this);
         this.setContent(main);
 
-        portalPublisher.publishEventDataSynchronously(EVENT_STARTED, this);
+        Dictionary<String, Object> props = new Hashtable<>();
+        props.put(PROPERTY_KEY_PORTAL_USER_ROLES, Arrays.asList(new String[]{"ADMIN", "USER"}));
+        portalPublisher.publishEventDataAndDictionnarySynchronously(EVENT_STARTED, this, props);
         LOGGER.debug("Fin Initialisation de l'UI");
     }
 
@@ -156,22 +162,21 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
     @Subscriber(topic = TOPIC_MODULE_UI_FACTORY, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_STARTED + ")")
     public void addModuleUiFactory(org.osgi.service.event.Event event,
-                    @EventArg(name = EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_FACTORY) final ModuleUiFactory<?> moduleUiFactory) {
-        String moduleUiName = moduleUiFactory.getName();
+                    @EventArg(name = PROPERTY_KEY_MODULE_UI_NAME) final String moduleUiName) {
         PushHelper.pushWithNotification(this, moduleUiName + " chargé", "Le module " + moduleUiName + " est désomeais disponible.");
     }
 
     @Subscriber(topic = TOPIC_MODULE_UI_FACTORY, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_STOPPED + ")")
     public void removeModuleUiFactory(org.osgi.service.event.Event event,
-                    @EventArg(name = EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_FACTORY) final ModuleUiFactory<?> moduleUiFactory) {
-        String moduleUiName = moduleUiFactory.getName();
+                    @EventArg(name = PROPERTY_KEY_MODULE_UI_NAME) final String moduleUiName) {
         PushHelper.pushWithNotification(this, moduleUiName + " déchargé", "Le module " + moduleUiName + " est désomeais indisponible.");
     }
 
     @Override
-    public void addNewModuleUiFactory(ModuleUiFactory<?> moduleUiFactory) {
-        leftSideMenu.addModuleUiFactory(moduleUiFactory);
+    public void addNewModuleUiFactory(final String moduleUiCode, final String moduleUiName, final FontIcon moduleUiIcon, final Integer moduleUiDisplayOrder,
+                    final Boolean isCloseable) {
+        leftSideMenu.addModuleUiFactory(moduleUiCode, moduleUiName, moduleUiIcon, moduleUiDisplayOrder, isCloseable);
     }
 
     // private List<String> getCurrentUserRoles() {

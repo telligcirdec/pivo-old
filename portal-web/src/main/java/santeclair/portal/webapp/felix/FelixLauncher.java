@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import santeclair.portal.webapp.HostActivator;
+import santeclair.portal.webapp.felix.config.FelixConfigAdminConfig;
 import santeclair.portal.webapp.felix.config.FileInstallConfig;
 import santeclair.portal.webapp.felix.config.FrameworkConfig;
 import santeclair.portal.webapp.felix.config.InitConfig;
@@ -129,6 +130,8 @@ public class FelixLauncher implements Serializable {
         // Config pour détecter l'installation automatique de bundle et de
         // fichier de config
         initConfigList.add(new FileInstallConfig(rootDir));
+        // Config pour le service de configadmin
+        initConfigList.add(new FelixConfigAdminConfig());
 
         return initConfigList;
     }

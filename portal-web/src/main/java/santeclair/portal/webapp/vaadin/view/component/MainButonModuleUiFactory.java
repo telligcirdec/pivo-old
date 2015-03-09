@@ -1,12 +1,13 @@
 package santeclair.portal.webapp.vaadin.view.component;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import santeclair.portal.vaadin.module.ModuleUiFactory;
-
 import com.google.common.base.Preconditions;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.server.FontIcon;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -18,28 +19,41 @@ public class MainButonModuleUiFactory extends Button implements Comparable<MainB
 
     private static final String MAIN_BUTTON_MODULE_UI_STYLE_NAME = "button-heading";
 
-    private final ModuleUiFactory<?> moduleUiFactory;
+    private final String moduleUiCode;
+    private final String moduleUiName;
+    private final Integer moduleUiDisplayOrder;
+    private final Map<String, String> moduleUiView;
+
     private final Navigator navigator;
 
-    public MainButonModuleUiFactory(final ModuleUiFactory<?> moduleUiFactory, final Navigator navigator) {
-        Preconditions.checkNotNull(moduleUiFactory, "You must set a module ui factory to create a button on left side menu.");
-        this.moduleUiFactory = moduleUiFactory;
-        this.navigator = navigator;
+    public MainButonModuleUiFactory(final String moduleUiCode, final String moduleUiName, final FontIcon moduleUiIcon, final Integer moduleUiDisplayOrder,
+                                    final Map<String, String> moduleUiView, final Navigator navigator) {
+        Preconditions.checkArgument(moduleUiCode != null && moduleUiName != null, "You must set a module ui code to create a button on left side menu.");
 
+        this.moduleUiCode = moduleUiCode;
+        this.moduleUiName = moduleUiName;
+        this.moduleUiDisplayOrder = moduleUiDisplayOrder;
+        this.moduleUiView = moduleUiView;
+        this.navigator = navigator;
+        init(moduleUiIcon);
+
+    }
+
+    private void init(final FontIcon moduleUiIcon) {
         this.setStyleName(ValoTheme.BUTTON_BORDERLESS);
         this.addStyleName(MAIN_BUTTON_MODULE_UI_STYLE_NAME);
-        this.setCaption(moduleUiFactory.getName());
-        this.setIcon(moduleUiFactory.getIcon());
+        this.setCaption(moduleUiName);
+        this.setIcon(moduleUiIcon);
         this.setWidth(100, Unit.PERCENTAGE);
         this.addClickListener(this);
     }
 
     @Override
     public int compareTo(MainButonModuleUiFactory mainButonModuleUiFactoryToCompare) {
-        String moduleUiFactoryCodeToCompare = mainButonModuleUiFactoryToCompare.getModuleUiFactory().getCode();
-        String moduleUiFactoryCodeSource = this.getModuleUiFactory().getCode();
-        Integer displayOrderToCompare = mainButonModuleUiFactoryToCompare.getModuleUiFactory().displayOrder();
-        Integer displayOrderSource = this.getModuleUiFactory().displayOrder();
+        String moduleUiNameToCompare = mainButonModuleUiFactoryToCompare.getModuleUiName();
+        String moduleUiNameSource = this.getModuleUiName();
+        Integer displayOrderToCompare = mainButonModuleUiFactoryToCompare.getModuleUiDisplayOrder();
+        Integer displayOrderSource = this.getModuleUiDisplayOrder();
         if (displayOrderToCompare == null || Integer.signum(displayOrderToCompare) < 1) {
             displayOrderToCompare = Integer.MAX_VALUE;
         }
@@ -47,7 +61,7 @@ public class MainButonModuleUiFactory extends Button implements Comparable<MainB
             displayOrderSource = Integer.MAX_VALUE;
         }
         if (displayOrderSource.equals(displayOrderToCompare)) {
-            return moduleUiFactoryCodeSource.compareTo(moduleUiFactoryCodeToCompare);
+            return moduleUiNameSource.compareTo(moduleUiNameToCompare);
         }
         return displayOrderSource.compareTo(displayOrderToCompare);
     }
@@ -55,10 +69,19 @@ public class MainButonModuleUiFactory extends Button implements Comparable<MainB
     @Override
     public void buttonClick(ClickEvent event) {
         LOGGER.debug("Click event : {}", event);
-        navigator.navigateTo("container/new/modules/" + moduleUiFactory.getCode());
+        navigator.navigateTo("container/new/modules/" + moduleUiCode);
     }
 
-    public ModuleUiFactory<?> getModuleUiFactory() {
-        return moduleUiFactory;
+    public String getModuleUiName() {
+        return moduleUiName;
     }
+
+    public Integer getModuleUiDisplayOrder() {
+        return moduleUiDisplayOrder;
+    }
+
+    public String getModuleUiCode() {
+        return moduleUiCode;
+    }
+
 }

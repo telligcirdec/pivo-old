@@ -27,9 +27,19 @@ public class FileInstallConfig implements InitConfig {
                         .put("felix.fileinstall.dir", rootDir + "/auto-bundle");
         fileInstallConfig.put("felix.fileinstall.tmpdir", rootDir
                         + "/auto-bundle/tmp");
-        fileInstallConfig.put("felix.fileinstall.log.level", "4");
         fileInstallConfig.put("felix.fileinstall.poll", "500");
-        fileInstallConfig.put("felix.fileinstall.log.level", "4");
+
+        if (LOGGER.isDebugEnabled() || LOGGER.isTraceEnabled()) {
+            fileInstallConfig.put("felix.fileinstall.log.level", "4");
+        } else if (LOGGER.isInfoEnabled()) {
+            fileInstallConfig.put("felix.fileinstall.log.level", "3");
+        } else if (LOGGER.isWarnEnabled()) {
+            fileInstallConfig.put("felix.fileinstall.log.level", "2");
+        } else if (LOGGER.isErrorEnabled()) {
+            fileInstallConfig.put("felix.fileinstall.log.level", "1");
+        } else {
+            fileInstallConfig.put("felix.fileinstall.log.level", "2");
+        }
 
         return fileInstallConfig;
     }

@@ -1,5 +1,6 @@
 package santeclair.portal.listener.service;
 
+import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 
 import org.osgi.framework.BundleContext;
@@ -8,14 +9,19 @@ import org.osgi.framework.ServiceEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractPortalServiceListener<T> implements PortalServiceListener<T> {
+public abstract class AbstractPortalServiceListener<T> implements PortalServiceListener<T>, Serializable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3958686169798794491L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPortalServiceListener.class);
 
     protected BundleContext bundleContext;
 
     private boolean isRegistered = false;
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public void serviceChanged(ServiceEvent serviceEvent) {
@@ -89,16 +95,14 @@ public abstract class AbstractPortalServiceListener<T> implements PortalServiceL
         return filter;
     }
 
-    public boolean isServiceRegistered(){
+    public boolean isServiceRegistered() {
         return isRegistered;
     }
-      
+
     @SuppressWarnings("unchecked")
     private Class<T> getServiceType() {
         return ((Class<T>) ((ParameterizedType) getClass()
                         .getGenericSuperclass()).getActualTypeArguments()[0]);
     }
-    
-    
-    
+
 }

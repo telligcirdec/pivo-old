@@ -1,9 +1,13 @@
 package santeclair.portal.event.publisher.callback;
 
-import santeclair.portal.vaadin.module.ModuleUiFactory;
+import com.vaadin.server.FontIcon;
 
 public interface PortalStartCallback {
 
-    public void addNewModuleUiFactory(ModuleUiFactory<?> moduleUiFactory);
+    public void addNewModuleUiFactory(final String moduleUiCode,
+                    final String moduleUiName,
+                    final FontIcon moduleUiIcon,
+                    final Integer moduleUiDisplayOrder,
+                    final Boolean isCloseable);
 
 }

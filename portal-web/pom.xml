@@ -210,7 +210,7 @@
 									<includes>
 										<include>*</include>
 									</includes>
-									<targetPath>VAADIN/widgetsets/santeclair.portal.webapp.vaadin.ModuleAppWidgetSet/ckeditor/plugins</targetPath>
+									<targetPath>VAADIN/widgetsets/santeclair.portal.webapp.vaadin.widgetset.PortalWidgetSet/ckeditor/plugins</targetPath>
 								</resource>
 							</webResources>
 						</configuration>
@@ -245,7 +245,7 @@
 									<includes>
 										<include>**/*</include>
 									</includes>
-									<targetPath>VAADIN/widgetsets/santeclair.portal.webapp.vaadin.ModuleAppWidgetSet/ckeditor/plugins</targetPath>
+									<targetPath>VAADIN/widgetsets/santeclair.portal.webapp.vaadin.widgetset.PortalWidgetSet/ckeditor/plugins</targetPath>
 								</resource>
 							</webResources>
 						</configuration>
@@ -280,7 +280,7 @@
 									<includes>
 										<include>**/*</include>
 									</includes>
-									<targetPath>VAADIN/widgetsets/santeclair.portal.webapp.vaadin.ModuleAppWidgetSet/ckeditor/plugins</targetPath>
+									<targetPath>VAADIN/widgetsets/santeclair.portal.webapp.vaadin.widgetset.PortalWidgetSet/ckeditor/plugins</targetPath>
 								</resource>
 							</webResources>
 						</configuration>
@@ -315,7 +315,7 @@
 									<includes>
 										<include>**/*</include>
 									</includes>
-									<targetPath>VAADIN/widgetsets/santeclair.portal.webapp.vaadin.ModuleAppWidgetSet/ckeditor/plugins</targetPath>
+									<targetPath>VAADIN/widgetsets/santeclair.portal.webapp.vaadin.widgetset.PortalWidgetSet/ckeditor/plugins</targetPath>
 								</resource>
 							</webResources>
 						</configuration>
@@ -376,11 +376,11 @@
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.compendium</artifactId>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.ipojo.handler.eventadmin</artifactId>
 			<version>1.8.0</version>
-		</dependency>
+		</dependency> -->
 
 
 
@@ -401,6 +401,7 @@
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-push</artifactId>
 		</dependency>
+
 		<!-- Ne pas supprimer du fait de l'analyse des dépendances Maven, nécessaire 
 			pour le plugin de compilation des widgetset -->
 		<dependency>
@@ -433,11 +434,21 @@
 					<artifactId>commons-logging</artifactId>
 					<groupId>commons-logging</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>org.objectweb.asm</artifactId>
+					<groupId>org.eclipse.jetty.orbit</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
+			<artifactId>dom</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
 			<artifactId>animator</artifactId>
+			<version>2.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
@@ -455,6 +466,12 @@
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>5.0.3</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- Spring -->
@@ -567,6 +584,12 @@
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-frontend-jaxws</artifactId>
 			<scope>runtime</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>asm</artifactId>
+					<groupId>asm</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>

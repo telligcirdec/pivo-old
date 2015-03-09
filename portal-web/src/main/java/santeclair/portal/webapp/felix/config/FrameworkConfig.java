@@ -29,14 +29,22 @@ public class FrameworkConfig implements InitConfig {
         configMap.put("felix.cache.rootdir", rootDir);
         configMap.put("org.osgi.framework.storage.clean", "onFirstInit");
         configMap.put("org.osgi.framework.storage", "bundle-cache");
-
-        configMap
-                        .put("felix.auto.deploy.dir", rootDir + "/bundle");
+        configMap.put("felix.auto.deploy.dir", rootDir + "/bundle");
         configMap.put("felix.auto.deploy.action", "install,start,update");
         configMap.put("felix.shutdown.hook", "true");
-
-        configMap.put("felix.log.level", "4");
         configMap.put("felix.service.urlhandlers", "true");
+
+        if (LOGGER.isDebugEnabled() || LOGGER.isTraceEnabled()) {
+            configMap.put("felix.log.level", "4");
+        } else if (LOGGER.isInfoEnabled()) {
+            configMap.put("felix.log.level", "3");
+        } else if (LOGGER.isWarnEnabled()) {
+            configMap.put("felix.log.level", "2");
+        } else if (LOGGER.isErrorEnabled()) {
+            configMap.put("felix.log.level", "1");
+        } else {
+            configMap.put("felix.log.level", "2");
+        }
 
         if (props != null) {
             configMap.putAll((Map) props);
