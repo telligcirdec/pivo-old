@@ -36,6 +36,7 @@ public abstract class ModuleUiHelper {
     private Integer displayOrder;
 
     private FontIcon fontIcon;
+    
     private List<String> rolesIsCloseable;
     private List<String> rolesAllowed;
     private List<String> rolesOpenOnInitialization;
@@ -43,6 +44,7 @@ public abstract class ModuleUiHelper {
 
     protected void bindLogService(LogService logService) {
         this.logService = logService;
+        
     }
 
     protected void start() {
@@ -85,7 +87,6 @@ public abstract class ModuleUiHelper {
     }
 
     protected void setIcon(String icon) {
-        fontIcon = FontAwesome.LINUX;
         try {
             fontIcon = FontAwesome.valueOf(icon);
         } catch (IllegalArgumentException | NullPointerException e) {

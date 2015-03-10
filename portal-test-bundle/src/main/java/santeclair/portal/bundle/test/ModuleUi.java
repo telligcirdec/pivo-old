@@ -64,7 +64,7 @@ public class ModuleUi extends ModuleUiHelper {
     }
 
     @Override
-    @Property(name = "icon", mandatory = true)
+    @Property(name = "icon", mandatory = true, value = "LINUX")
     public void setIcon(String icon) {
         super.setIcon(icon);
     }
