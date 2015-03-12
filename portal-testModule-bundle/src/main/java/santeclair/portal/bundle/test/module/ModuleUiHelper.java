@@ -15,6 +15,8 @@ public abstract class ModuleUiHelper {
     private Boolean isCloseable;
 
     private Boolean severalTabsAllowed;
+    
+    private Integer displayOrder;
 
     protected void bindLogService(LogService logService) {
         this.logService = logService;
@@ -39,5 +41,9 @@ public abstract class ModuleUiHelper {
     protected void setSeveralTabsAllowed(Boolean severalTabsAllowed) {
         this.severalTabsAllowed = severalTabsAllowed;
     }
-
+   
+    protected void setDisplayOrder(Integer displayOrder) {
+        this.displayOrder = displayOrder;
+    }
+    
 }
