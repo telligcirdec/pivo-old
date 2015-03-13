@@ -3,9 +3,9 @@ package santeclair.portal.webapp.vaadin;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_STARTED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_STOPPED;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_NAME;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_MENU;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_USER_ROLES;
-import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY;
+import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
 
 import java.util.Arrays;
@@ -29,6 +29,7 @@ import santeclair.portal.event.handler.Subscriber;
 import santeclair.portal.event.publisher.callback.PortalStartCallback;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener.Publisher;
+import santeclair.portal.menu.MenuModule;
 import santeclair.portal.webapp.HostActivator;
 import santeclair.portal.webapp.vaadin.view.LeftSideMenu;
 import santeclair.portal.webapp.vaadin.view.Main;
@@ -42,7 +43,6 @@ import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.DefaultErrorHandler;
-import com.vaadin.server.FontIcon;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -159,24 +159,23 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         }
     }
 
-    @Subscriber(topic = TOPIC_MODULE_UI_FACTORY, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
+    @Subscriber(topic = TOPIC_MODULE_UI, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_STARTED + ")")
-    public void addModuleUiFactory(org.osgi.service.event.Event event,
-                    @EventArg(name = PROPERTY_KEY_MODULE_UI_NAME) final String moduleUiName) {
-        PushHelper.pushWithNotification(this, moduleUiName + " chargé", "Le module " + moduleUiName + " est désomeais disponible.");
+    public void addModuleUi(org.osgi.service.event.Event event,
+                    @EventArg(name = PROPERTY_KEY_MODULE_UI_MENU) final MenuModule menuModule) {
+        PushHelper.pushWithNotification(this, menuModule.getLibelleModuleUi() + " chargé", "Le module " + menuModule.getLibelleModuleUi() + " est désomeais disponible.");
     }
 
-    @Subscriber(topic = TOPIC_MODULE_UI_FACTORY, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
+    @Subscriber(topic = TOPIC_MODULE_UI, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_STOPPED + ")")
-    public void removeModuleUiFactory(org.osgi.service.event.Event event,
-                    @EventArg(name = PROPERTY_KEY_MODULE_UI_NAME) final String moduleUiName) {
-        PushHelper.pushWithNotification(this, moduleUiName + " déchargé", "Le module " + moduleUiName + " est désomeais indisponible.");
+    public void removeModuleUi(org.osgi.service.event.Event event,
+                    @EventArg(name = PROPERTY_KEY_MODULE_UI_MENU) final MenuModule menuModule) {
+        PushHelper.pushWithNotification(this, menuModule.getLibelleModuleUi() + " déchargé", "Le module " + menuModule.getLibelleModuleUi() + " est désomeais indisponible.");
     }
 
     @Override
-    public void addNewModuleUiFactory(final String moduleUiCode, final String moduleUiName, final FontIcon moduleUiIcon, final Integer moduleUiDisplayOrder,
-                    final Boolean isCloseable) {
-        leftSideMenu.addModuleUiFactory(moduleUiCode, moduleUiName, moduleUiIcon, moduleUiDisplayOrder, isCloseable);
+    public void addNewModuleUi(MenuModule menuModule) {
+        leftSideMenu.addModuleUi(menuModule);
     }
 
     // private List<String> getCurrentUserRoles() {

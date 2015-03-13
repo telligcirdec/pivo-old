@@ -3,11 +3,8 @@ package santeclair.portal.webapp.vaadin.view;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_STARTED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_STOPPED;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_DISPLAY_ORDER;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_ICON;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_NAME;
-import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI_FACTORY;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_MENU;
+import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 
 import java.util.TreeSet;
 
@@ -20,11 +17,11 @@ import santeclair.portal.event.handler.AbstractEventHandler;
 import santeclair.portal.event.handler.EventArg;
 import santeclair.portal.event.handler.PortalEventHandler;
 import santeclair.portal.event.handler.Subscriber;
+import santeclair.portal.menu.MenuModule;
 import santeclair.portal.webapp.vaadin.PushHelper;
-import santeclair.portal.webapp.vaadin.view.component.MainButonModuleUiFactory;
+import santeclair.portal.webapp.vaadin.view.component.MainButonModuleUi;
 
 import com.vaadin.navigator.Navigator;
-import com.vaadin.server.FontIcon;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.UI;
@@ -52,35 +49,32 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
         registerEventHandlerItself(bundleContext);
     }
 
-    @Subscriber(topic = TOPIC_MODULE_UI_FACTORY, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
+    @Subscriber(topic = TOPIC_MODULE_UI, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_STARTED + ")")
-    public synchronized void addModuleUiFactory(@EventArg(name = PROPERTY_KEY_MODULE_UI_CODE) final String moduleUiCode,
-                    @EventArg(name = PROPERTY_KEY_MODULE_UI_NAME) final String moduleUiName,
-                    @EventArg(name = PROPERTY_KEY_MODULE_UI_ICON) final FontIcon moduleUiIcon,
-                    @EventArg(name = PROPERTY_KEY_MODULE_UI_DISPLAY_ORDER) final Integer moduleUiDisplayOrder,
-                    final Boolean isCloseable) {
-        LOGGER.debug("global addModuleUiFactory");
-        MainButonModuleUiFactory mainButonModuleUiFactory = new MainButonModuleUiFactory(moduleUiCode, moduleUiName, moduleUiIcon, moduleUiDisplayOrder, null, navigator);
-        TreeSet<Component> butonModuleUiFactories = new TreeSet<>();
-        butonModuleUiFactories.add(mainButonModuleUiFactory);
+    public synchronized void addModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI_MENU, required = true) final MenuModule menuModule) {
+        LOGGER.debug("global addModuleUi");
+        MainButonModuleUi mainButonModuleUi = new MainButonModuleUi(menuModule.getCodeModuleUi(), menuModule.getLibelleModuleUi(),
+                        menuModule.getIconModuleUi(), menuModule.getDisplayOrderModuleUi(), null, navigator);
+        TreeSet<Component> butonModuleUi = new TreeSet<>();
+        butonModuleUi.add(mainButonModuleUi);
         for (Component component : buttonContainer) {
-            if (MainButonModuleUiFactory.class.isAssignableFrom(component.getClass())) {
-                butonModuleUiFactories.add(component);
+            if (MainButonModuleUi.class.isAssignableFrom(component.getClass())) {
+                butonModuleUi.add(component);
             }
         }
         buttonContainer.removeAllComponents();
-        buttonContainer.addComponents(butonModuleUiFactories.toArray(new Component[]{}));
+        buttonContainer.addComponents(butonModuleUi.toArray(new Component[]{}));
         PushHelper.push(ui);
     }
 
-    @Subscriber(topic = TOPIC_MODULE_UI_FACTORY, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
+    @Subscriber(topic = TOPIC_MODULE_UI, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_STOPPED + ")")
-    public synchronized void removeModuleUiFactory(@EventArg(name = PROPERTY_KEY_MODULE_UI_CODE) final String moduleUiCode) {
-        LOGGER.debug("removeModuleUiFactory : {}", moduleUiCode);
+    public synchronized void removeModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI_MENU, required = true) final MenuModule menuModule) {
+        LOGGER.debug("removeModuleUi : {}", menuModule.getCodeModuleUi());
         for (Component component : buttonContainer) {
-            if (MainButonModuleUiFactory.class.isAssignableFrom(component.getClass())) {
-                MainButonModuleUiFactory currentComponent = MainButonModuleUiFactory.class.cast(component);
-                if (currentComponent.getModuleUiCode().equals(moduleUiCode)) {
+            if (MainButonModuleUi.class.isAssignableFrom(component.getClass())) {
+                MainButonModuleUi currentComponent = MainButonModuleUi.class.cast(component);
+                if (currentComponent.getModuleUiCode().equals(menuModule.getCodeModuleUi())) {
                     buttonContainer.removeComponent(component);
                 }
             }

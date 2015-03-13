@@ -18,11 +18,11 @@ public interface EventDictionaryConstant {
     /**
      * Nom du topic ou sont firé les event en rapport avec les factories de modules ui
      */
-    public static final String TOPIC_MODULE_UI_FACTORY = TOPIC_PORTAL + "/module/ModuleUiFactoryEvent";
+    public static final String TOPIC_MODULE_UI = TOPIC_PORTAL + "/module/ModuleUiEvent";
     /**
      * Nom du topic ou sont firé les event en rapport avec les buttons permettant le démarrage des modules
      */
-    public static final String TOPIC_MAIN_BUTTON_MODULE_UI_FACTORY = TOPIC_PORTAL + "/MainButonModuleUiFactory";
+    public static final String TOPIC_MAIN_BUTTON_MODULE_UI = TOPIC_PORTAL + "/MainButonModuleUi";
 
     /*
      * Properties keys
@@ -44,6 +44,7 @@ public interface EventDictionaryConstant {
     /**
      * Propriété autour des modules ui
      */
+    public static final String PROPERTY_KEY_MODULE_UI_MENU = "property.key.module.ui.menu";
     public static final String PROPERTY_KEY_MODULE_UI_CODE = "property.key.module.ui.code";
     public static final String PROPERTY_KEY_MODULE_UI_NAME = "property.key.module.ui.name";
     public static final String PROPERTY_KEY_MODULE_UI_ICON = "property.key.module.ui.icon";

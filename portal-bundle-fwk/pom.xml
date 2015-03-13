@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>santeclair</groupId>
 		<artifactId>super-pom</artifactId>
-		<version>4.57.0-SNAPSHOT</version>
+		<version>4.57.0.PORTAL-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>portal-bundle-fwk</artifactId>
