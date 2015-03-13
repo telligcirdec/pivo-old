@@ -38,6 +38,7 @@ public class ViewUiImpl extends ViewUiHelper implements ViewUi {
             }
         }
         
+        // Enregistrement de la view auprès de son module
         moduleUi.registerView(this);
     }
     

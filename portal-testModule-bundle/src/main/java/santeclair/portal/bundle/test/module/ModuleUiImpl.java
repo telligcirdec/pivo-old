@@ -53,7 +53,7 @@ public class ModuleUiImpl implements ModuleUi {
     private Boolean severalTabsAllowed;
     private Integer displayOrder;
     
-    private final List<ViewUi> viewsUi = new ArrayList<ViewUi>();
+    private List<ViewUi> viewsUi;
     
     /*
      * Instance var
@@ -63,12 +63,7 @@ public class ModuleUiImpl implements ModuleUi {
     @Validate
     public void start() {
         logService.log(LogService.LOG_INFO, "TestModuleUi Starting");
-        List<MenuView> menuViews = new ArrayList<MenuView>();
-        for (ViewUi viewUi : viewsUi) {
-            menuViews.add(new MenuView(viewUi.getCode(), viewUi.getLibelle(), viewUi.getIcon(), viewUi.getOpenOnInitialization()));
-        }
-        menuModule = new MenuModule(code, libelle, icon, displayOrder, isCloseable, severalTabsAllowed, menuViews);
-        
+        menuModule = constructMenuModule(code, libelle, icon, displayOrder, isCloseable, severalTabsAllowed, viewsUi);
         publisher.send(startProperties());
         logService.log(LogService.LOG_INFO, "TestModuleUi Started");
     }
@@ -117,6 +112,10 @@ public class ModuleUiImpl implements ModuleUi {
         this.displayOrder = displayOrder;
     }
 
+    public void setViewsUi(List<ViewUi> viewsUi) {
+        this.viewsUi = viewsUi;
+    }
+
     public String getCode() {
         return code;
     }
@@ -136,9 +135,16 @@ public class ModuleUiImpl implements ModuleUi {
     public Integer getDisplayOrder() {
         return displayOrder;
     }
-
+    
+    public List<ViewUi> getViewsUi() {
+        return viewsUi;
+    }
+    
     @Override
     public void registerView(ViewUi view) {
+        if (null == this.viewsUi) {
+            this.viewsUi = new ArrayList<ViewUi>();
+        }
         this.viewsUi.add(view);
     }
     
@@ -163,5 +169,27 @@ public class ModuleUiImpl implements ModuleUi {
         eventProps.put(PROPERTY_KEY_MODULE_UI_MENU, menuModule);
 
         return eventProps;
+    }
+    
+    
+    /**
+     * 
+     * @param code
+     * @param libelle
+     * @param icon
+     * @param displayOrder
+     * @param isCloseable
+     * @param severalTabsAllowed
+     * @param viewsUi
+     * @return
+     */
+    private MenuModule constructMenuModule(String code, String libelle, String icon, Integer displayOrder, Boolean isCloseable, Boolean severalTabsAllowed, List<ViewUi> viewsUi) {
+        List<MenuView> menuViews = new ArrayList<MenuView>();
+        if (null != viewsUi) {
+            for (ViewUi viewUi : viewsUi) {
+                menuViews.add(new MenuView(viewUi.getCode(), viewUi.getLibelle(), viewUi.getIcon(), viewUi.getOpenOnInitialization()));
+            }
+        }
+        return new MenuModule(code, libelle, icon, displayOrder, isCloseable, severalTabsAllowed, menuViews);
     }
 }

@@ -2,7 +2,6 @@ package santeclair.portal.bundle.utils.view;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.List;
 
 import org.osgi.service.log.LogService;
 
@@ -20,7 +19,6 @@ public abstract class ViewUiHelper {
     private String libelle;
     private FontIcon icon;
     private Boolean openOnInitialization;
-    private List<ViewUi> viewsUi;
 
     protected void updated(Dictionary<?, ?> conf) {
         logService.log(LogService.LOG_DEBUG, "The instance was reconfigured");
@@ -64,10 +62,6 @@ public abstract class ViewUiHelper {
         this.openOnInitialization = openOnInitialization;
     }
     
-    public void setViewsUi(List<ViewUi> viewsUi) {
-        this.viewsUi = viewsUi;
-    }
-
     public FontIcon getIcon() {
         return icon;
     }
@@ -83,5 +77,4 @@ public abstract class ViewUiHelper {
     public Boolean getOpenOnInitialization() {
         return openOnInitialization;
     }
-    
 }
