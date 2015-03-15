@@ -13,6 +13,11 @@ import santeclair.portal.listener.service.AbstractPortalServiceListener;
 @Component
 public class LogReaderServiceListener extends AbstractPortalServiceListener<LogReaderService> {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5912052764997483805L;
+
     @Autowired
     private PortalLogListener portalLogListener;
 

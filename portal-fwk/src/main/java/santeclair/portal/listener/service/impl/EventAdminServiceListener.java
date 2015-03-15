@@ -26,6 +26,11 @@ import com.google.common.base.Preconditions;
 @Component
 public class EventAdminServiceListener extends AbstractPortalServiceListener<EventAdmin> {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -335842613390379729L;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(EventAdminServiceListener.class);
 
     private final List<Publisher<?, ?>> publishers = new ArrayList<>();
@@ -42,9 +47,9 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
         this.service = null;
     }
 
-    public <SOURCE, DATA> Publisher<SOURCE, DATA> registerPublisher(String topic, SOURCE source) {
+    public <SOURCE, DATA> Publisher<SOURCE, DATA> registerPublisher(SOURCE source, String... topics) {
         LOGGER.info("Create a new Publisher");
-        Publisher<SOURCE, DATA> publisher = new PublisherImpl<>(topic, this, source);
+        Publisher<SOURCE, DATA> publisher = new PublisherImpl<>(this, source, topics);
         publishers.add(publisher);
         return publisher;
     }
@@ -86,12 +91,12 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
         private static final long serialVersionUID = -1356857447344703240L;
 
         private final EventAdminServiceListener eventAdminServiceListener;
-        private final String topic;
+        private final String[] topics;
         private final SOURCE source;
 
-        public PublisherImpl(String topic, EventAdminServiceListener eventAdminServiceListener, SOURCE source) {
+        public PublisherImpl(EventAdminServiceListener eventAdminServiceListener, SOURCE source, String... topics) {
             this.eventAdminServiceListener = eventAdminServiceListener;
-            this.topic = topic;
+            this.topics = topics;
             this.source = source;
         }
 
@@ -103,15 +108,17 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
             if (eventAdminServiceListener.isServiceRegistered()) {
                 dictionary.put(PROPERTY_KEY_EVENT_NAME, eventName);
                 dictionary.put(PROPERTY_KEY_EVENT_SOURCE, source);
-                Event event = new Event(topic, dictionary);
-                if (synchronous) {
-                    service.sendEvent(event);
-                } else {
-                    service.postEvent(event);
+                for (String topic : topics) {
+                    Event event = new Event(topic, dictionary);
+                    if (synchronous) {
+                        service.sendEvent(event);
+                    } else {
+                        service.postEvent(event);
+                    }
                 }
             } else {
                 LOGGER.warn("You tried to send an event {} on topic {} with dictionary : {} but no {} service is registered in the OSGi context. No event would be publish.",
-                                eventName, topic, dictionary,
+                                eventName, topics, dictionary,
                                 EventAdmin.class);
             }
         }

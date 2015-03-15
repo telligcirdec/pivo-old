@@ -4,6 +4,6 @@ import santeclair.portal.menu.MenuModule;
 
 public interface PortalStartCallback {
 
-    public void addNewModuleUi(MenuModule menuModule);
+    public void addMenuModule(MenuModule menuModule);
 
 }

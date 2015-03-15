@@ -4,11 +4,11 @@ import com.vaadin.server.FontIcon;
 
 public class MenuView {
 
-    private String codeViewUi;
-    private String libelleViewUi;
-    private FontIcon iconViewUi;
-    private Boolean openOnInitializationViewUi;
-    
+    private final String codeViewUi;
+    private final String libelleViewUi;
+    private final FontIcon iconViewUi;
+    private final Boolean openOnInitializationViewUi;
+
     /**
      * Constructeur
      */
@@ -18,38 +18,23 @@ public class MenuView {
         this.iconViewUi = iconViewUi;
         this.openOnInitializationViewUi = openOnInitializationViewUi;
     }
-    
-    /** Getters et Setters */
-    
+
+    /** Getters */
+
     public String getCodeViewUi() {
         return codeViewUi;
     }
-    
-    public void setCodeViewUi(String codeViewUi) {
-        this.codeViewUi = codeViewUi;
-    }
-    
+
     public String getLibelleViewUi() {
         return libelleViewUi;
     }
-    
-    public void setLibelleViewUi(String libelleViewUi) {
-        this.libelleViewUi = libelleViewUi;
-    }
-    
+
     public FontIcon getIconViewUi() {
         return iconViewUi;
     }
-    
-    public void setIconViewUi(FontIcon iconViewUi) {
-        this.iconViewUi = iconViewUi;
-    }
-    
+
     public Boolean getOpenOnInitializationViewUi() {
         return openOnInitializationViewUi;
     }
-    
-    public void setOpenOnInitializationViewUi(Boolean openOnInitializationViewUi) {
-        this.openOnInitializationViewUi = openOnInitializationViewUi;
-    }
+
 }

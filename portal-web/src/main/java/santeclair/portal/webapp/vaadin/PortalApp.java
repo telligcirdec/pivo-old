@@ -6,7 +6,6 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_MENU;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_USER_ROLES;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
-import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -118,7 +117,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
         registerEventHandlerItself(context);
 
-        portalPublisher = eventAdminServiceListener.registerPublisher(TOPIC_PORTAL, this);
+        portalPublisher = eventAdminServiceListener.registerPublisher(this, TOPIC_MODULE_UI);
         this.setContent(main);
 
         Dictionary<String, Object> props = new Hashtable<>();
@@ -159,23 +158,19 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         }
     }
 
+    @Override
     @Subscriber(topic = TOPIC_MODULE_UI, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_STARTED + ")")
-    public void addModuleUi(org.osgi.service.event.Event event,
-                    @EventArg(name = PROPERTY_KEY_MODULE_UI_MENU) final MenuModule menuModule) {
-        PushHelper.pushWithNotification(this, menuModule.getLibelleModuleUi() + " chargé", "Le module " + menuModule.getLibelleModuleUi() + " est désomeais disponible.");
+    public void addMenuModule(@EventArg(name = PROPERTY_KEY_MODULE_UI_MENU) final MenuModule menuModule) {
+        PushHelper.pushWithNotification(this, menuModule.getLibelleModuleUi() + " chargé", "Le module " + menuModule.getLibelleModuleUi() + " est désormais disponible.");
+        leftSideMenu.addModuleUi(menuModule);
     }
 
     @Subscriber(topic = TOPIC_MODULE_UI, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_STOPPED + ")")
-    public void removeModuleUi(org.osgi.service.event.Event event,
+    public void removeMenuModule(org.osgi.service.event.Event event,
                     @EventArg(name = PROPERTY_KEY_MODULE_UI_MENU) final MenuModule menuModule) {
         PushHelper.pushWithNotification(this, menuModule.getLibelleModuleUi() + " déchargé", "Le module " + menuModule.getLibelleModuleUi() + " est désomeais indisponible.");
-    }
-
-    @Override
-    public void addNewModuleUi(MenuModule menuModule) {
-        leftSideMenu.addModuleUi(menuModule);
     }
 
     // private List<String> getCurrentUserRoles() {
