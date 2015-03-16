@@ -1,11 +1,15 @@
 package santeclair.portal.webapp.vaadin;
 
-import static santeclair.portal.event.EventDictionaryConstant.EVENT_STARTED;
-import static santeclair.portal.event.EventDictionaryConstant.EVENT_STOPPED;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_MODULE_UI;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_PORTAL;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STARTED;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STOPPED;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CONTEXT;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_MENU;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_USER_ROLES;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
+import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -122,7 +126,10 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
         Dictionary<String, Object> props = new Hashtable<>();
         props.put(PROPERTY_KEY_PORTAL_USER_ROLES, Arrays.asList(new String[]{"ADMIN", "USER"}));
-        portalPublisher.publishEventDataAndDictionnarySynchronously(EVENT_STARTED, this, props);
+        props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_PORTAL);
+        props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STARTED);
+
+        portalPublisher.publishEventDataAndDictionnarySynchronously(this, props);
         LOGGER.debug("Fin Initialisation de l'UI");
     }
 
@@ -159,15 +166,15 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
     }
 
     @Override
-    @Subscriber(topic = TOPIC_MODULE_UI, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
-                    + EVENT_STARTED + ")")
+    @Subscriber(topic = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
+                    + EVENT_NAME_STARTED + "))")
     public void addMenuModule(@EventArg(name = PROPERTY_KEY_MODULE_UI_MENU) final MenuModule menuModule) {
         PushHelper.pushWithNotification(this, menuModule.getLibelleModuleUi() + " chargé", "Le module " + menuModule.getLibelleModuleUi() + " est désormais disponible.");
         leftSideMenu.addModuleUi(menuModule);
     }
 
-    @Subscriber(topic = TOPIC_MODULE_UI, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
-                    + EVENT_STOPPED + ")")
+    @Subscriber(topic = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
+                    + EVENT_NAME_STOPPED + "))")
     public void removeMenuModule(org.osgi.service.event.Event event,
                     @EventArg(name = PROPERTY_KEY_MODULE_UI_MENU) final MenuModule menuModule) {
         PushHelper.pushWithNotification(this, menuModule.getLibelleModuleUi() + " déchargé", "Le module " + menuModule.getLibelleModuleUi() + " est désomeais indisponible.");

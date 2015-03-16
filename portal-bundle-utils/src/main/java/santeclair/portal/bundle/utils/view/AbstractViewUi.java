@@ -11,10 +11,10 @@ public abstract class AbstractViewUi implements ViewUi {
 
     protected LogService logService;
 
-    private String codeModule;
+    protected String codeModule;
 
     private String codeOldValue;
-    private String code;
+    protected String code;
 
     private String libelle;
     private FontIcon icon;
@@ -25,12 +25,11 @@ public abstract class AbstractViewUi implements ViewUi {
     }
 
     protected void bindLogService(LogService logService) {
-        logService.log(LogService.LOG_DEBUG, "ViewUi " + this.code + " is binding logService.");
+        logService.log(LogService.LOG_DEBUG, "ViewUi " + this.getCode() + " is binding logService.");
         this.logService = logService;
     }
 
     protected void setCodeModule(String codeModule) {
-        logService.log(LogService.LOG_DEBUG, "ViewUi " + this.code + " is binding logService.");
         this.codeModule = codeModule;
     }
 

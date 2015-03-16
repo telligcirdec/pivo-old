@@ -49,6 +49,7 @@ public interface EventDictionaryConstant {
     /**
      * Propriété autour des modules ui
      */
+    public static final String PROPERTY_KEY_MODULE_UI = "property.key.module.ui";
     public static final String PROPERTY_KEY_MODULE_UI_MENU = "property.key.module.ui.menu";
     public static final String PROPERTY_KEY_MODULE_UI_CODE = "property.key.module.ui.code";
 
@@ -60,16 +61,16 @@ public interface EventDictionaryConstant {
     /*
      * Event context
      */
-    public static final String EVENT_PORTAL = "portal";
-    public static final String EVENT_MODULE_UI = "moduleUi";
-    public static final String EVENT_VIEW_UI = "viewUi";
+    public static final String EVENT_CONTEXT_PORTAL = "context-portal";
+    public static final String EVENT_CONTEXT_MODULE_UI = "context-moduleUi";
+    public static final String EVENT_CONTEXT_VIEW_UI = "context-viewUi";
 
     /*
      * Events name
      */
-    public static final String EVENT_STARTED = "started";
-    public static final String EVENT_STOPPED = "stopped";
-    public static final String EVENT_UPDATED = "updated";
-    public static final String EVENT_ON_CLICK = "on_click";
+    public static final String EVENT_NAME_STARTED = "started";
+    public static final String EVENT_NAME_STOPPED = "stopped";
+    public static final String EVENT_NAME_UPDATED = "updated";
+    public static final String EVENT_NAME_ON_CLICK = "on_click";
 
 }

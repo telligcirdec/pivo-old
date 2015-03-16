@@ -2,7 +2,6 @@ package santeclair.portal.listener.service.impl;
 
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_DATA;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_DATA_TYPE;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_SOURCE;
 
 import java.io.Serializable;
@@ -11,7 +10,6 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
@@ -63,23 +61,23 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
 
     public interface Publisher<SOURCE, DATA> extends Serializable {
 
-        public void publishEvent(String eventName, Dictionary<String, Object> dictionary, boolean synchronous);
+        public void publishEvent(Dictionary<String, Object> dictionary, boolean synchronous);
 
-        public void publishEventSynchronously(String eventName, Dictionary<String, Object> dictionary);
+        public void publishEventSynchronously(Dictionary<String, Object> dictionary);
 
-        public void publishEventAsynchronously(String eventName, Dictionary<String, Object> dictionary);
+        public void publishEventAsynchronously(Dictionary<String, Object> dictionary);
 
-        public void publishEventData(String eventName, DATA data, boolean synchronous);
+        public void publishEventData(DATA data, boolean synchronous);
 
-        public void publishEventDataSynchronously(String eventName, DATA data);
+        public void publishEventDataSynchronously(DATA data);
 
-        public void publishEventDataAsynchronously(String eventName, DATA data);
+        public void publishEventDataAsynchronously(DATA data);
 
-        public void publishEventDataAndDictionnary(String eventName, DATA data, Dictionary<String, Object> props, boolean synchronous);
+        public void publishEventDataAndDictionnary(DATA data, Dictionary<String, Object> props, boolean synchronous);
 
-        public void publishEventDataAndDictionnarySynchronously(String eventName, DATA data, Dictionary<String, Object> props);
+        public void publishEventDataAndDictionnarySynchronously(DATA data, Dictionary<String, Object> props);
 
-        public void publishEventDataAndDictionnaryAsynchronously(String eventName, DATA data, Dictionary<String, Object> props);
+        public void publishEventDataAndDictionnaryAsynchronously(DATA data, Dictionary<String, Object> props);
 
     }
 
@@ -101,12 +99,10 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
         }
 
         @Override
-        public void publishEvent(final String eventName, Dictionary<String, Object> dictionary, boolean synchronous) {
-            Preconditions.checkArgument(StringUtils.isNotBlank(eventName), "You must set an eventName to send an event");
+        public void publishEvent(Dictionary<String, Object> dictionary, boolean synchronous) {
             LOGGER.info("Publishing event via send");
             dictionary = dictionary == null ? new Hashtable<String, Object>() : dictionary;
             if (eventAdminServiceListener.isServiceRegistered()) {
-                dictionary.put(PROPERTY_KEY_EVENT_NAME, eventName);
                 dictionary.put(PROPERTY_KEY_EVENT_SOURCE, source);
                 for (String topic : topics) {
                     Event event = new Event(topic, dictionary);
@@ -117,51 +113,51 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
                     }
                 }
             } else {
-                LOGGER.warn("You tried to send an event {} on topic {} with dictionary : {} but no {} service is registered in the OSGi context. No event would be publish.",
-                                eventName, topics, dictionary,
+                LOGGER.warn("You tried to send an event on topic {} with dictionary : {} but no {} service is registered in the OSGi context. No event would be publish.",
+                                topics, dictionary,
                                 EventAdmin.class);
             }
         }
 
         @Override
-        public void publishEventData(String eventName, DATA data, boolean synchronous) {
+        public void publishEventData(DATA data, boolean synchronous) {
             LOGGER.info("Publishing event via sendData");
-            publishEvent(eventName, addDataToDictionary(data, null), synchronous);
+            publishEvent(addDataToDictionary(data, null), synchronous);
         }
 
         @Override
-        public void publishEventSynchronously(String eventName, Dictionary<String, Object> dictionary) {
-            publishEvent(eventName, dictionary, true);
+        public void publishEventSynchronously(Dictionary<String, Object> dictionary) {
+            publishEvent(dictionary, true);
         }
 
         @Override
-        public void publishEventAsynchronously(String eventName, Dictionary<String, Object> dictionary) {
-            publishEvent(eventName, dictionary, false);
+        public void publishEventAsynchronously(Dictionary<String, Object> dictionary) {
+            publishEvent(dictionary, false);
         }
 
         @Override
-        public void publishEventDataSynchronously(String eventName, DATA data) {
-            publishEventData(eventName, data, true);
+        public void publishEventDataSynchronously(DATA data) {
+            publishEventData(data, true);
         }
 
         @Override
-        public void publishEventDataAsynchronously(String eventName, DATA data) {
-            publishEventData(eventName, data, false);
+        public void publishEventDataAsynchronously(DATA data) {
+            publishEventData(data, false);
         }
 
         @Override
-        public void publishEventDataAndDictionnary(String eventName, DATA data, Dictionary<String, Object> props, boolean synchronous) {
-            publishEvent(eventName, addDataToDictionary(data, props), synchronous);
+        public void publishEventDataAndDictionnary(DATA data, Dictionary<String, Object> props, boolean synchronous) {
+            publishEvent(addDataToDictionary(data, props), synchronous);
         }
 
         @Override
-        public void publishEventDataAndDictionnarySynchronously(String eventName, DATA data, Dictionary<String, Object> props) {
-            publishEvent(eventName, addDataToDictionary(data, props), true);
+        public void publishEventDataAndDictionnarySynchronously(DATA data, Dictionary<String, Object> props) {
+            publishEvent(addDataToDictionary(data, props), true);
         }
 
         @Override
-        public void publishEventDataAndDictionnaryAsynchronously(String eventName, DATA data, Dictionary<String, Object> props) {
-            publishEvent(eventName, addDataToDictionary(data, props), false);
+        public void publishEventDataAndDictionnaryAsynchronously(DATA data, Dictionary<String, Object> props) {
+            publishEvent(addDataToDictionary(data, props), false);
         }
 
         private Dictionary<String, Object> addDataToDictionary(DATA data, Dictionary<String, Object> props) {

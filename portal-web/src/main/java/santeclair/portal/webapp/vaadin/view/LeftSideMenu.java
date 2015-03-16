@@ -1,7 +1,7 @@
 package santeclair.portal.webapp.vaadin.view;
 
-import static santeclair.portal.event.EventDictionaryConstant.EVENT_STARTED;
-import static santeclair.portal.event.EventDictionaryConstant.EVENT_STOPPED;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STARTED;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STOPPED;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_MENU;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
@@ -50,7 +50,7 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
     }
 
     @Subscriber(topic = TOPIC_MODULE_UI, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
-                    + EVENT_STARTED + ")")
+                    + EVENT_NAME_STARTED + ")")
     public synchronized void addModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI_MENU, required = true) final MenuModule menuModule) {
         LOGGER.debug("global addModuleUi");
         MainButonModuleUi mainButonModuleUi = new MainButonModuleUi(menuModule.getCodeModuleUi(), menuModule.getLibelleModuleUi(),
@@ -68,7 +68,7 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
     }
 
     @Subscriber(topic = TOPIC_MODULE_UI, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
-                    + EVENT_STOPPED + ")")
+                    + EVENT_NAME_STOPPED + ")")
     public synchronized void removeModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI_MENU, required = true) final MenuModule menuModule) {
         LOGGER.debug("removeModuleUi : {}", menuModule.getCodeModuleUi());
         for (Component component : buttonContainer) {
