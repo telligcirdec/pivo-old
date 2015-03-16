@@ -1,10 +1,6 @@
 package santeclair.portal.webapp.vaadin.view;
 
-import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STARTED;
-import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STOPPED;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_MENU;
-import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 
 import java.util.TreeSet;
 
@@ -16,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import santeclair.portal.event.handler.AbstractEventHandler;
 import santeclair.portal.event.handler.EventArg;
 import santeclair.portal.event.handler.PortalEventHandler;
-import santeclair.portal.event.handler.Subscriber;
 import santeclair.portal.menu.MenuModule;
 import santeclair.portal.webapp.vaadin.PushHelper;
 import santeclair.portal.webapp.vaadin.view.component.MainButonModuleUi;
@@ -49,8 +44,6 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
         registerEventHandlerItself(bundleContext);
     }
 
-    @Subscriber(topic = TOPIC_MODULE_UI, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
-                    + EVENT_NAME_STARTED + ")")
     public synchronized void addModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI_MENU, required = true) final MenuModule menuModule) {
         LOGGER.debug("global addModuleUi");
         MainButonModuleUi mainButonModuleUi = new MainButonModuleUi(menuModule.getCodeModuleUi(), menuModule.getLibelleModuleUi(),
@@ -67,8 +60,6 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
         PushHelper.push(ui);
     }
 
-    @Subscriber(topic = TOPIC_MODULE_UI, filter = "(" + PROPERTY_KEY_EVENT_NAME + "="
-                    + EVENT_NAME_STOPPED + ")")
     public synchronized void removeModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI_MENU, required = true) final MenuModule menuModule) {
         LOGGER.debug("removeModuleUi : {}", menuModule.getCodeModuleUi());
         for (Component component : buttonContainer) {

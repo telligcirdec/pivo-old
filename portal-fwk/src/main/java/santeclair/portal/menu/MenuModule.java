@@ -59,4 +59,12 @@ public class MenuModule {
         return menuViews;
     }
 
+    public void removeMenuView(String codeViewUi) {
+        for (MenuView menuView : menuViews) {
+            if (menuView.getCodeViewUi().equals(codeViewUi)) {
+                menuViews.remove(menuView);
+                break;
+            }
+        }
+    }
 }

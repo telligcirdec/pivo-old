@@ -169,15 +169,18 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
     @Subscriber(topic = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_NAME_STARTED + "))")
     public void addMenuModule(@EventArg(name = PROPERTY_KEY_MODULE_UI_MENU) final MenuModule menuModule) {
-        PushHelper.pushWithNotification(this, menuModule.getLibelleModuleUi() + " chargé", "Le module " + menuModule.getLibelleModuleUi() + " est désormais disponible.");
-        leftSideMenu.addModuleUi(menuModule);
+        if (null != menuModule.getMenuViews() && !menuModule.getMenuViews().isEmpty()) {
+            PushHelper.pushWithNotification(this, menuModule.getLibelleModuleUi() + " chargé", "Le module " + menuModule.getLibelleModuleUi() + " est désormais disponible.");
+            leftSideMenu.addModuleUi(menuModule);
+        }
     }
 
+    @Override
     @Subscriber(topic = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_NAME_STOPPED + "))")
-    public void removeMenuModule(org.osgi.service.event.Event event,
-                    @EventArg(name = PROPERTY_KEY_MODULE_UI_MENU) final MenuModule menuModule) {
-        PushHelper.pushWithNotification(this, menuModule.getLibelleModuleUi() + " déchargé", "Le module " + menuModule.getLibelleModuleUi() + " est désomeais indisponible.");
+    public void removeMenuModule(@EventArg(name = PROPERTY_KEY_MODULE_UI_MENU) final MenuModule menuModule) {
+        PushHelper.pushWithNotification(this, menuModule.getLibelleModuleUi() + " déchargé", "Le module " + menuModule.getLibelleModuleUi() + " est désormais indisponible.");
+        leftSideMenu.removeModuleUi(menuModule);
     }
 
     // private List<String> getCurrentUserRoles() {

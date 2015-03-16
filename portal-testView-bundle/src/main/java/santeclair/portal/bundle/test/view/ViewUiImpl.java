@@ -3,12 +3,14 @@ package santeclair.portal.bundle.test.view;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_VIEW_UI;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STARTED;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STOPPED;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CONTEXT;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
+import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_VIEW_UI;
 
 import java.util.Dictionary;
@@ -17,6 +19,7 @@ import java.util.Hashtable;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.ipojo.annotations.Bind;
 import org.apache.felix.ipojo.annotations.Component;
+import org.apache.felix.ipojo.annotations.Invalidate;
 import org.apache.felix.ipojo.annotations.Property;
 import org.apache.felix.ipojo.annotations.Updated;
 import org.apache.felix.ipojo.annotations.Validate;
@@ -33,7 +36,7 @@ import santeclair.portal.bundle.utils.view.ViewUi;
 @Component
 public class ViewUiImpl extends AbstractViewUi implements ViewUi {
 
-    @Publishes(name = "testViewUiPublisher", topics = TOPIC_MODULE_UI)
+    @Publishes(name = "testViewUiPublisher", topics = TOPIC_MODULE_UI + ", " + TOPIC_PORTAL)
     private Publisher publisher;
 
     @Validate
@@ -45,9 +48,21 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
         props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STARTED);
         props.put(PROPERTY_KEY_MODULE_UI_CODE, codeModule);
         props.put(PROPERTY_KEY_VIEW_UI, this);
-
+        
         publisher.send(props);
         logService.log(LogService.LOG_INFO, "TestViewUi Started");
+    }
+    
+    @Invalidate
+    public void stop() {
+        logService.log(LogService.LOG_INFO, "TestViewUi Stopping");
+        Dictionary<String, Object> props = new Hashtable<>(4);
+        props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_VIEW_UI);
+        props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STOPPED);
+        props.put(PROPERTY_KEY_MODULE_UI_CODE, codeModule);
+        props.put(PROPERTY_KEY_VIEW_UI, this);
+        publisher.send(props);
+        logService.log(LogService.LOG_INFO, "TestViewUi Stopped");
     }
 
     /*
@@ -64,13 +79,31 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
             ModuleUi moduleUi = (ModuleUi) event.getProperty(PROPERTY_KEY_MODULE_UI);
             logService.log(LogService.LOG_DEBUG, "ModuleUi with code " + codeModule + " is starting.");
 
-            Dictionary<String, Object> props = new Hashtable<>(1);
+            Dictionary<String, Object> props = new Hashtable<>(2);
             props.put(PROPERTY_KEY_VIEW_UI, this);
             props.put(PROPERTY_KEY_MODULE_UI_CODE, codeModule);
             Event registerViewUiEvent = new Event(TOPIC_MODULE_UI, props);
 
             moduleUi.registerViewUi(registerViewUiEvent);
         }
+    }
+    
+    @Subscriber(name = "moduleStop", topics = TOPIC_VIEW_UI, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
+                    + EVENT_NAME_STOPPED + "))")
+    public void moduleStop(Event event) {
+        String moduleCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_MODULE_UI_CODE);
+        if (StringUtils.isNotBlank(moduleCodeFromEvent) && moduleCodeFromEvent.equalsIgnoreCase(codeModule)) {
+            ModuleUi moduleUi = (ModuleUi) event.getProperty(PROPERTY_KEY_MODULE_UI);
+            logService.log(LogService.LOG_DEBUG, "ModuleUi with code " + codeModule + " is stopping.");
+
+            Dictionary<String, Object> props = new Hashtable<>(2);
+            props.put(PROPERTY_KEY_VIEW_UI, this);
+            props.put(PROPERTY_KEY_MODULE_UI_CODE, codeModule);
+            Event unregisterViewUiEvent = new Event(TOPIC_MODULE_UI, props);
+
+            moduleUi.unregisterViewUi(unregisterViewUiEvent);
+        }
+        
     }
 
     /*

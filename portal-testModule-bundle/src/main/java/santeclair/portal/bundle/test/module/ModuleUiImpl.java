@@ -30,7 +30,6 @@ import org.apache.felix.ipojo.annotations.Invalidate;
 import org.apache.felix.ipojo.annotations.Property;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
-import org.apache.felix.ipojo.annotations.Updated;
 import org.apache.felix.ipojo.annotations.Validate;
 import org.apache.felix.ipojo.handlers.event.Publishes;
 import org.apache.felix.ipojo.handlers.event.Subscriber;
@@ -51,8 +50,11 @@ import com.vaadin.server.FontIcon;
 @Provides(specifications = ModuleUi.class)
 public class ModuleUiImpl implements ModuleUi {
 
-    @Publishes(name = "moduleUiPublisher", topics = TOPIC_VIEW_UI + ", " + TOPIC_PORTAL, synchronous = true)
-    private Publisher publisher;
+    @Publishes(name = "moduleUiPublisherView", topics = TOPIC_VIEW_UI, synchronous = true)
+    private Publisher publisherView;
+    
+    @Publishes(name = "moduleUiPublisherPortal", topics = TOPIC_PORTAL, synchronous = true)
+    private Publisher publisherPortal;
 
     @Requires
     private LogService logService;
@@ -83,14 +85,18 @@ public class ModuleUiImpl implements ModuleUi {
     public void start() {
         logService.log(LogService.LOG_INFO, this.libelle + " (" + this.code + ") Starting");
         menuModule = constructMenuModule(code, libelle, icon, displayOrder, isCloseable, severalTabsAllowed, viewUis);
-        publisher.send(startProperties());
+        Dictionary<String, Object> props = startProperties();
+        publisherView.send(props);
+        publisherPortal.send(props);
         logService.log(LogService.LOG_INFO, this.libelle + " (" + this.code + ") Started");
     }
 
     @Invalidate
     public void stop() {
-        logService.log(LogService.LOG_INFO, this.libelle + " (" + this.code + ") Stopping");
-        publisher.send(stopProperties());
+        logService.log(LogService.LOG_INFO, this.libelle + " (" + this.code + ") Stopping"); 
+        Dictionary<String, Object> props = stopProperties();
+        publisherView.send(props);
+        publisherPortal.send(props);
         logService.log(LogService.LOG_INFO, this.libelle + " (" + this.code + ") Stopped");
     }
 
@@ -103,7 +109,9 @@ public class ModuleUiImpl implements ModuleUi {
     public void portalStarted(Event event) {
         logService.log(LogService.LOG_INFO, "A Portal is Starting");
         PortalStartCallback portalStartCallback = PortalStartCallback.class.cast(event.getProperty(PROPERTY_KEY_EVENT_DATA));
-        portalStartCallback.addMenuModule(menuModule);
+        if (null != menuModule.getMenuViews() && !menuModule.getMenuViews().isEmpty()) {
+            portalStartCallback.addMenuModule(menuModule);
+        }
     }
 
     @Override
@@ -116,6 +124,10 @@ public class ModuleUiImpl implements ModuleUi {
             String codeView = viewUi.getCode();
             logService.log(LogService.LOG_INFO, "A View is Starting => " + codeView);
             viewUis.put(codeView, viewUi);
+            menuModule.getMenuViews().add(new MenuView(viewUi.getCode(), viewUi.getLibelle(), viewUi.getIcon(), viewUi.getOpenOnInitialization()));
+
+            publisherPortal.send(startProperties());
+            
         }
     }
 
@@ -127,7 +139,7 @@ public class ModuleUiImpl implements ModuleUi {
             ViewUi viewUi = (ViewUi) event.getProperty(PROPERTY_KEY_VIEW_UI);
             String codeView = viewUi.getCode();
             logService.log(LogService.LOG_INFO, "A View is Updating => " + codeView);
-            viewUis.put(codeView, viewUi);
+            viewUis.put(codeView, viewUi); 
         }
     }
 
@@ -141,17 +153,14 @@ public class ModuleUiImpl implements ModuleUi {
             String codeView = viewUi.getCode();
             logService.log(LogService.LOG_INFO, "A View is Stopping => " + codeView);
             viewUis.remove(codeView);
+            menuModule.removeMenuView(codeView);
+            publisherPortal.send(stopProperties());
         }
     }
 
     /*
      * Properties
      */
-
-    @Updated
-    public void updated(Dictionary<?, ?> conf) {
-
-    }
 
     @Property(name = "code", mandatory = true)
     protected void setCode(String code) {
@@ -218,6 +227,7 @@ public class ModuleUiImpl implements ModuleUi {
         eventProps.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STOPPED);
         eventProps.put(PROPERTY_KEY_MODULE_UI_CODE, code);
         eventProps.put(PROPERTY_KEY_MODULE_UI_MENU, menuModule);
+        eventProps.put(PROPERTY_KEY_MODULE_UI, this);
 
         return eventProps;
     }
