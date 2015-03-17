@@ -5,7 +5,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
+import santeclair.portal.module.ModuleUi;
+import santeclair.portal.view.ViewUi;
+
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.FontIcon;
 import com.vaadin.ui.Button;
@@ -19,30 +21,23 @@ public class MainButonModuleUi extends Button implements Comparable<MainButonMod
 
     private static final String MAIN_BUTTON_MODULE_UI_STYLE_NAME = "button-heading";
 
-    private final String moduleUiCode;
-    private final String moduleUiName;
-    private final Integer moduleUiDisplayOrder;
-    private final Map<String, String> moduleUiView;
-
+    private final ModuleUi moduleUi;
+    private final Map<String, ViewUi> viewUiMap;
     private final Navigator navigator;
 
-    public MainButonModuleUi(final String moduleUiCode, final String moduleUiName, final FontIcon moduleUiIcon, final Integer moduleUiDisplayOrder,
-                                    final Map<String, String> moduleUiView, final Navigator navigator) {
-        Preconditions.checkArgument(moduleUiCode != null && moduleUiName != null, "You must set a module ui code to create a button on left side menu.");
-
-        this.moduleUiCode = moduleUiCode;
-        this.moduleUiName = moduleUiName;
-        this.moduleUiDisplayOrder = moduleUiDisplayOrder;
-        this.moduleUiView = moduleUiView;
+    public MainButonModuleUi(final ModuleUi moduleUi,
+                             final Map<String, ViewUi> viewUiMap, final Navigator navigator) {
+        this.moduleUi = moduleUi;
+        this.viewUiMap = viewUiMap;
         this.navigator = navigator;
-        init(moduleUiIcon);
+        init(moduleUi.getLibelle(), moduleUi.getIcon());
 
     }
 
-    private void init(final FontIcon moduleUiIcon) {
+    private void init(final String moduleUiLibelle, final FontIcon moduleUiIcon) {
         this.setStyleName(ValoTheme.BUTTON_BORDERLESS);
         this.addStyleName(MAIN_BUTTON_MODULE_UI_STYLE_NAME);
-        this.setCaption(moduleUiName);
+        this.setCaption(moduleUiLibelle);
         this.setIcon(moduleUiIcon);
         this.setWidth(100, Unit.PERCENTAGE);
         this.addClickListener(this);
@@ -50,10 +45,10 @@ public class MainButonModuleUi extends Button implements Comparable<MainButonMod
 
     @Override
     public int compareTo(MainButonModuleUi mainButonModuleUiFactoryToCompare) {
-        String moduleUiNameToCompare = mainButonModuleUiFactoryToCompare.getModuleUiName();
-        String moduleUiNameSource = this.getModuleUiName();
-        Integer displayOrderToCompare = mainButonModuleUiFactoryToCompare.getModuleUiDisplayOrder();
-        Integer displayOrderSource = this.getModuleUiDisplayOrder();
+        String moduleUiLibelleToCompare = mainButonModuleUiFactoryToCompare.getModuleUi().getLibelle();
+        String moduleUiLibelleSource = this.getModuleUi().getLibelle();
+        Integer displayOrderToCompare = mainButonModuleUiFactoryToCompare.getModuleUi().getDisplayOrder();
+        Integer displayOrderSource = this.getModuleUi().getDisplayOrder();
         if (displayOrderToCompare == null || Integer.signum(displayOrderToCompare) < 1) {
             displayOrderToCompare = Integer.MAX_VALUE;
         }
@@ -61,7 +56,7 @@ public class MainButonModuleUi extends Button implements Comparable<MainButonMod
             displayOrderSource = Integer.MAX_VALUE;
         }
         if (displayOrderSource.equals(displayOrderToCompare)) {
-            return moduleUiNameSource.compareTo(moduleUiNameToCompare);
+            return moduleUiLibelleSource.compareTo(moduleUiLibelleToCompare);
         }
         return displayOrderSource.compareTo(displayOrderToCompare);
     }
@@ -69,19 +64,11 @@ public class MainButonModuleUi extends Button implements Comparable<MainButonMod
     @Override
     public void buttonClick(ClickEvent event) {
         LOGGER.debug("Click event : {}", event);
-        navigator.navigateTo("container/new/modules/" + moduleUiCode);
+        navigator.navigateTo("container/new/modules/" + this.moduleUi.getCode());
     }
 
-    public String getModuleUiName() {
-        return moduleUiName;
-    }
-
-    public Integer getModuleUiDisplayOrder() {
-        return moduleUiDisplayOrder;
-    }
-
-    public String getModuleUiCode() {
-        return moduleUiCode;
+    public ModuleUi getModuleUi() {
+        return moduleUi;
     }
 
 }

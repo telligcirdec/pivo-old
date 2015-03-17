@@ -5,26 +5,24 @@ import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_PORT
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_VIEW_UI;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STARTED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STOPPED;
-import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_UPDATED;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CONTEXT;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_DATA;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_MENU;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_VIEW_UI;
 
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Invalidate;
 import org.apache.felix.ipojo.annotations.Property;
@@ -37,11 +35,9 @@ import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
 import org.osgi.service.event.Event;
 import org.osgi.service.log.LogService;
 
-import santeclair.portal.bundle.utils.module.ModuleUi;
-import santeclair.portal.bundle.utils.view.ViewUi;
 import santeclair.portal.event.publisher.callback.PortalStartCallback;
-import santeclair.portal.menu.MenuModule;
-import santeclair.portal.menu.MenuView;
+import santeclair.portal.module.ModuleUi;
+import santeclair.portal.view.ViewUi;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.FontIcon;
@@ -52,7 +48,7 @@ public class ModuleUiImpl implements ModuleUi {
 
     @Publishes(name = "moduleUiPublisherView", topics = TOPIC_VIEW_UI, synchronous = true)
     private Publisher publisherView;
-    
+
     @Publishes(name = "moduleUiPublisherPortal", topics = TOPIC_PORTAL, synchronous = true)
     private Publisher publisherPortal;
 
@@ -62,7 +58,6 @@ public class ModuleUiImpl implements ModuleUi {
     /*
      * Properties
      */
-    private String codeOldValue;
     private String code;
     private String libelle;
     private FontIcon icon;
@@ -73,31 +68,25 @@ public class ModuleUiImpl implements ModuleUi {
     private final Map<String, ViewUi> viewUis = new HashMap<>();
 
     /*
-     * Instance var
-     */
-    private MenuModule menuModule;
-
-    /*
      * Lifecycle
      */
 
     @Validate
     public void start() {
-        logService.log(LogService.LOG_INFO, this.libelle + " (" + this.code + ") Starting");
-        menuModule = constructMenuModule(code, libelle, icon, displayOrder, isCloseable, severalTabsAllowed, viewUis);
-        Dictionary<String, Object> props = startProperties();
+        logService.log(LogService.LOG_INFO, "ModuleUi " + this.libelle + " (" + this.code + ") is starting");
+        Dictionary<String, Object> props = startProperties(this);
         publisherView.send(props);
         publisherPortal.send(props);
-        logService.log(LogService.LOG_INFO, this.libelle + " (" + this.code + ") Started");
+        logService.log(LogService.LOG_INFO, "ModuleUi " + this.libelle + " (" + this.code + ") started");
     }
 
     @Invalidate
     public void stop() {
-        logService.log(LogService.LOG_INFO, this.libelle + " (" + this.code + ") Stopping"); 
-        Dictionary<String, Object> props = stopProperties();
+        logService.log(LogService.LOG_INFO, "ModuleUi " + this.libelle + " (" + this.code + ") is stopping");
+        Dictionary<String, Object> props = stopProperties(this);
         publisherView.send(props);
         publisherPortal.send(props);
-        logService.log(LogService.LOG_INFO, this.libelle + " (" + this.code + ") Stopped");
+        logService.log(LogService.LOG_INFO, "ModuleUi " + this.libelle + " (" + this.code + ") stopped");
     }
 
     /*
@@ -107,70 +96,70 @@ public class ModuleUiImpl implements ModuleUi {
     @Subscriber(name = "portalStarted", topics = TOPIC_MODULE_UI,
                     filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_PORTAL + ")(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_STARTED + "))")
     public void portalStarted(Event event) {
-        logService.log(LogService.LOG_INFO, "A Portal is Starting");
+        logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") / portalStarted(event) => A Portal is Starting");
         PortalStartCallback portalStartCallback = PortalStartCallback.class.cast(event.getProperty(PROPERTY_KEY_EVENT_DATA));
-        if (null != menuModule.getMenuViews() && !menuModule.getMenuViews().isEmpty()) {
-            portalStartCallback.addMenuModule(menuModule);
-        }
+        portalStartCallback.addModuleUi(this);
     }
 
-    @Override
     @Subscriber(name = "viewStarted", topics = TOPIC_MODULE_UI,
-                    filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_VIEW_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_STARTED + "))")
+                    filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_VIEW_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_STARTED + ")("
+                                    + PROPERTY_KEY_MODULE_UI_CODE + "=*))")
     public void registerViewUi(Event event) {
         String moduleCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_MODULE_UI_CODE);
-        if (StringUtils.isNotBlank(moduleCodeFromEvent) && moduleCodeFromEvent.equalsIgnoreCase(code)) {
+        if (moduleCodeFromEvent.equalsIgnoreCase(code)) {
             ViewUi viewUi = (ViewUi) event.getProperty(PROPERTY_KEY_VIEW_UI);
-            String codeView = viewUi.getCode();
-            logService.log(LogService.LOG_INFO, "A View is Starting => " + codeView);
-            viewUis.put(codeView, viewUi);
-            menuModule.getMenuViews().add(new MenuView(viewUi.getCode(), viewUi.getLibelle(), viewUi.getIcon(), viewUi.getOpenOnInitialization()));
-
-            publisherPortal.send(startProperties());
-            
+            logService.log(LogService.LOG_INFO,
+                            "From ModuleUi " + libelle + " (" + code + ") / registerViewUi(event) => A ViewUi " + viewUi.getLibelle() + " (" + viewUi.getCode()
+                                            + ") fired an event 'starting'.");
+            registerViewUi(viewUi);
         }
     }
 
-    @Subscriber(name = "viewUpdated", topics = TOPIC_MODULE_UI,
-                    filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_VIEW_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_UPDATED + "))")
-    public void viewUpdated(Event event) {
-        String moduleCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_MODULE_UI_CODE);
-        if (StringUtils.isNotBlank(moduleCodeFromEvent) && moduleCodeFromEvent.equalsIgnoreCase(code)) {
-            ViewUi viewUi = (ViewUi) event.getProperty(PROPERTY_KEY_VIEW_UI);
-            String codeView = viewUi.getCode();
-            logService.log(LogService.LOG_INFO, "A View is Updating => " + codeView);
-            viewUis.put(codeView, viewUi); 
-        }
-    }
-
-    @Override
     @Subscriber(name = "viewStopped", topics = TOPIC_MODULE_UI,
-                    filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_VIEW_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_STOPPED + "))")
+                    filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_VIEW_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_STOPPED + ")("
+                                    + PROPERTY_KEY_MODULE_UI_CODE + "=*))")
     public void unregisterViewUi(Event event) {
         String moduleCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_MODULE_UI_CODE);
-        if (StringUtils.isNotBlank(moduleCodeFromEvent) && moduleCodeFromEvent.equalsIgnoreCase(code)) {
+        if (moduleCodeFromEvent.equalsIgnoreCase(code)) {
             ViewUi viewUi = (ViewUi) event.getProperty(PROPERTY_KEY_VIEW_UI);
-            String codeView = viewUi.getCode();
-            logService.log(LogService.LOG_INFO, "A View is Stopping => " + codeView);
-            viewUis.remove(codeView);
-            menuModule.removeMenuView(codeView);
-            publisherPortal.send(stopProperties());
+            logService.log(LogService.LOG_INFO,
+                            "From ModuleUi " + libelle + " (" + code + ") / unregisterViewUi(event) => A ViewUi " + viewUi.getLibelle() + " (" + viewUi.getCode()
+                                            + ") fired an event 'stopping'.");
+            unregisterViewUi(viewUi);
         }
     }
 
     /*
-     * Properties
+     * Callback
+     */
+
+    @Override
+    public void registerViewUi(ViewUi viewUi) {
+        String codeView = viewUi.getCode();
+        logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") / registerViewUi(viewUi) => A ViewUi " + viewUi.getLibelle() + " (" + codeView
+                        + ") is starting.");
+        viewUis.put(codeView, viewUi);
+        logService.log(LogService.LOG_DEBUG, "From ModuleUi " + libelle + " (" + code + ") => An event 'moduleUi starting' is going to be send on portal topic");
+        publisherPortal.send(startProperties(this));
+    }
+
+    @Override
+    public void unregisterViewUi(ViewUi viewUi) {
+        String codeView = viewUi.getCode();
+        logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") / unregisterViewUi(viewUi) => A ViewUi " + viewUi.getLibelle() + " (" + codeView
+                        + ") is stopping.");
+        viewUis.remove(codeView);
+        logService.log(LogService.LOG_DEBUG, "From ModuleUi " + libelle + " (" + code + ") => An event 'moduleUi stopping' is going to be send on portal topic");
+        publisherPortal.send(stopProperties(this));
+    }
+
+    /*
+     * Managed Properties (setter)
      */
 
     @Property(name = "code", mandatory = true)
     protected void setCode(String code) {
-        this.codeOldValue = this.code;
         this.code = code;
-    }
-
-    @Override
-    public String getCode() {
-        return this.code;
     }
 
     @Property(name = "libelle", mandatory = true)
@@ -204,46 +193,81 @@ public class ModuleUiImpl implements ModuleUi {
     }
 
     /*
-     * Private method
+     * Getter
      */
-    private Dictionary<String, Object> startProperties() {
-        logService.log(LogService.LOG_DEBUG, "Building TestModuleUi starting dictionnary event");
+
+    @Override
+    public String getCode() {
+        return code;
+    }
+
+    @Override
+    public String getLibelle() {
+        return libelle;
+    }
+
+    @Override
+    public FontIcon getIcon() {
+        return icon;
+    }
+
+    @Override
+    public Boolean getIsCloseable() {
+        return isCloseable;
+    }
+
+    @Override
+    public Boolean getSeveralTabsAllowed() {
+        return severalTabsAllowed;
+    }
+
+    @Override
+    public Integer getDisplayOrder() {
+        return displayOrder;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map<String, ViewUi> getViewUis(final List<String> currentUserRoles) {
+        Map<String, ViewUi> viewMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(currentUserRoles)) {
+            for (String viewKey : viewUis.keySet()) {
+                ViewUi viewUi = viewUis.get(viewKey);
+                for (String roleAllowed : viewUi.getRolesAllowed()) {
+                    if (currentUserRoles.contains(roleAllowed) || roleAllowed.equals("ANY")) {
+                        viewMap.put(viewKey, viewUi);
+                        break;
+                    }
+                }
+            }
+        }
+        return MapUtils.unmodifiableMap(viewMap);
+    }
+
+    /*
+     * Private methods
+     */
+
+    private static Dictionary<String, Object> startProperties(final ModuleUiImpl moduleUi) {
 
         Dictionary<String, Object> eventProps = new Hashtable<>();
         eventProps.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_MODULE_UI);
         eventProps.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STARTED);
-        eventProps.put(PROPERTY_KEY_MODULE_UI_CODE, code);
-        eventProps.put(PROPERTY_KEY_MODULE_UI_MENU, menuModule);
-        eventProps.put(PROPERTY_KEY_MODULE_UI, this);
+        eventProps.put(PROPERTY_KEY_MODULE_UI_CODE, moduleUi.getCode());
+        eventProps.put(PROPERTY_KEY_MODULE_UI, moduleUi);
 
         return eventProps;
     }
 
-    private Dictionary<String, Object> stopProperties() {
-        logService.log(LogService.LOG_DEBUG, "Building TestModuleUi stopping dictionnary event");
+    private static Dictionary<String, Object> stopProperties(final ModuleUiImpl moduleUi) {
 
         Dictionary<String, Object> eventProps = new Hashtable<>();
         eventProps.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_MODULE_UI);
         eventProps.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STOPPED);
-        eventProps.put(PROPERTY_KEY_MODULE_UI_CODE, code);
-        eventProps.put(PROPERTY_KEY_MODULE_UI_MENU, menuModule);
-        eventProps.put(PROPERTY_KEY_MODULE_UI, this);
+        eventProps.put(PROPERTY_KEY_MODULE_UI_CODE, moduleUi.getCode());
+        eventProps.put(PROPERTY_KEY_MODULE_UI, moduleUi);
 
         return eventProps;
-    }
-
-    /**
-     * 
-     */
-    private static MenuModule constructMenuModule(final String code, final String libelle, final FontIcon icon, final Integer displayOrder, final Boolean isCloseable,
-                    final Boolean severalTabsAllowed, final Map<String, ViewUi> viewsUi) {
-        List<MenuView> menuViews = new ArrayList<MenuView>();
-        if (null != viewsUi) {
-            for (ViewUi viewUi : viewsUi.values()) {
-                menuViews.add(new MenuView(viewUi.getCode(), viewUi.getLibelle(), viewUi.getIcon(), viewUi.getOpenOnInitialization()));
-            }
-        }
-        return new MenuModule(code, libelle, icon, displayOrder, isCloseable, severalTabsAllowed, menuViews);
     }
 
 }

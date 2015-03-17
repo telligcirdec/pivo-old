@@ -6,7 +6,7 @@ import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STARTED
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STOPPED;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CONTEXT;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_MENU;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_USER_ROLES;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.osgi.framework.BundleContext;
@@ -32,7 +34,8 @@ import santeclair.portal.event.handler.Subscriber;
 import santeclair.portal.event.publisher.callback.PortalStartCallback;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener.Publisher;
-import santeclair.portal.menu.MenuModule;
+import santeclair.portal.module.ModuleUi;
+import santeclair.portal.view.ViewUi;
 import santeclair.portal.webapp.HostActivator;
 import santeclair.portal.webapp.vaadin.view.LeftSideMenu;
 import santeclair.portal.webapp.vaadin.view.Main;
@@ -125,7 +128,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         this.setContent(main);
 
         Dictionary<String, Object> props = new Hashtable<>();
-        props.put(PROPERTY_KEY_PORTAL_USER_ROLES, Arrays.asList(new String[]{"ADMIN", "USER"}));
+        props.put(PROPERTY_KEY_PORTAL_USER_ROLES, getCurrentUserRoles());
         props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_PORTAL);
         props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STARTED);
 
@@ -167,20 +170,20 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
     @Override
     @Subscriber(topic = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
-                    + EVENT_NAME_STARTED + "))")
-    public void addMenuModule(@EventArg(name = PROPERTY_KEY_MODULE_UI_MENU) final MenuModule menuModule) {
-        if (null != menuModule.getMenuViews() && !menuModule.getMenuViews().isEmpty()) {
-            PushHelper.pushWithNotification(this, menuModule.getLibelleModuleUi() + " chargé", "Le module " + menuModule.getLibelleModuleUi() + " est désormais disponible.");
-            leftSideMenu.addModuleUi(menuModule);
+                    + EVENT_NAME_STARTED + ")(" + PROPERTY_KEY_MODULE_UI + "=*))")
+    public void addModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI) final ModuleUi moduleUi) {
+        Map<String, ViewUi> viewUiMap = moduleUi.getViewUis(getCurrentUserRoles());
+        if (!viewUiMap.isEmpty()) {
+            PushHelper.pushWithNotification(this, moduleUi.getLibelle() + " chargé", "Le module " + moduleUi.getLibelle() + " est désormais disponible.");
+            leftSideMenu.addModuleUi(moduleUi, viewUiMap);
         }
     }
 
-    @Override
     @Subscriber(topic = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
-                    + EVENT_NAME_STOPPED + "))")
-    public void removeMenuModule(@EventArg(name = PROPERTY_KEY_MODULE_UI_MENU) final MenuModule menuModule) {
-        PushHelper.pushWithNotification(this, menuModule.getLibelleModuleUi() + " déchargé", "Le module " + menuModule.getLibelleModuleUi() + " est désormais indisponible.");
-        leftSideMenu.removeModuleUi(menuModule);
+                    + EVENT_NAME_STOPPED + ")(" + PROPERTY_KEY_MODULE_UI + "=*))")
+    public void removeModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI) final ModuleUi moduleUi) {
+        PushHelper.pushWithNotification(this, moduleUi.getLibelle() + " déchargé", "Le module " + moduleUi.getLibelle() + " est désormais indisponible.");
+        leftSideMenu.removeModuleUi(moduleUi);
     }
 
     // private List<String> getCurrentUserRoles() {
@@ -195,6 +198,10 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
     // }
     // return roles;
     // }
+
+    private List<String> getCurrentUserRoles() {
+        return Arrays.asList(new String[]{"ADMIN", "USER"});
+    }
 
     private void setErrorHandler() {
         this.setErrorHandler(new DefaultErrorHandler() {

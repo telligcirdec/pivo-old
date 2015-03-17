@@ -1,7 +1,6 @@
 package santeclair.portal.webapp.vaadin.view;
 
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_MENU;
-
+import java.util.Map;
 import java.util.TreeSet;
 
 import org.osgi.framework.BundleContext;
@@ -10,9 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import santeclair.portal.event.handler.AbstractEventHandler;
-import santeclair.portal.event.handler.EventArg;
 import santeclair.portal.event.handler.PortalEventHandler;
-import santeclair.portal.menu.MenuModule;
+import santeclair.portal.module.ModuleUi;
+import santeclair.portal.view.ViewUi;
 import santeclair.portal.webapp.vaadin.PushHelper;
 import santeclair.portal.webapp.vaadin.view.component.MainButonModuleUi;
 
@@ -44,10 +43,9 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
         registerEventHandlerItself(bundleContext);
     }
 
-    public synchronized void addModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI_MENU, required = true) final MenuModule menuModule) {
+    public synchronized void addModuleUi(final ModuleUi moduleUi, final Map<String, ViewUi> viewUiMap) {
         LOGGER.debug("global addModuleUi");
-        MainButonModuleUi mainButonModuleUi = new MainButonModuleUi(menuModule.getCodeModuleUi(), menuModule.getLibelleModuleUi(),
-                        menuModule.getIconModuleUi(), menuModule.getDisplayOrderModuleUi(), null, navigator);
+        MainButonModuleUi mainButonModuleUi = new MainButonModuleUi(moduleUi, viewUiMap, navigator);
         TreeSet<Component> butonModuleUi = new TreeSet<>();
         butonModuleUi.add(mainButonModuleUi);
         for (Component component : buttonContainer) {
@@ -60,12 +58,12 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
         PushHelper.push(ui);
     }
 
-    public synchronized void removeModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI_MENU, required = true) final MenuModule menuModule) {
-        LOGGER.debug("removeModuleUi : {}", menuModule.getCodeModuleUi());
+    public synchronized void removeModuleUi(final ModuleUi moduleUi) {
+        LOGGER.debug("removeModuleUi : {}", moduleUi.getCode());
         for (Component component : buttonContainer) {
             if (MainButonModuleUi.class.isAssignableFrom(component.getClass())) {
                 MainButonModuleUi currentComponent = MainButonModuleUi.class.cast(component);
-                if (currentComponent.getModuleUiCode().equals(menuModule.getCodeModuleUi())) {
+                if (currentComponent.getModuleUi().getCode().equals(moduleUi.getCode())) {
                     buttonContainer.removeComponent(component);
                 }
             }

@@ -1,11 +1,12 @@
 package santeclair.portal.event.publisher.callback;
 
-import santeclair.portal.menu.MenuModule;
+import santeclair.portal.module.ModuleUi;
+
 
 public interface PortalStartCallback {
 
-    public void addMenuModule(MenuModule menuModule);
+    public void addModuleUi(ModuleUi moduleUi);
     
-    public void removeMenuModule(MenuModule menuModule);
+    //public void removeMenuModule(MenuModule menuModule);
 
 }

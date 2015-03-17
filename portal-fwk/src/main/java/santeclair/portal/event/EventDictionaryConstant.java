@@ -50,7 +50,6 @@ public interface EventDictionaryConstant {
      * Propriété autour des modules ui
      */
     public static final String PROPERTY_KEY_MODULE_UI = "property.key.module.ui";
-    public static final String PROPERTY_KEY_MODULE_UI_MENU = "property.key.module.ui.menu";
     public static final String PROPERTY_KEY_MODULE_UI_CODE = "property.key.module.ui.code";
 
     /**
