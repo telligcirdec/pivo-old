@@ -25,6 +25,6 @@ public interface ModuleUi {
 
     void registerViewUi(ViewUi viewUi);
 
-    void unregisterViewUi(ViewUi viewUi);
+    //void unregisterViewUi(ViewUi viewUi);
 
 }

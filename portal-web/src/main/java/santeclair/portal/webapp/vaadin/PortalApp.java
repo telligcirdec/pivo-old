@@ -183,21 +183,8 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
                     + EVENT_NAME_STOPPED + ")(" + PROPERTY_KEY_MODULE_UI + "=*))")
     public void removeModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI) final ModuleUi moduleUi) {
         PushHelper.pushWithNotification(this, moduleUi.getLibelle() + " déchargé", "Le module " + moduleUi.getLibelle() + " est désormais indisponible.");
-        leftSideMenu.removeModuleUi(moduleUi);
+        leftSideMenu.removeModuleUi(moduleUi.getCode());
     }
-
-    // private List<String> getCurrentUserRoles() {
-    // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    // LOGGER.info("Portal authentication : " + authentication);
-    // @SuppressWarnings("unchecked")
-    // Collection<GrantedAuthority> grantedAuthorities = (Collection<GrantedAuthority>) authentication.getAuthorities();
-    // LOGGER.debug("current user roles : " + grantedAuthorities);
-    // List<String> roles = new ArrayList<>();
-    // for (GrantedAuthority grantedAuthority : grantedAuthorities) {
-    // roles.add(grantedAuthority.getAuthority());
-    // }
-    // return roles;
-    // }
 
     private List<String> getCurrentUserRoles() {
         return Arrays.asList(new String[]{"ADMIN", "USER"});

@@ -58,12 +58,12 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
         PushHelper.push(ui);
     }
 
-    public synchronized void removeModuleUi(final ModuleUi moduleUi) {
-        LOGGER.debug("removeModuleUi : {}", moduleUi.getCode());
+    public synchronized void removeModuleUi(final String moduleUiCode) {
+        LOGGER.debug("removeModuleUi : {}", moduleUiCode);
         for (Component component : buttonContainer) {
             if (MainButonModuleUi.class.isAssignableFrom(component.getClass())) {
                 MainButonModuleUi currentComponent = MainButonModuleUi.class.cast(component);
-                if (currentComponent.getModuleUi().getCode().equals(moduleUi.getCode())) {
+                if (currentComponent.getModuleUi().getCode().equals(moduleUiCode)) {
                     buttonContainer.removeComponent(component);
                 }
             }

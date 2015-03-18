@@ -2,14 +2,11 @@ package santeclair.portal.bundle.test.view;
 
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STARTED;
-import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STOPPED;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CONTEXT;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
-import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_VIEW_UI;
 
-import java.util.Dictionary;
 import java.util.List;
 
 import org.apache.felix.ipojo.annotations.Bind;
@@ -30,7 +27,7 @@ import santeclair.portal.view.ViewUi;
 @Component
 public class ViewUiImpl extends AbstractViewUi implements ViewUi {
 
-    @Publishes(name = "testViewUiPublisher", topics = TOPIC_MODULE_UI + ", " + TOPIC_PORTAL)
+    @Publishes(name = "testViewUiPublisher", topics = TOPIC_MODULE_UI)
     private Publisher publisher;
 
     /*
@@ -59,12 +56,12 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
         super.moduleStart(event);
     }
 
-    @Override
-    @Subscriber(name = "moduleStop", topics = TOPIC_VIEW_UI, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
-                    + EVENT_NAME_STOPPED + "))")
-    public void moduleStop(Event event) {
-        super.moduleStop(event);
-    }
+//    @Override
+//    @Subscriber(name = "moduleStop", topics = TOPIC_VIEW_UI, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
+//                    + EVENT_NAME_STOPPED + "))")
+//    public void moduleStop(Event event) {
+//        super.moduleStop(event);
+//    }
 
     /*
      * Bind services
@@ -77,13 +74,13 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
     }
 
     /*
-     * Properties
+     * Managed Properties (setter)
      */
 
     @Override
     @Updated
-    public void updated(Dictionary<?, ?> conf) {
-        super.updated(conf);
+    public void updated() {
+        super.updated();
     }
 
     @Override
@@ -109,7 +106,7 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
     protected void setIcon(String icon) {
         super.setIcon(icon);
     }
-
+    
     @Override
     @Property(name = "openOnInitialization", value = "false")
     protected void setOpenOnInitialization(Boolean openOnInitialization) {
@@ -122,6 +119,10 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
         super.setRolesAllowed(rolesAllowed);
     }
 
+    /*
+     * Getter
+     */
+    
     @Override
     protected Publisher getPublisher() {
         return publisher;
