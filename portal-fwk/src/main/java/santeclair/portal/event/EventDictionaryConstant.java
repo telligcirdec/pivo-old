@@ -15,6 +15,12 @@ public interface EventDictionaryConstant {
      * Nom du topic portail
      */
     public static final String TOPIC_PORTAL = TOPIC_ROOT + "/portal";
+    
+    /**
+     * Nom du topic portail
+     */
+    public static final String TOPIC_NAVIGATOR = TOPIC_PORTAL + "/navigator";
+    
     /**
      * Nom du topic ou sont firé les event en rapport avec les modules ui
      */
@@ -44,8 +50,13 @@ public interface EventDictionaryConstant {
     /**
      * Propriété du portail
      */
-    public static final String PROPERTY_KEY_PORTAL_USER_ROLES = "property.key.portal.user.roles";
+    public static final String PROPERTY_KEY_EVENT_PORTAL_UIID = "property.key.event.portal.uiId";
 
+    /**
+     * Propriété de navigation
+     */
+    public static final String PROPERTY_KEY_EVENT_NAVIGATOR_URI = "property.key.event.navigator.uri";
+    
     /**
      * Propriété autour des modules ui
      */
@@ -64,6 +75,7 @@ public interface EventDictionaryConstant {
     public static final String EVENT_CONTEXT_PORTAL = "context-portal";
     public static final String EVENT_CONTEXT_MODULE_UI = "context-moduleUi";
     public static final String EVENT_CONTEXT_VIEW_UI = "context-viewUi";
+    public static final String EVENT_CONTEXT_TABS = "context-tabs";
 
     /*
      * Events name
@@ -71,6 +83,8 @@ public interface EventDictionaryConstant {
     public static final String EVENT_NAME_STARTED = "started";
     public static final String EVENT_NAME_STOPPED = "stopped";
     public static final String EVENT_NAME_UPDATED = "updated";
+    public static final String EVENT_NAME_NEW = "new";
     public static final String EVENT_NAME_ON_CLICK = "on_click";
+    public static final String EVENT_NAME_NAVIGATION = "navigation";
 
 }

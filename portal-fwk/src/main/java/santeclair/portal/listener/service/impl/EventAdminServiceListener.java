@@ -31,7 +31,7 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventAdminServiceListener.class);
 
-    private final List<Publisher<?, ?>> publishers = new ArrayList<>();
+    private final List<Publisher<?>> publishers = new ArrayList<>();
 
     private EventAdmin service;
 
@@ -45,27 +45,43 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
         this.service = null;
     }
 
-    public <SOURCE, DATA> Publisher<SOURCE, DATA> registerPublisher(SOURCE source, String... topics) {
+    public <SOURCE, DATA> DataPublisher<SOURCE, DATA> registerDataPublisher(SOURCE source, String... topics) {
         LOGGER.info("Create a new Publisher");
-        Publisher<SOURCE, DATA> publisher = new PublisherImpl<>(this, source, topics);
+        DataPublisher<SOURCE, DATA> publisher = new DataPublisherImpl<>(this, source, topics);
+        publishers.add(publisher);
+        return publisher;
+    }
+    
+    public <SOURCE, DATA> Publisher<SOURCE> registerPublisher(SOURCE source, String... topics) {
+        LOGGER.info("Create a new Publisher");
+        Publisher<SOURCE> publisher = new PublisherImpl<>(this, source, topics);
         publishers.add(publisher);
         return publisher;
     }
 
-    public void unregisterPublisher(Publisher<?, ?>... publishers) {
+    public void unregisterPublisher(Publisher<?>... publishers) {
         LOGGER.info("Destroying publishers");
-        for (Publisher<?, ?> publisher : publishers) {
-            this.publishers.remove(publisher);
+        if (publishers != null && publishers.length > 0) {
+            for (Publisher<?> publisher : publishers) {
+                if (publisher != null) {
+                    this.publishers.remove(publisher);
+                }
+            }
         }
+
     }
 
-    public interface Publisher<SOURCE, DATA> extends Serializable {
+    public interface Publisher<SOURCE> extends Serializable {
 
         public void publishEvent(Dictionary<String, Object> dictionary, boolean synchronous);
 
         public void publishEventSynchronously(Dictionary<String, Object> dictionary);
 
         public void publishEventAsynchronously(Dictionary<String, Object> dictionary);
+
+    }
+    
+    public interface DataPublisher<SOURCE, DATA> extends Serializable, Publisher<SOURCE> {
 
         public void publishEventData(DATA data, boolean synchronous);
 
@@ -81,21 +97,65 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
 
     }
 
-    private class PublisherImpl<SOURCE, DATA> implements Publisher<SOURCE, DATA> {
+    private class PublisherImpl<SOURCE> implements Publisher<SOURCE> {
 
         /**
          * 
          */
         private static final long serialVersionUID = -1356857447344703240L;
 
-        private final EventAdminServiceListener eventAdminServiceListener;
-        private final String[] topics;
-        private final SOURCE source;
+        protected final EventAdminServiceListener eventAdminServiceListener;
+        protected final String[] topics;
+        protected final SOURCE source;
 
         public PublisherImpl(EventAdminServiceListener eventAdminServiceListener, SOURCE source, String... topics) {
             this.eventAdminServiceListener = eventAdminServiceListener;
             this.topics = topics;
             this.source = source;
+        }
+
+        @Override
+        public void publishEvent(Dictionary<String, Object> dictionary, boolean synchronous) {
+            LOGGER.info("Publishing event via send");
+            dictionary = dictionary == null ? new Hashtable<String, Object>() : dictionary;
+            if (eventAdminServiceListener.isServiceRegistered()) {
+                dictionary.put(PROPERTY_KEY_EVENT_SOURCE, source);
+                for (String topic : topics) {
+                    Event event = new Event(topic, dictionary);
+                    if (synchronous) {
+                        service.sendEvent(event);
+                    } else {
+                        service.postEvent(event);
+                    }
+                }
+            } else {
+                LOGGER.warn("You tried to send an event on topic {} with dictionary : {} but no {} service is registered in the OSGi context. No event would be publish.",
+                                topics, dictionary,
+                                EventAdmin.class);
+            }
+        }
+
+        @Override
+        public void publishEventSynchronously(Dictionary<String, Object> dictionary) {
+            publishEvent(dictionary, true);
+        }
+
+        @Override
+        public void publishEventAsynchronously(Dictionary<String, Object> dictionary) {
+            publishEvent(dictionary, false);
+        }
+
+    }
+    
+    private class DataPublisherImpl<SOURCE, DATA> extends PublisherImpl<SOURCE> implements DataPublisher<SOURCE, DATA> {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -1356857447344703240L;
+
+        public DataPublisherImpl(EventAdminServiceListener eventAdminServiceListener, SOURCE source, String... topics) {
+            super(eventAdminServiceListener, source, topics);
         }
 
         @Override

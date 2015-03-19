@@ -65,22 +65,20 @@ public abstract class AbstractViewUi implements ViewUi {
 
     protected void moduleStart(Event event) {
         String moduleCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_MODULE_UI_CODE);
-        if (StringUtils.isNotBlank(moduleCodeFromEvent) && moduleCodeFromEvent.equalsIgnoreCase(codeModule)) {
+        if (moduleCodeFromEvent.equalsIgnoreCase(codeModule)) {
             ModuleUi moduleUi = (ModuleUi) event.getProperty(PROPERTY_KEY_MODULE_UI);
             logService.log(LogService.LOG_DEBUG, "From ViewUi " + this.libelle + " (" + this.code + ") (moduleStart(event)) => ModuleUi with code " + codeModule + " is starting.");
             moduleUi.registerViewUi(this);
         }
     }
-
-    // protected void moduleStop(Event event) {
-    // String moduleCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_MODULE_UI_CODE);
-    // if (moduleCodeFromEvent.equalsIgnoreCase(codeModule)) {
-    // ModuleUi moduleUi = (ModuleUi) event.getProperty(PROPERTY_KEY_MODULE_UI);
-    // logService.log(LogService.LOG_DEBUG, "From ViewUi " + this.libelle + " (" + this.code + ") (moduleStop(event)) => ModuleUi with code " +
-    // codeModule + " is stopping.");
-    // moduleUi.unregisterViewUi(this);
-    // }
-    // }
+    
+    protected void getNewViewUi(Event event) {
+        String moduleCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_MODULE_UI_CODE);
+        String viewCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_VIEW_UI_CODE);
+        if (moduleCodeFromEvent.equalsIgnoreCase(codeModule) && viewCodeFromEvent.equalsIgnoreCase(code)) {
+            test
+        }
+    }
 
     /*
      * Bind services
@@ -97,7 +95,7 @@ public abstract class AbstractViewUi implements ViewUi {
 
     protected void updated() {
         logService.log(LogService.LOG_DEBUG, "ViewUi " + this.libelle + " (" + this.code + ") has been modified.");
-        getPublisher().send(stopProperties(this, oldCodeModule, oldCode));
+        getPublisher().send(stopProperties(this, oldCode, oldCodeModule));
         getPublisher().send(startProperties(this));
     }
 
@@ -183,7 +181,7 @@ public abstract class AbstractViewUi implements ViewUi {
         return stopProperties(viewUi, viewUi.codeModule, viewUi.code);
     }
 
-    private static Dictionary<String, Object> stopProperties(final AbstractViewUi viewUi, final String codeModule, final String codeView) {
+    private static Dictionary<String, Object> stopProperties(final AbstractViewUi viewUi, final String codeView, final String codeModule) {
 
         Dictionary<String, Object> eventProps = new Hashtable<>(4);
         eventProps.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_VIEW_UI);

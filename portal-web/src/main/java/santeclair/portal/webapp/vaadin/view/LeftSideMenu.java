@@ -10,15 +10,13 @@ import org.slf4j.LoggerFactory;
 
 import santeclair.portal.event.handler.AbstractEventHandler;
 import santeclair.portal.event.handler.PortalEventHandler;
+import santeclair.portal.listener.service.impl.EventAdminServiceListener;
 import santeclair.portal.module.ModuleUi;
 import santeclair.portal.view.ViewUi;
-import santeclair.portal.webapp.vaadin.PushHelper;
 import santeclair.portal.webapp.vaadin.view.component.MainButonModuleUi;
 
-import com.vaadin.navigator.Navigator;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
@@ -26,14 +24,15 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(LeftSideMenu.class);
     private static final long serialVersionUID = -4748523363216844520L;
     private final VerticalLayout buttonContainer;
-    private final UI ui;
-    private final Navigator navigator;
 
-    public LeftSideMenu(final UI ui, final Navigator navigator) {
+    private final EventAdminServiceListener eventAdminServiceListener;
+    private final String uiId;
+    
+    public LeftSideMenu(EventAdminServiceListener eventAdminServiceListener, String uiId) {
         super("sidebarLayout");
+        this.eventAdminServiceListener = eventAdminServiceListener;
+        this.uiId = uiId;
         buttonContainer = new VerticalLayout();
-        this.ui = ui;
-        this.navigator = navigator;
     }
 
     public void init(BundleContext bundleContext) {
@@ -45,7 +44,7 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
 
     public synchronized void addModuleUi(final ModuleUi moduleUi, final Map<String, ViewUi> viewUiMap) {
         LOGGER.debug("global addModuleUi");
-        MainButonModuleUi mainButonModuleUi = new MainButonModuleUi(moduleUi, viewUiMap, navigator);
+        MainButonModuleUi mainButonModuleUi = new MainButonModuleUi(moduleUi, viewUiMap, eventAdminServiceListener, uiId);
         TreeSet<Component> butonModuleUi = new TreeSet<>();
         butonModuleUi.add(mainButonModuleUi);
         for (Component component : buttonContainer) {
@@ -55,20 +54,21 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
         }
         buttonContainer.removeAllComponents();
         buttonContainer.addComponents(butonModuleUi.toArray(new Component[]{}));
-        PushHelper.push(ui);
     }
 
-    public synchronized void removeModuleUi(final String moduleUiCode) {
+    public synchronized boolean removeModuleUi(final String moduleUiCode) {
         LOGGER.debug("removeModuleUi : {}", moduleUiCode);
+        boolean modulehasBeenRemoved = false;
         for (Component component : buttonContainer) {
             if (MainButonModuleUi.class.isAssignableFrom(component.getClass())) {
                 MainButonModuleUi currentComponent = MainButonModuleUi.class.cast(component);
                 if (currentComponent.getModuleUi().getCode().equals(moduleUiCode)) {
                     buttonContainer.removeComponent(component);
+                    modulehasBeenRemoved = true;
                 }
             }
         }
-        PushHelper.push(ui);
+        return modulehasBeenRemoved;
     }
 
     @Override

@@ -4,6 +4,7 @@ import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_MODU
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STARTED;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CONTEXT;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_VIEW_UI;
 
@@ -24,10 +25,13 @@ import org.osgi.service.log.LogService;
 import santeclair.portal.bundle.utils.view.AbstractViewUi;
 import santeclair.portal.view.ViewUi;
 
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+
 @Component
 public class ViewUiImpl extends AbstractViewUi implements ViewUi {
 
-    @Publishes(name = "testViewUiPublisher", topics = TOPIC_MODULE_UI)
+    @Publishes(name = "testViewUiPublisher", topics = TOPIC_MODULE_UI, synchronous=true)
     private Publisher publisher;
 
     /*
@@ -51,17 +55,10 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
      */
     @Override
     @Subscriber(name = "moduleStart", topics = TOPIC_VIEW_UI, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
-                    + EVENT_NAME_STARTED + "))")
+                    + EVENT_NAME_STARTED + ")("+PROPERTY_KEY_MODULE_UI_CODE+"=*))")
     public void moduleStart(Event event) {
         super.moduleStart(event);
     }
-
-//    @Override
-//    @Subscriber(name = "moduleStop", topics = TOPIC_VIEW_UI, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
-//                    + EVENT_NAME_STOPPED + "))")
-//    public void moduleStop(Event event) {
-//        super.moduleStop(event);
-//    }
 
     /*
      * Bind services
@@ -130,6 +127,8 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
 
     @Override
     public com.vaadin.ui.Component getRootComponent(List<String> currentUserRoles) {
-        return null;
+        HorizontalLayout horizontalLayout = new HorizontalLayout(new Label("Mouahahaha !!!!"));
+        
+        return horizontalLayout;
     }
 }

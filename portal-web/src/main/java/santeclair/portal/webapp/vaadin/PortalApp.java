@@ -7,7 +7,7 @@ import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STOPPED
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CONTEXT;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_USER_ROLES;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
 
@@ -33,10 +33,11 @@ import santeclair.portal.event.handler.PortalEventHandler;
 import santeclair.portal.event.handler.Subscriber;
 import santeclair.portal.event.publisher.callback.PortalStartCallback;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener;
-import santeclair.portal.listener.service.impl.EventAdminServiceListener.Publisher;
+import santeclair.portal.listener.service.impl.EventAdminServiceListener.DataPublisher;
 import santeclair.portal.module.ModuleUi;
 import santeclair.portal.view.ViewUi;
 import santeclair.portal.webapp.HostActivator;
+import santeclair.portal.webapp.vaadin.navigator.NavigatorEventHandler;
 import santeclair.portal.webapp.vaadin.view.LeftSideMenu;
 import santeclair.portal.webapp.vaadin.view.Main;
 import santeclair.portal.webapp.vaadin.view.Tabs;
@@ -77,9 +78,9 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
     // Container des onglets
     private Tabs tabs;
 
-    private Navigator navigator;
+    private NavigatorEventHandler navigatorEventHandler;
 
-    private Publisher<PortalApp, PortalStartCallback> portalPublisher;
+    private DataPublisher<PortalApp, PortalStartCallback> portalDataPublisher;
 
     /*
      * Début du Code UI
@@ -99,11 +100,14 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         this.setSizeFull();
         this.setErrorHandler();
 
-        navigator = new Navigator(this, (ViewDisplay) this);
+        Navigator navigator = new Navigator(this, (ViewDisplay) this);
+        String sessionId = this.getSession().getSession().getId();
+        navigatorEventHandler = new NavigatorEventHandler(navigator, sessionId);
+        navigatorEventHandler.registerEventHandlerItself(context);
 
         // Création du composant contenant les tabsheet
         LOGGER.info("Initialisation du container d'onglet");
-        tabs = new Tabs();
+        tabs = new Tabs(eventAdminServiceListener);
         tabs.init();
 
         navigator.addView("", tabs);
@@ -111,7 +115,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
         // Création du composant contenant le menu à gauche avec les boutons
         LOGGER.info("Initialisation du menu gauche");
-        leftSideMenu = new LeftSideMenu(this, navigator);
+        leftSideMenu = new LeftSideMenu(eventAdminServiceListener, sessionId);
         leftSideMenu.init(context);
 
         // Création du container principal
@@ -124,16 +128,16 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
         registerEventHandlerItself(context);
 
-        portalPublisher = eventAdminServiceListener.registerPublisher(this, TOPIC_MODULE_UI);
+        portalDataPublisher = eventAdminServiceListener.registerDataPublisher(this, TOPIC_MODULE_UI);
         this.setContent(main);
 
-        Dictionary<String, Object> props = new Hashtable<>();
-        props.put(PROPERTY_KEY_PORTAL_USER_ROLES, getCurrentUserRoles());
+        Dictionary<String, Object> props = new Hashtable<>(2);
         props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_PORTAL);
         props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STARTED);
 
-        portalPublisher.publishEventDataAndDictionnarySynchronously(this, props);
+        portalDataPublisher.publishEventDataAndDictionnarySynchronously(this, props);
         LOGGER.debug("Fin Initialisation de l'UI");
+
     }
 
     @Override
@@ -144,8 +148,11 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         HostActivator hostActivator = applicationContext.getBean(HostActivator.class);
         EventAdminServiceListener eventAdminServiceListener = applicationContext.getBean(EventAdminServiceListener.class);
 
-        unregisterEventHandlerItSelf(hostActivator.getBundleContext());
-        eventAdminServiceListener.unregisterPublisher(portalPublisher);
+        BundleContext context = hostActivator.getBundleContext();
+
+        unregisterEventHandlerItSelf(context);
+        eventAdminServiceListener.unregisterPublisher(portalDataPublisher);
+        navigatorEventHandler.unregisterEventHandlerItSelf(context);
 
         super.detach();
     }
@@ -170,20 +177,37 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
     @Override
     @Subscriber(topic = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
-                    + EVENT_NAME_STARTED + ")(" + PROPERTY_KEY_MODULE_UI + "=*))")
-    public void addModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI) final ModuleUi moduleUi) {
+                    + EVENT_NAME_STARTED + ")(" + PROPERTY_KEY_MODULE_UI + "=*)(" + PROPERTY_KEY_MODULE_UI_CODE + "=*))")
+    public void addModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI) final ModuleUi moduleUi, @EventArg(name = PROPERTY_KEY_MODULE_UI_CODE) final String moduleCode) {
+        String moduleLibelle = moduleUi.getLibelle();
+        LOGGER.info("Adding module {} ({}) => Check view roles allowed", moduleLibelle, moduleCode);
         Map<String, ViewUi> viewUiMap = moduleUi.getViewUis(getCurrentUserRoles());
         if (!viewUiMap.isEmpty()) {
-            PushHelper.pushWithNotification(this, moduleUi.getLibelle() + " chargé", "Le module " + moduleUi.getLibelle() + " est désormais disponible.");
+            LOGGER.info("Adding module {} ({}) => At least one view is allowed for current user", moduleLibelle, moduleCode);
             leftSideMenu.addModuleUi(moduleUi, viewUiMap);
+            LOGGER.info("Module {} ({}) has been added => push notification is fired", moduleLibelle, moduleCode);
+            PushHelper.pushWithNotification(this, moduleLibelle + " chargé", "Le module " + moduleLibelle + " est désormais disponible.");
+        } else {
+            LOGGER.info("Removing module {} ({}) during adding process because no views are associated to this module anymore.", moduleLibelle, moduleCode);
+            boolean moduleHasBeenRemoved = leftSideMenu.removeModuleUi(moduleCode);
+            if (moduleHasBeenRemoved) {
+                LOGGER.info("Module {} ({}) has been removed => push notification is fired", moduleLibelle, moduleCode);
+                PushHelper.pushWithNotification(this, moduleUi.getLibelle() + " déchargé", "Le module " + moduleUi.getLibelle() + " est désormais indisponible.");
+            }
         }
     }
 
     @Subscriber(topic = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_NAME_STOPPED + ")(" + PROPERTY_KEY_MODULE_UI + "=*))")
     public void removeModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI) final ModuleUi moduleUi) {
-        PushHelper.pushWithNotification(this, moduleUi.getLibelle() + " déchargé", "Le module " + moduleUi.getLibelle() + " est désormais indisponible.");
-        leftSideMenu.removeModuleUi(moduleUi.getCode());
+        String moduleCode = moduleUi.getCode();
+        String moduleLibelle = moduleUi.getLibelle();
+        LOGGER.info("Removing module {} ({})", moduleLibelle, moduleCode);
+        boolean moduleHasBeenRemoved = leftSideMenu.removeModuleUi(moduleUi.getCode());
+        if (moduleHasBeenRemoved) {
+            LOGGER.info("Module {} ({}) has been removed => push notification is fired", moduleLibelle, moduleCode);
+            PushHelper.pushWithNotification(this, moduleLibelle + " déchargé", "Le module " + moduleLibelle + " est désormais indisponible.");
+        }
     }
 
     private List<String> getCurrentUserRoles() {

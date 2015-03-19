@@ -1,14 +1,18 @@
 package santeclair.portal.webapp.vaadin.view.component;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import santeclair.portal.event.EventDictionaryConstant;
+import santeclair.portal.listener.service.impl.EventAdminServiceListener;
+import santeclair.portal.listener.service.impl.EventAdminServiceListener.Publisher;
 import santeclair.portal.module.ModuleUi;
 import santeclair.portal.view.ViewUi;
+import santeclair.portal.webapp.vaadin.navigator.NavigatorEventHandler;
 
-import com.vaadin.navigator.Navigator;
 import com.vaadin.server.FontIcon;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.themes.ValoTheme;
@@ -23,15 +27,18 @@ public class MainButonModuleUi extends Button implements Comparable<MainButonMod
 
     private final ModuleUi moduleUi;
     private final Map<String, ViewUi> viewUiMap;
-    private final Navigator navigator;
+    private final Publisher<MainButonModuleUi> publisher;
+    private final String uiId;
 
     public MainButonModuleUi(final ModuleUi moduleUi,
-                             final Map<String, ViewUi> viewUiMap, final Navigator navigator) {
+                             final Map<String, ViewUi> viewUiMap,
+                             final EventAdminServiceListener eventAdminServiceListener,
+                             final String uiId) {
         this.moduleUi = moduleUi;
         this.viewUiMap = viewUiMap;
-        this.navigator = navigator;
+        this.publisher = eventAdminServiceListener.registerPublisher(this, EventDictionaryConstant.TOPIC_NAVIGATOR);
+        this.uiId = uiId;
         init(moduleUi.getLibelle(), moduleUi.getIcon());
-
     }
 
     private void init(final String moduleUiLibelle, final FontIcon moduleUiIcon) {
@@ -64,7 +71,16 @@ public class MainButonModuleUi extends Button implements Comparable<MainButonMod
     @Override
     public void buttonClick(ClickEvent event) {
         LOGGER.debug("Click event : {}", event);
-        navigator.navigateTo("container/new/modules/" + this.moduleUi.getCode());
+        if (!viewUiMap.isEmpty() && viewUiMap.size() == 1) {
+            Set<String> keySet = viewUiMap.keySet();
+            String viewCode = null;
+            for (String key : keySet) {
+                viewCode = key;
+            }
+            publisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/new/modules/" + this.moduleUi.getCode() + "/views/" + viewCode, uiId));
+        } else {
+
+        }
     }
 
     public ModuleUi getModuleUi() {

@@ -11,6 +11,7 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI_CODE;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_VIEW_UI;
@@ -60,6 +61,7 @@ public class ModuleUiImpl implements ModuleUi {
      * Properties
      */
     private String code;
+    private String oldCode;
     private String libelle;
     private FontIcon icon;
     private Boolean isCloseable;
@@ -99,12 +101,12 @@ public class ModuleUiImpl implements ModuleUi {
     private void portalStarted(Event event) {
         logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") / portalStarted(event) => A Portal is Starting");
         PortalStartCallback portalStartCallback = PortalStartCallback.class.cast(event.getProperty(PROPERTY_KEY_EVENT_DATA));
-        portalStartCallback.addModuleUi(this);
+        portalStartCallback.addModuleUi(this, this.code);
     }
 
     @Subscriber(name = "viewStarted", topics = TOPIC_MODULE_UI,
                     filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_VIEW_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_STARTED + ")("
-                                    + PROPERTY_KEY_MODULE_UI_CODE + "=*))")
+                                    + PROPERTY_KEY_MODULE_UI_CODE + "=*)(" + PROPERTY_KEY_VIEW_UI + "=*))")
     private void registerViewUi(Event event) {
         String moduleCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_MODULE_UI_CODE);
         if (moduleCodeFromEvent.equalsIgnoreCase(code)) {
@@ -118,15 +120,16 @@ public class ModuleUiImpl implements ModuleUi {
 
     @Subscriber(name = "viewStopped", topics = TOPIC_MODULE_UI,
                     filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_VIEW_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_STOPPED + ")("
-                                    + PROPERTY_KEY_MODULE_UI_CODE + "=*))")
+                                    + PROPERTY_KEY_MODULE_UI_CODE + "=*)(" + PROPERTY_KEY_VIEW_UI_CODE + "=*)(" + PROPERTY_KEY_VIEW_UI + "=*))")
     private void unregisterViewUi(Event event) {
         String moduleCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_MODULE_UI_CODE);
         if (moduleCodeFromEvent.equalsIgnoreCase(code)) {
+            String viewCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_VIEW_UI_CODE);
             ViewUi viewUi = (ViewUi) event.getProperty(PROPERTY_KEY_VIEW_UI);
             logService.log(LogService.LOG_INFO,
                             "From ModuleUi " + libelle + " (" + code + ") / unregisterViewUi(event) => A ViewUi " + viewUi.getLibelle() + " (" + viewUi.getCode()
                                             + ") fired an event 'stopping'.");
-            unregisterViewUi(viewUi);
+            unregisterViewUi(viewCodeFromEvent, viewUi.getLibelle());
         }
     }
 
@@ -150,14 +153,18 @@ public class ModuleUiImpl implements ModuleUi {
 
     @Updated
     private void updated() {
+        logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") => updtating module");
         viewUis.clear();
-        Dictionary<String, Object> props = startProperties(this);
-        publisherView.send(props);
-        publisherPortal.send(props);
+        Dictionary<String, Object> propsStartView = startProperties(this);
+        publisherView.send(propsStartView);
+        Dictionary<String, Object> propsStartPortal = startProperties(this, oldCode);
+        publisherPortal.send(propsStartPortal);
+        logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") => module updated");
     }
 
     @Property(name = "code", mandatory = true)
     private void setCode(String code) {
+        this.oldCode = this.code == null ? code : this.code;
         this.code = code;
     }
 
@@ -246,26 +253,34 @@ public class ModuleUiImpl implements ModuleUi {
     /*
      * Private instance methods
      */
-    
-    private void unregisterViewUi(ViewUi viewUi) {
-        String codeView = viewUi.getCode();
-        logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") / unregisterViewUi(viewUi) => A ViewUi " + viewUi.getLibelle() + " (" + codeView
+
+    private void unregisterViewUi(String codeView, String libelleView) {
+        logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") / unregisterViewUi(viewUi) => A ViewUi " + libelleView + " (" + codeView
                         + ") is stopping.");
         viewUis.remove(codeView);
         logService.log(LogService.LOG_DEBUG, "From ModuleUi " + libelle + " (" + code + ") => An event 'moduleUi stopping' is going to be send on portal topic");
-        publisherPortal.send(startProperties(this));
+
+        if (viewUis.isEmpty()) {
+            publisherPortal.send(stopProperties(this));
+        } else {
+            publisherPortal.send(startProperties(this));
+        }
     }
-    
+
     /*
      * Private static methods
      */
 
     private static Dictionary<String, Object> startProperties(final ModuleUiImpl moduleUi) {
+        return startProperties(moduleUi, moduleUi.getCode());
+    }
+
+    private static Dictionary<String, Object> startProperties(final ModuleUiImpl moduleUi, String moduleCode) {
 
         Dictionary<String, Object> eventProps = new Hashtable<>(4);
         eventProps.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_MODULE_UI);
         eventProps.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STARTED);
-        eventProps.put(PROPERTY_KEY_MODULE_UI_CODE, moduleUi.getCode());
+        eventProps.put(PROPERTY_KEY_MODULE_UI_CODE, moduleCode);
         eventProps.put(PROPERTY_KEY_MODULE_UI, moduleUi);
 
         return eventProps;
@@ -273,7 +288,7 @@ public class ModuleUiImpl implements ModuleUi {
 
     private static Dictionary<String, Object> stopProperties(final ModuleUiImpl moduleUi) {
 
-        Dictionary<String, Object> eventProps = new Hashtable<>(4);
+        Dictionary<String, Object> eventProps = new Hashtable<>(3);
         eventProps.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_MODULE_UI);
         eventProps.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STOPPED);
         eventProps.put(PROPERTY_KEY_MODULE_UI, moduleUi);
