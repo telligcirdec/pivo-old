@@ -24,6 +24,7 @@ import org.osgi.service.log.LogService;
 
 import santeclair.portal.module.ModuleUi;
 import santeclair.portal.view.ViewUi;
+import santeclair.portal.view.ViewUiRootComponent;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.FontIcon;
@@ -42,7 +43,7 @@ public abstract class AbstractViewUi implements ViewUi {
     private Boolean openOnInitialization;
     private List<String> rolesAllowed;
 
-    private final Map<String, Component> onlyOneViewComponentMap = new HashMap<>();
+    private final Map<String, ViewUiRootComponent> onlyOneViewComponentMap = new HashMap<>();
 
     /*
      * Lifecycle
@@ -97,8 +98,8 @@ public abstract class AbstractViewUi implements ViewUi {
      */
 
     @Override
-    public Component getViewComponent(String sessionId, Boolean severalTabsAllowed, List<String> currentUserRoles) {
-        Component viewComponent = null;
+    public ViewUiRootComponent getViewComponent(String sessionId, Boolean severalTabsAllowed, List<String> currentUserRoles) {
+        ViewUiRootComponent viewComponent = null;
         if (!severalTabsAllowed) {
             viewComponent = onlyOneViewComponentMap.get(sessionId);
             if (viewComponent == null) {
