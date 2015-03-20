@@ -15,9 +15,9 @@ public interface ModuleUi {
 
     FontIcon getIcon();
 
-    Boolean getIsCloseable();
+    Boolean isCloseable();
 
-    Boolean getSeveralTabsAllowed();
+    Boolean isSeveralTabsAllowed();
 
     Integer getDisplayOrder();
 

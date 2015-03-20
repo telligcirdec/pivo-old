@@ -7,15 +7,17 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI_CODE;
 
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
 import org.osgi.service.event.Event;
 import org.osgi.service.log.LogService;
@@ -25,6 +27,7 @@ import santeclair.portal.view.ViewUi;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.FontIcon;
+import com.vaadin.ui.Component;
 
 public abstract class AbstractViewUi implements ViewUi {
 
@@ -38,6 +41,8 @@ public abstract class AbstractViewUi implements ViewUi {
     private FontIcon icon;
     private Boolean openOnInitialization;
     private List<String> rolesAllowed;
+
+    private final Map<String, Component> onlyOneViewComponentMap = new HashMap<>();
 
     /*
      * Lifecycle
@@ -71,13 +76,11 @@ public abstract class AbstractViewUi implements ViewUi {
             moduleUi.registerViewUi(this);
         }
     }
-    
-    protected void getNewViewUi(Event event) {
-        String moduleCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_MODULE_UI_CODE);
-        String viewCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_VIEW_UI_CODE);
-        if (moduleCodeFromEvent.equalsIgnoreCase(codeModule) && viewCodeFromEvent.equalsIgnoreCase(code)) {
-            test
-        }
+
+    protected void portalStopped(Event event) {
+        String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
+        logService.log(LogService.LOG_DEBUG, "From ViewUi " + this.libelle + " (" + this.code + ") (portalStopped(event)) => A Portal is stopping (" + sessionId + ")");
+        onlyOneViewComponentMap.remove(sessionId);
     }
 
     /*
@@ -87,6 +90,25 @@ public abstract class AbstractViewUi implements ViewUi {
     protected void bindLogService(LogService logService) {
         logService.log(LogService.LOG_DEBUG, "ViewUi is binding logService.");
         this.logService = logService;
+    }
+
+    /*
+     * Services
+     */
+
+    @Override
+    public Component getViewComponent(String sessionId, Boolean severalTabsAllowed, List<String> currentUserRoles) {
+        Component viewComponent = null;
+        if (!severalTabsAllowed) {
+            viewComponent = onlyOneViewComponentMap.get(sessionId);
+            if (viewComponent == null) {
+                viewComponent = getRootComponent();
+                onlyOneViewComponentMap.put(sessionId, viewComponent);
+            }
+        } else {
+            viewComponent = getRootComponent();
+        }
+        return viewComponent;
     }
 
     /*
@@ -161,6 +183,8 @@ public abstract class AbstractViewUi implements ViewUi {
      */
 
     protected abstract Publisher getPublisher();
+
+    protected abstract Component getRootComponent();
 
     /*
      * Static methods

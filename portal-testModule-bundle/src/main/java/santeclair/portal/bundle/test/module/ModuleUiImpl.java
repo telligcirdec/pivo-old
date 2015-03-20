@@ -2,7 +2,9 @@ package santeclair.portal.bundle.test.module;
 
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_PORTAL;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_TABS;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_VIEW_UI;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_NEW;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STARTED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STOPPED;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CONTEXT;
@@ -10,6 +12,7 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI_CODE;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
@@ -38,6 +41,7 @@ import org.osgi.service.event.Event;
 import org.osgi.service.log.LogService;
 
 import santeclair.portal.event.publisher.callback.PortalStartCallback;
+import santeclair.portal.event.publisher.callback.TabsCallback;
 import santeclair.portal.module.ModuleUi;
 import santeclair.portal.view.ViewUi;
 
@@ -64,11 +68,13 @@ public class ModuleUiImpl implements ModuleUi {
     private String oldCode;
     private String libelle;
     private FontIcon icon;
-    private Boolean isCloseable;
+    private Boolean closeable;
     private Boolean severalTabsAllowed;
     private Integer displayOrder;
 
     private final Map<String, ViewUi> viewUis = new HashMap<>();
+
+    private final Map<String, ModuleUiCustomComponent> onlyOneInstanceComponentMap = new HashMap<>();
 
     /*
      * Lifecycle
@@ -87,6 +93,7 @@ public class ModuleUiImpl implements ModuleUi {
     private void stop() {
         logService.log(LogService.LOG_INFO, "ModuleUi " + this.libelle + " (" + this.code + ") is stopping");
         viewUis.clear();
+        onlyOneInstanceComponentMap.clear();
         Dictionary<String, Object> props = stopProperties(this);
         publisherPortal.send(props);
         logService.log(LogService.LOG_INFO, "ModuleUi " + this.libelle + " (" + this.code + ") stopped");
@@ -97,11 +104,21 @@ public class ModuleUiImpl implements ModuleUi {
      */
 
     @Subscriber(name = "portalStarted", topics = TOPIC_MODULE_UI,
-                    filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_PORTAL + ")(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_STARTED + "))")
+                    filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_PORTAL + ")(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_STARTED + ")("
+                                    + PROPERTY_KEY_EVENT_DATA + "=*))")
     private void portalStarted(Event event) {
         logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") / portalStarted(event) => A Portal is Starting");
         PortalStartCallback portalStartCallback = PortalStartCallback.class.cast(event.getProperty(PROPERTY_KEY_EVENT_DATA));
         portalStartCallback.addModuleUi(this, this.code);
+    }
+
+    @Subscriber(name = "portalStopped", topics = TOPIC_MODULE_UI,
+                    filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_PORTAL + ")(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_STOPPED + ")("
+                                    + PROPERTY_KEY_PORTAL_SESSION_ID + "=*))")
+    private void portalStopped(Event event) {
+        String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
+        logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") / portalStopped(event) => A Portal is stooping (" + sessionId + ")");
+        onlyOneInstanceComponentMap.remove(sessionId);
     }
 
     @Subscriber(name = "viewStarted", topics = TOPIC_MODULE_UI,
@@ -130,6 +147,33 @@ public class ModuleUiImpl implements ModuleUi {
                             "From ModuleUi " + libelle + " (" + code + ") / unregisterViewUi(event) => A ViewUi " + viewUi.getLibelle() + " (" + viewUi.getCode()
                                             + ") fired an event 'stopping'.");
             unregisterViewUi(viewCodeFromEvent, viewUi.getLibelle());
+        }
+    }
+
+    @Subscriber(name = "newViewUi", topics = TOPIC_MODULE_UI, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_TABS + ")(" + PROPERTY_KEY_EVENT_NAME + "="
+                    + EVENT_NAME_NEW + ")(" + PROPERTY_KEY_MODULE_UI_CODE + "=*)(" + PROPERTY_KEY_VIEW_UI_CODE + "=*)(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)("
+                    + PROPERTY_KEY_EVENT_DATA + "=*))")
+    private void newViewUi(Event event) {
+        String moduleCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_MODULE_UI_CODE);
+        String viewCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_VIEW_UI_CODE);
+        if (moduleCodeFromEvent.equalsIgnoreCase(code) && viewUis.containsKey(viewCodeFromEvent)) {
+            ViewUi viewUi = viewUis.get(viewCodeFromEvent);
+            String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
+            TabsCallback tabsCallback = (TabsCallback) event.getProperty(PROPERTY_KEY_EVENT_DATA);
+            com.vaadin.ui.Component component = viewUi.getViewComponent(sessionId, severalTabsAllowed, null);
+            ModuleUiCustomComponent moduleUiCustomComponent = null;
+            if (!severalTabsAllowed) {
+                moduleUiCustomComponent = onlyOneInstanceComponentMap.get(sessionId);
+                if (moduleUiCustomComponent == null) {
+                    moduleUiCustomComponent = new ModuleUiCustomComponent(component);
+                    onlyOneInstanceComponentMap.put(sessionId, moduleUiCustomComponent);
+                } else {
+                    moduleUiCustomComponent.setCompositionRoot(component);
+                }
+            } else {
+                moduleUiCustomComponent = new ModuleUiCustomComponent(component);
+            }
+            tabsCallback.addView(code, viewCodeFromEvent, this.libelle + " - " + viewUi.getLibelle(), icon, closeable, moduleUiCustomComponent);
         }
     }
 
@@ -183,9 +227,9 @@ public class ModuleUiImpl implements ModuleUi {
         }
     }
 
-    @Property(name = "isCloseable", value = "true")
-    private void setIsCloseable(Boolean isCloseable) {
-        this.isCloseable = isCloseable;
+    @Property(name = "closeable", value = "true")
+    private void setCloseable(Boolean closeable) {
+        this.closeable = closeable;
     }
 
     @Property(name = "severalTabsAllowed", value = "false")
@@ -218,12 +262,12 @@ public class ModuleUiImpl implements ModuleUi {
     }
 
     @Override
-    public Boolean getIsCloseable() {
-        return isCloseable;
+    public Boolean isCloseable() {
+        return closeable;
     }
 
     @Override
-    public Boolean getSeveralTabsAllowed() {
+    public Boolean isSeveralTabsAllowed() {
         return severalTabsAllowed;
     }
 

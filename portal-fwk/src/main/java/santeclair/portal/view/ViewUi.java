@@ -17,5 +17,5 @@ public interface ViewUi {
 
     List<String> getRolesAllowed();
 
-    Component getRootComponent(List<String> currentUserRoles);
+    Component getViewComponent(String sessionId, Boolean severalTabsAllowed, List<String> currentUserRoles) ;
 }

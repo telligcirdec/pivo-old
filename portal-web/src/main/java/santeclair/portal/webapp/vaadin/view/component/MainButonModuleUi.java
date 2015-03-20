@@ -1,12 +1,13 @@
 package santeclair.portal.webapp.vaadin.view.component;
 
+import static santeclair.portal.event.EventDictionaryConstant.TOPIC_NAVIGATOR;
+
 import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import santeclair.portal.event.EventDictionaryConstant;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener.Publisher;
 import santeclair.portal.module.ModuleUi;
@@ -27,6 +28,7 @@ public class MainButonModuleUi extends Button implements Comparable<MainButonMod
 
     private final ModuleUi moduleUi;
     private final Map<String, ViewUi> viewUiMap;
+    private final EventAdminServiceListener eventAdminServiceListener;
     private final Publisher<MainButonModuleUi> publisher;
     private final String uiId;
 
@@ -36,8 +38,9 @@ public class MainButonModuleUi extends Button implements Comparable<MainButonMod
                              final String uiId) {
         this.moduleUi = moduleUi;
         this.viewUiMap = viewUiMap;
-        this.publisher = eventAdminServiceListener.registerPublisher(this, EventDictionaryConstant.TOPIC_NAVIGATOR);
+        this.publisher = eventAdminServiceListener.registerPublisher(this, TOPIC_NAVIGATOR);
         this.uiId = uiId;
+        this.eventAdminServiceListener = eventAdminServiceListener;
         init(moduleUi.getLibelle(), moduleUi.getIcon());
     }
 
@@ -48,6 +51,12 @@ public class MainButonModuleUi extends Button implements Comparable<MainButonMod
         this.setIcon(moduleUiIcon);
         this.setWidth(100, Unit.PERCENTAGE);
         this.addClickListener(this);
+    }
+
+    @Override
+    public void detach() {
+        super.detach();
+        eventAdminServiceListener.unregisterPublisher(publisher);
     }
 
     @Override

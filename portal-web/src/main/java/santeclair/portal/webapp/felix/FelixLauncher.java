@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import santeclair.portal.webapp.HostActivator;
 import santeclair.portal.webapp.felix.config.FelixConfigAdminConfig;
+import santeclair.portal.webapp.felix.config.FelixEventAdminConfig;
 import santeclair.portal.webapp.felix.config.FileInstallConfig;
 import santeclair.portal.webapp.felix.config.FrameworkConfig;
 import santeclair.portal.webapp.felix.config.InitConfig;
@@ -132,7 +133,9 @@ public class FelixLauncher implements Serializable {
         initConfigList.add(new FileInstallConfig(rootDir));
         // Config pour le service de configadmin
         initConfigList.add(new FelixConfigAdminConfig());
-
+        // Config pour le service event admin
+        initConfigList.add(new FelixEventAdminConfig());
+        
         return initConfigList;
     }
 

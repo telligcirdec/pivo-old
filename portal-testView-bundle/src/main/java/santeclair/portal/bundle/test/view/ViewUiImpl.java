@@ -1,14 +1,15 @@
 package santeclair.portal.bundle.test.view;
 
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_MODULE_UI;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_PORTAL;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STARTED;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STOPPED;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CONTEXT;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_VIEW_UI;
-
-import java.util.List;
 
 import org.apache.felix.ipojo.annotations.Bind;
 import org.apache.felix.ipojo.annotations.Component;
@@ -31,7 +32,7 @@ import com.vaadin.ui.Label;
 @Component
 public class ViewUiImpl extends AbstractViewUi implements ViewUi {
 
-    @Publishes(name = "testViewUiPublisher", topics = TOPIC_MODULE_UI, synchronous=true)
+    @Publishes(name = "testViewUiPublisher", topics = TOPIC_MODULE_UI, synchronous = true)
     private Publisher publisher;
 
     /*
@@ -55,11 +56,19 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
      */
     @Override
     @Subscriber(name = "moduleStart", topics = TOPIC_VIEW_UI, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
-                    + EVENT_NAME_STARTED + ")("+PROPERTY_KEY_MODULE_UI_CODE+"=*))")
+                    + EVENT_NAME_STARTED + ")(" + PROPERTY_KEY_MODULE_UI_CODE + "=*))")
     public void moduleStart(Event event) {
         super.moduleStart(event);
     }
 
+    @Override
+    @Subscriber(name = "portalStopped", topics = TOPIC_VIEW_UI,
+                    filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_PORTAL + ")(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_STOPPED + ")("
+                                    + PROPERTY_KEY_PORTAL_SESSION_ID + "=*))")
+    public void portalStopped(Event event) {
+        super.portalStopped(event);
+    }
+    
     /*
      * Bind services
      */
@@ -70,6 +79,15 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
         super.bindLogService(logService);
     }
 
+    /*
+     * Services
+     */
+    
+    @Override
+    protected com.vaadin.ui.Component getRootComponent() {
+        return new HorizontalLayout(new Label("Maouahahahaha => " + Math.random()));
+    }
+    
     /*
      * Managed Properties (setter)
      */
@@ -103,7 +121,7 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
     protected void setIcon(String icon) {
         super.setIcon(icon);
     }
-    
+
     @Override
     @Property(name = "openOnInitialization", value = "false")
     protected void setOpenOnInitialization(Boolean openOnInitialization) {
@@ -119,16 +137,12 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
     /*
      * Getter
      */
-    
+
     @Override
     protected Publisher getPublisher() {
         return publisher;
     }
 
-    @Override
-    public com.vaadin.ui.Component getRootComponent(List<String> currentUserRoles) {
-        HorizontalLayout horizontalLayout = new HorizontalLayout(new Label("Mouahahaha !!!!"));
-        
-        return horizontalLayout;
-    }
+    
+
 }

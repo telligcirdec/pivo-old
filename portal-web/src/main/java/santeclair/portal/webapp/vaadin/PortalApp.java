@@ -8,8 +8,10 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
+import static santeclair.portal.event.EventDictionaryConstant.TOPIC_VIEW_UI;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -34,6 +36,7 @@ import santeclair.portal.event.handler.Subscriber;
 import santeclair.portal.event.publisher.callback.PortalStartCallback;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener.DataPublisher;
+import santeclair.portal.listener.service.impl.EventAdminServiceListener.Publisher;
 import santeclair.portal.module.ModuleUi;
 import santeclair.portal.view.ViewUi;
 import santeclair.portal.webapp.HostActivator;
@@ -80,7 +83,9 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
     private NavigatorEventHandler navigatorEventHandler;
 
-    private DataPublisher<PortalApp, PortalStartCallback> portalDataPublisher;
+    private DataPublisher<PortalApp, PortalStartCallback> moduleUiTopicDataPublisher;
+    
+    private Publisher<PortalApp> viewUiTopicPublisher;
 
     /*
      * Début du Code UI
@@ -107,7 +112,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
         // Création du composant contenant les tabsheet
         LOGGER.info("Initialisation du container d'onglet");
-        tabs = new Tabs(eventAdminServiceListener);
+        tabs = new Tabs(eventAdminServiceListener, sessionId, getCurrentUserRoles());
         tabs.init();
 
         navigator.addView("", tabs);
@@ -128,14 +133,17 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
         registerEventHandlerItself(context);
 
-        portalDataPublisher = eventAdminServiceListener.registerDataPublisher(this, TOPIC_MODULE_UI);
+        moduleUiTopicDataPublisher = eventAdminServiceListener.registerDataPublisher(this, TOPIC_MODULE_UI);
+        viewUiTopicPublisher = eventAdminServiceListener.registerDataPublisher(this, TOPIC_VIEW_UI);
+        
         this.setContent(main);
 
-        Dictionary<String, Object> props = new Hashtable<>(2);
+        Dictionary<String, Object> props = new Hashtable<>(3);
         props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_PORTAL);
         props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STARTED);
+        props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
 
-        portalDataPublisher.publishEventDataAndDictionnarySynchronously(this, props);
+        moduleUiTopicDataPublisher.publishEventDataAndDictionnarySynchronously(this, props);
         LOGGER.debug("Fin Initialisation de l'UI");
 
     }
@@ -150,8 +158,19 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
         BundleContext context = hostActivator.getBundleContext();
 
+        String sessionId = this.getSession().getSession().getId();
+
+        Dictionary<String, Object> props = new Hashtable<>(3);
+        props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_PORTAL);
+        props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STOPPED);
+        props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
+
+        moduleUiTopicDataPublisher.publishEventDataAndDictionnarySynchronously(this, props);
+        viewUiTopicPublisher.publishEventSynchronously(props);
+        
         unregisterEventHandlerItSelf(context);
-        eventAdminServiceListener.unregisterPublisher(portalDataPublisher);
+
+        eventAdminServiceListener.unregisterPublisher(moduleUiTopicDataPublisher, viewUiTopicPublisher);
         navigatorEventHandler.unregisterEventHandlerItSelf(context);
 
         super.detach();
