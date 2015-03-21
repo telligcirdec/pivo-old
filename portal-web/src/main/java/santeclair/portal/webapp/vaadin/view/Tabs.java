@@ -16,7 +16,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +24,7 @@ import santeclair.portal.event.publisher.callback.TabsCallback;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener.DataPublisher;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener.Publisher;
+import santeclair.portal.view.CloseableComponent;
 import santeclair.portal.webapp.vaadin.navigator.NavigatorEventHandler;
 
 import com.vaadin.navigator.View;
@@ -97,7 +98,7 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
             }
             count++;
         }
-        if ("NEW".equalsIgnoreCase(container)) {
+        if ("NEW".equalsIgnoreCase(container) && StringUtils.isNotBlank(moduleCode) && StringUtils.isNotBlank(moduleView)) {
             Dictionary<String, Object> props = new Hashtable<>();
 
             props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_TABS);
@@ -109,7 +110,7 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
             addExtractedParams(parameters, props);
 
             tabsDataPublisher.publishEventDataAndDictionnarySynchronously(this, props);
-        } else {
+        } else if (StringUtils.isNumeric(container)) {
             Integer containerHash = new Integer(container);
             Integer numberOfTab = this.getComponentCount();
             for (int i = 0; i < numberOfTab; i++) {
@@ -123,17 +124,15 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
     }
 
     @Override
-    public void addView(String moduleCode, String viewCode, String caption, FontIcon icon, Boolean closable, Component moduleUiView) {
+    public void addView(String caption, FontIcon icon, Boolean closable, Component moduleUiView) {
         Tab moduleUiViewAlreadyAdded = this.getTab(moduleUiView);
         if (moduleUiViewAlreadyAdded != null) {
-            navigationPublisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + moduleUiViewAlreadyAdded.hashCode() + "/modules/" + moduleCode
-                            + "/views/" + viewCode, sessionId));
+            navigationPublisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + moduleUiViewAlreadyAdded.hashCode(), sessionId));
         } else {
             Tab tab = this.addTab(moduleUiView, caption);
             tab.setIcon(icon);
             tab.setClosable(closable);
-            navigationPublisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tab.hashCode() + "/modules/" + moduleCode
-                            + "/views/" + viewCode, sessionId));
+            navigationPublisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tab.hashCode(), sessionId));
         }
     }
 
@@ -146,13 +145,17 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
     @Override
     public void onTabClose(TabSheet tabsheet, Component tabContent) {
         // TODO Auto-generated method stub
-        
+        if (CloseableComponent.class.isAssignableFrom(tabContent.getClass())) {
+            CloseableComponent closeableComponent = CloseableComponent.class.cast(tabContent);
+            closeableComponent.isCloseable();
+        }
     }
 
     @Override
     public void selectedTabChange(SelectedTabChangeEvent event) {
-        // TODO Auto-generated method stub
-        
+        TabSheet tabSheet = event.getTabSheet();
+        Tab tab = tabSheet.getTab(event.getComponent());
+        navigationPublisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tab.hashCode(), sessionId));
     }
 
     private void addExtractedParams(String fragment, Dictionary<String, Object> props) {

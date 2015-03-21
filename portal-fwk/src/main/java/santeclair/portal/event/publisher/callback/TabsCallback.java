@@ -5,6 +5,6 @@ import com.vaadin.ui.Component;
 
 public interface TabsCallback {
 
-    void addView(String moduleCode, String viewCode, String caption, FontIcon icon, Boolean closable, Component moduleUiView);
+    void addView(String caption, FontIcon icon, Boolean closable, Component moduleUiView);
 
 }

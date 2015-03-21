@@ -173,7 +173,7 @@ public class ModuleUiImpl implements ModuleUi {
             } else {
                 moduleUiCustomComponent = new ModuleUiCustomComponent(component);
             }
-            tabsCallback.addView(code, viewCodeFromEvent, this.libelle + " - " + viewUi.getLibelle(), icon, closeable, moduleUiCustomComponent);
+            tabsCallback.addView(this.libelle + " - " + viewUi.getLibelle(), icon, closeable, moduleUiCustomComponent);
         }
     }
 

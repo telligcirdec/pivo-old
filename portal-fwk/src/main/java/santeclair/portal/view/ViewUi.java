@@ -3,6 +3,7 @@ package santeclair.portal.view;
 import java.util.List;
 
 import com.vaadin.server.FontIcon;
+import com.vaadin.ui.Component;
 
 public interface ViewUi {
 
@@ -16,5 +17,5 @@ public interface ViewUi {
 
     List<String> getRolesAllowed();
 
-    ViewUiRootComponent getViewComponent(String sessionId, Boolean severalTabsAllowed, List<String> currentUserRoles) ;
+    Component getViewComponent(String sessionId, Boolean severalTabsAllowed, List<String> currentUserRoles);
 }
