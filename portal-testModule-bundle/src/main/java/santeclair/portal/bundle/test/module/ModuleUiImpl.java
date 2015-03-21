@@ -165,15 +165,16 @@ public class ModuleUiImpl implements ModuleUi {
             if (!severalTabsAllowed) {
                 moduleUiCustomComponent = onlyOneInstanceComponentMap.get(sessionId);
                 if (moduleUiCustomComponent == null) {
-                    moduleUiCustomComponent = new ModuleUiCustomComponent(component);
+                    moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId, component);
                     onlyOneInstanceComponentMap.put(sessionId, moduleUiCustomComponent);
                 } else {
                     moduleUiCustomComponent.setCompositionRoot(component);
                 }
             } else {
-                moduleUiCustomComponent = new ModuleUiCustomComponent(component);
+                moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId, component);
             }
-            tabsCallback.addView(this.libelle + " - " + viewUi.getLibelle(), icon, closeable, moduleUiCustomComponent);
+            int tabHash = tabsCallback.addView(this.libelle + " - " + viewUi.getLibelle(), icon, closeable, moduleUiCustomComponent);
+            moduleUiCustomComponent.setTabHash(tabHash);
         }
     }
 

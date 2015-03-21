@@ -124,16 +124,20 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
     }
 
     @Override
-    public void addView(String caption, FontIcon icon, Boolean closable, Component moduleUiView) {
-        Tab moduleUiViewAlreadyAdded = this.getTab(moduleUiView);
-        if (moduleUiViewAlreadyAdded != null) {
-            navigationPublisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + moduleUiViewAlreadyAdded.hashCode(), sessionId));
+    public int addView(String caption, FontIcon icon, Boolean closable, Component moduleUiView) {
+        Tab tab = this.getTab(moduleUiView);
+        int tabHash = -1;
+        if (tab != null) {
+            tabHash = tab.hashCode();
+            navigationPublisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tabHash, sessionId));
         } else {
-            Tab tab = this.addTab(moduleUiView, caption);
+            tab = this.addTab(moduleUiView, caption);
             tab.setIcon(icon);
             tab.setClosable(closable);
-            navigationPublisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tab.hashCode(), sessionId));
+            tabHash = tab.hashCode();
+            navigationPublisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tabHash, sessionId));
         }
+        return tabHash;
     }
 
     @Override
@@ -147,7 +151,13 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
         // TODO Auto-generated method stub
         if (CloseableComponent.class.isAssignableFrom(tabContent.getClass())) {
             CloseableComponent closeableComponent = CloseableComponent.class.cast(tabContent);
-            closeableComponent.isCloseable();
+            if (closeableComponent.isCloseable()) {
+
+            } else {
+
+            }
+        } else {
+
         }
     }
 
