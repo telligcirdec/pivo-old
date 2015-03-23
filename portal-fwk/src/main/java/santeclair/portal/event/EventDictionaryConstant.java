@@ -59,13 +59,19 @@ public interface EventDictionaryConstant {
     public static final String PROPERTY_KEY_NAVIGATOR_URI = "property.key.event.navigator.uri";
 
     /**
+     * Propriété des onglets
+     */
+    public static final String PROPERTY_KEY_TAB_HASH = "property.key.event.tab.hash";
+
+    
+    /**
      * Propriété autour des modules ui
      */
     public static final String PROPERTY_KEY_MODULE_UI = "property.key.module.ui";
     public static final String PROPERTY_KEY_MODULE_UI_CODE = "property.key.module.ui.code";
 
     /**
-     * Propriété autour des modules ui
+     * Propriété autour des view ui
      */
     public static final String PROPERTY_KEY_VIEW_UI = "property.key.view.ui";
     public static final String PROPERTY_KEY_VIEW_UI_CODE = "property.key.view.ui.code";
@@ -85,6 +91,7 @@ public interface EventDictionaryConstant {
     public static final String EVENT_NAME_STOPPED = "stopped";
     public static final String EVENT_NAME_UPDATED = "updated";
     public static final String EVENT_NAME_NEW = "new";
+    public static final String EVENT_NAME_CLOSED = "closed";
     public static final String EVENT_NAME_ON_CLICK = "on_click";
     public static final String EVENT_NAME_NAVIGATION = "navigation";
 

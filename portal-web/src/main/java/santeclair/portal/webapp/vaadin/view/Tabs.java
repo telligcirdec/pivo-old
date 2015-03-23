@@ -1,12 +1,14 @@
 package santeclair.portal.webapp.vaadin.view;
 
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_TABS;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_CLOSED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_NEW;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CONTEXT;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_CURRENT_USER_ROLES;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI_CODE;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_NAVIGATOR;
@@ -24,7 +26,6 @@ import santeclair.portal.event.publisher.callback.TabsCallback;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener.DataPublisher;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener.Publisher;
-import santeclair.portal.view.CloseableComponent;
 import santeclair.portal.webapp.vaadin.navigator.NavigatorEventHandler;
 
 import com.vaadin.navigator.View;
@@ -148,24 +149,36 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
 
     @Override
     public void onTabClose(TabSheet tabsheet, Component tabContent) {
-        // TODO Auto-generated method stub
-        if (CloseableComponent.class.isAssignableFrom(tabContent.getClass())) {
-            CloseableComponent closeableComponent = CloseableComponent.class.cast(tabContent);
-            if (closeableComponent.isCloseable()) {
 
-            } else {
+        Tab tab = tabsheet.getTab(tabContent);
+        Dictionary<String, Object> props = new Hashtable<>();
+        props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_TABS);
+        props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_CLOSED);
+        props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
+        props.put(PROPERTY_KEY_TAB_HASH, tab.hashCode());
 
+        tabsDataPublisher.publishEventDataAndDictionnarySynchronously(this, props);
+    }
+
+    @Override
+    public void removeView(int tabHash) {
+        Integer numberOfTab = this.getComponentCount();
+        for (int i = 0; i < numberOfTab; i++) {
+            Tab tab = this.getTab(i);
+            if (tab != null && tab.hashCode() == tabHash) {
+                this.removeTab(tab);
+                break;
             }
-        } else {
-
         }
     }
 
     @Override
     public void selectedTabChange(SelectedTabChangeEvent event) {
         TabSheet tabSheet = event.getTabSheet();
-        Tab tab = tabSheet.getTab(event.getComponent());
-        navigationPublisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tab.hashCode(), sessionId));
+        Tab tab = tabSheet.getTab(tabSheet.getSelectedTab());
+        if (tab != null) {
+            navigationPublisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tab.hashCode(), sessionId));
+        }
     }
 
     private void addExtractedParams(String fragment, Dictionary<String, Object> props) {

@@ -160,21 +160,20 @@ public class ModuleUiImpl implements ModuleUi {
             ViewUi viewUi = viewUis.get(viewCodeFromEvent);
             String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
             TabsCallback tabsCallback = (TabsCallback) event.getProperty(PROPERTY_KEY_EVENT_DATA);
-            com.vaadin.ui.Component component = viewUi.getViewComponent(sessionId, severalTabsAllowed, null);
             ModuleUiCustomComponent moduleUiCustomComponent = null;
             if (!severalTabsAllowed) {
                 moduleUiCustomComponent = onlyOneInstanceComponentMap.get(sessionId);
                 if (moduleUiCustomComponent == null) {
-                    moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId, component);
+                    moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId);
                     onlyOneInstanceComponentMap.put(sessionId, moduleUiCustomComponent);
-                } else {
-                    moduleUiCustomComponent.setCompositionRoot(component);
                 }
             } else {
-                moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId, component);
+                moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId);
             }
             int tabHash = tabsCallback.addView(this.libelle + " - " + viewUi.getLibelle(), icon, closeable, moduleUiCustomComponent);
+            com.vaadin.ui.Component component = viewUi.getViewMainComponent(sessionId, tabHash, severalTabsAllowed, null);
             moduleUiCustomComponent.setTabHash(tabHash);
+            moduleUiCustomComponent.setCompositionRoot(component);
         }
     }
 

@@ -11,10 +11,20 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTA
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_VIEW_UI;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+import org.apache.felix.ipojo.ComponentInstance;
+import org.apache.felix.ipojo.ConfigurationException;
+import org.apache.felix.ipojo.Factory;
+import org.apache.felix.ipojo.InstanceManager;
+import org.apache.felix.ipojo.MissingHandlerException;
+import org.apache.felix.ipojo.UnacceptableConfiguration;
 import org.apache.felix.ipojo.annotations.Bind;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Invalidate;
 import org.apache.felix.ipojo.annotations.Property;
+import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.Updated;
 import org.apache.felix.ipojo.annotations.Validate;
 import org.apache.felix.ipojo.handlers.event.Publishes;
@@ -23,14 +33,15 @@ import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
 import org.osgi.service.event.Event;
 import org.osgi.service.log.LogService;
 
+import santeclair.portal.bundle.test.view.component.MainComponent;
 import santeclair.portal.bundle.utils.view.AbstractViewUi;
 import santeclair.portal.view.ViewUi;
 
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-
 @Component
 public class ViewUiImpl extends AbstractViewUi implements ViewUi {
+
+    @Requires(filter = "(factory.name=MainComponent)")
+    private Factory factory;
 
     @Publishes(name = "testViewUiPublisher", topics = TOPIC_MODULE_UI, synchronous = true)
     private Publisher publisher;
@@ -68,7 +79,7 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
     public void portalStopped(Event event) {
         super.portalStopped(event);
     }
-    
+
     /*
      * Bind services
      */
@@ -82,12 +93,20 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
     /*
      * Services
      */
-    
+
     @Override
-    protected com.vaadin.ui.Component getRootComponent() {
-        return new HorizontalLayout(new Label("Maouahahahaha => " + Math.random()));
+    protected com.vaadin.ui.Component getMainComponent(String sessionId, Integer tabHash) throws UnacceptableConfiguration, MissingHandlerException, ConfigurationException {
+        Dictionary<String, Object> props = new Hashtable<>();
+        props.put("instance.name", getCode() + "-" + MainComponent.class.getCanonicalName() + "-" + sessionId + "-" + tabHash);
+        ComponentInstance instance = factory.createComponentInstance(props);
+        if (instance.getState() == ComponentInstance.VALID) {
+            MainComponent mainComponent =
+                            (MainComponent) ((InstanceManager) instance).getPojoObject();
+            return mainComponent;
+        }
+        return null;
     }
-    
+
     /*
      * Managed Properties (setter)
      */
@@ -129,6 +148,12 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
     }
 
     @Override
+    @Property(name = "openOnInitialization", value = "false")
+    protected void setVisibleOnMenu(Boolean visibleOnMenu) {
+        super.setVisibleOnMenu(visibleOnMenu);
+    }
+
+    @Override
     @Property(name = "rolesAllowed", value = "{NONE}")
     protected void setRolesAllowed(String[] rolesAllowed) {
         super.setRolesAllowed(rolesAllowed);
@@ -142,7 +167,5 @@ public class ViewUiImpl extends AbstractViewUi implements ViewUi {
     protected Publisher getPublisher() {
         return publisher;
     }
-
-    
 
 }

@@ -31,7 +31,7 @@ import com.vaadin.ui.Component;
 
 public abstract class AbstractViewUi implements ViewUi {
 
-    private LogService logService;
+    protected LogService logService;
 
     private String oldCodeModule;
     private String codeModule;
@@ -40,6 +40,7 @@ public abstract class AbstractViewUi implements ViewUi {
     private String libelle;
     private FontIcon icon;
     private Boolean openOnInitialization;
+    private Boolean visibleOnMenu;
     private List<String> rolesAllowed;
 
     private final Map<String, Component> onlyOneViewComponentMap = new HashMap<>();
@@ -97,16 +98,23 @@ public abstract class AbstractViewUi implements ViewUi {
      */
 
     @Override
-    public Component getViewComponent(String sessionId, Boolean severalTabsAllowed, List<String> currentUserRoles) {
+    public Component getViewMainComponent(String sessionId, Integer tabHash, Boolean severalTabsAllowed, List<String> currentUserRoles) {
         Component viewComponent = null;
-        if (!severalTabsAllowed) {
-            viewComponent = onlyOneViewComponentMap.get(sessionId);
-            if (viewComponent == null) {
-                viewComponent = getRootComponent();
-                onlyOneViewComponentMap.put(sessionId, viewComponent);
+        try {
+            if (!severalTabsAllowed) {
+                viewComponent = onlyOneViewComponentMap.get(sessionId);
+                if (viewComponent == null) {
+                    viewComponent = getMainComponent(sessionId, tabHash);
+                    onlyOneViewComponentMap.put(sessionId, viewComponent);
+                }
+            } else {
+                viewComponent = getMainComponent(sessionId, tabHash);
             }
-        } else {
-            viewComponent = getRootComponent();
+        } catch (Exception e) {
+            logService.log(LogService.LOG_ERROR, "From viewUi " + getLibelle() + " (" + getCode() + ") => Error during creation of the main component.", e);
+        }
+        if (viewComponent == null) {
+            logService.log(LogService.LOG_WARNING, "From viewUi " + getLibelle() + " (" + getCode() + ") => No Main component declared.");
         }
         return viewComponent;
     }
@@ -149,6 +157,10 @@ public abstract class AbstractViewUi implements ViewUi {
         this.openOnInitialization = openOnInitialization;
     }
 
+    protected void setVisibleOnMenu(Boolean visibleOnMenu) {
+        this.visibleOnMenu = visibleOnMenu;
+    }
+
     /*
      * Getter
      */
@@ -174,6 +186,11 @@ public abstract class AbstractViewUi implements ViewUi {
     }
 
     @Override
+    public Boolean getVisibleOnMenu() {
+        return visibleOnMenu;
+    }
+
+    @Override
     public List<String> getRolesAllowed() {
         return rolesAllowed;
     }
@@ -184,7 +201,7 @@ public abstract class AbstractViewUi implements ViewUi {
 
     protected abstract Publisher getPublisher();
 
-    protected abstract Component getRootComponent();
+    protected abstract Component getMainComponent(String sessionId, Integer tabHash) throws Exception;
 
     /*
      * Static methods

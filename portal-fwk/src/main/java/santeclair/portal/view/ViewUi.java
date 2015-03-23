@@ -15,7 +15,9 @@ public interface ViewUi {
 
     Boolean getOpenOnInitialization();
 
+    Boolean getVisibleOnMenu();
+
     List<String> getRolesAllowed();
 
-    Component getViewComponent(String sessionId, Boolean severalTabsAllowed, List<String> currentUserRoles);
+    Component getViewMainComponent(String sessionId, Integer tabHash, Boolean severalTabsAllowed, List<String> currentUserRoles);
 }
