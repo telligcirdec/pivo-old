@@ -236,7 +236,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>C:\ProgramData\Santeclair\portal-exp\auto-bundle</outputDirectory>
+							<outputDirectory>C:\ProgramData\Santeclair\portal-exp\config\view</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${project.basedir}/config</directory>
