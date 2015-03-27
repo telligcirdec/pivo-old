@@ -84,7 +84,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
     private NavigatorEventHandler navigatorEventHandler;
 
     private DataPublisher<PortalApp, PortalStartCallback> moduleUiTopicDataPublisher;
-    
+
     private Publisher<PortalApp> viewUiTopicPublisher;
 
     /*
@@ -133,9 +133,9 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
         registerEventHandlerItself(context);
 
-        moduleUiTopicDataPublisher = eventAdminServiceListener.registerDataPublisher(this, TOPIC_MODULE_UI);
-        viewUiTopicPublisher = eventAdminServiceListener.registerDataPublisher(this, TOPIC_VIEW_UI);
-        
+        moduleUiTopicDataPublisher = eventAdminServiceListener.registerDataPublisher(this, PortalStartCallback.class, TOPIC_MODULE_UI);
+        viewUiTopicPublisher = eventAdminServiceListener.registerDataPublisher(this, PortalStartCallback.class, TOPIC_VIEW_UI);
+
         this.setContent(main);
 
         Dictionary<String, Object> props = new Hashtable<>(3);
@@ -148,6 +148,8 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
     }
 
+    
+    
     @Override
     public void detach() {
         LOGGER.info("Detachement de l'UI");
@@ -167,7 +169,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
         moduleUiTopicDataPublisher.publishEventDataAndDictionnarySynchronously(this, props);
         viewUiTopicPublisher.publishEventSynchronously(props);
-        
+
         unregisterEventHandlerItSelf(context);
 
         eventAdminServiceListener.unregisterPublisher(moduleUiTopicDataPublisher, viewUiTopicPublisher);

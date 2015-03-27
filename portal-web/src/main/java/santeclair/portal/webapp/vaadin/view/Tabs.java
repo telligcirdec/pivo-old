@@ -1,8 +1,10 @@
 package santeclair.portal.webapp.vaadin.view;
 
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_TABS;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_ASKING_CLOSED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_CLOSED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_NEW;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STARTED;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CONTEXT;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
@@ -10,8 +12,10 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTA
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI_CODE;
+import static santeclair.portal.event.EventDictionaryConstant.TOPIC_COMPONENT_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_NAVIGATOR;
+import static santeclair.portal.event.EventDictionaryConstant.TOPIC_VIEW_UI;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -47,7 +51,9 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
 
     private static final String PARAMS_URI_FRAGMENT = "params";
 
-    private final DataPublisher<Tabs, TabsCallback> tabsDataPublisher;
+    private final DataPublisher<Tabs, TabsCallback> tabsDataPublisherOnModule;
+    private final DataPublisher<Tabs, TabsCallback> tabsDataPublisherOnView;
+    private final DataPublisher<Tabs, TabsCallback> tabsDataPublisherOnComponent;
     private final Publisher<Tabs> navigationPublisher;
 
     private final EventAdminServiceListener eventAdminServiceListener;
@@ -58,7 +64,9 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
         this.eventAdminServiceListener = eventAdminServiceListener;
         this.sessionId = sessionId;
         this.currentUserRoles = currentUserRoles;
-        this.tabsDataPublisher = eventAdminServiceListener.registerDataPublisher(this, TOPIC_MODULE_UI);
+        this.tabsDataPublisherOnModule = eventAdminServiceListener.registerDataPublisher(this, TabsCallback.class, TOPIC_MODULE_UI);
+        this.tabsDataPublisherOnView = eventAdminServiceListener.registerDataPublisher(this, TabsCallback.class, TOPIC_VIEW_UI);
+        this.tabsDataPublisherOnComponent = eventAdminServiceListener.registerDataPublisher(this, TabsCallback.class, TOPIC_COMPONENT_UI);
         this.navigationPublisher = eventAdminServiceListener.registerPublisher(this, TOPIC_NAVIGATOR);
     }
 
@@ -68,12 +76,19 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
         this.setCloseHandler(this);
         this.addStyleName(ValoTheme.TABSHEET_FRAMED);
         this.addStyleName(ValoTheme.TABSHEET_PADDED_TABBAR);
+
+        Dictionary<String, Object> props = new Hashtable<>();
+        props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_TABS);
+        props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STARTED);
+        props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
+
+        tabsDataPublisherOnView.publishEventDataAndDictionnarySynchronously(this, props);
     }
 
     @Override
     public void detach() {
         super.detach();
-        eventAdminServiceListener.unregisterPublisher(tabsDataPublisher, navigationPublisher);
+        eventAdminServiceListener.unregisterPublisher(tabsDataPublisherOnModule, tabsDataPublisherOnView, tabsDataPublisherOnComponent, navigationPublisher);
     }
 
     @Override
@@ -110,7 +125,7 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
             props.put(PROPERTY_KEY_PORTAL_CURRENT_USER_ROLES, currentUserRoles);
             addExtractedParams(parameters, props);
 
-            tabsDataPublisher.publishEventDataAndDictionnarySynchronously(this, props);
+            tabsDataPublisherOnModule.publishEventDataAndDictionnarySynchronously(this, props);
         } else if (StringUtils.isNumeric(container)) {
             Integer containerHash = new Integer(container);
             Integer numberOfTab = this.getComponentCount();
@@ -151,13 +166,14 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
     public void onTabClose(TabSheet tabsheet, Component tabContent) {
 
         Tab tab = tabsheet.getTab(tabContent);
+        
         Dictionary<String, Object> props = new Hashtable<>();
         props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_TABS);
-        props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_CLOSED);
+        props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_ASKING_CLOSED);
         props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
         props.put(PROPERTY_KEY_TAB_HASH, tab.hashCode());
 
-        tabsDataPublisher.publishEventDataAndDictionnarySynchronously(this, props);
+        tabsDataPublisherOnComponent.publishEventDataAndDictionnarySynchronously(this, props);
     }
 
     @Override
@@ -166,6 +182,15 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
         for (int i = 0; i < numberOfTab; i++) {
             Tab tab = this.getTab(i);
             if (tab != null && tab.hashCode() == tabHash) {
+                
+                Dictionary<String, Object> props = new Hashtable<>();
+                props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_TABS);
+                props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_CLOSED);
+                props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
+                props.put(PROPERTY_KEY_TAB_HASH, tabHash);
+                
+                tabsDataPublisherOnView.publishEventSynchronously(props);
+                
                 this.removeTab(tab);
                 break;
             }

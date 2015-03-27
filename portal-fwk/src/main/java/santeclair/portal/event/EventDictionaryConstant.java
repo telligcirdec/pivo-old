@@ -28,7 +28,11 @@ public interface EventDictionaryConstant {
     /**
      * Nom du topic ou sont firé les event en rapport avec les view ui
      */
-    public static final String TOPIC_VIEW_UI = TOPIC_PORTAL + "/module/ViewUiEvent";
+    public static final String TOPIC_VIEW_UI = TOPIC_MODULE_UI + "/ViewUiEvent";
+    /**
+     * Nom du topic ou sont firé les event en rapport avec les view ui
+     */
+    public static final String TOPIC_COMPONENT_UI = TOPIC_VIEW_UI + "/ComponentUiEvent";
     /**
      * Nom du topic ou sont firé les event en rapport avec les buttons permettant le démarrage des modules
      */
@@ -63,7 +67,6 @@ public interface EventDictionaryConstant {
      */
     public static final String PROPERTY_KEY_TAB_HASH = "property.key.event.tab.hash";
 
-    
     /**
      * Propriété autour des modules ui
      */
@@ -91,6 +94,7 @@ public interface EventDictionaryConstant {
     public static final String EVENT_NAME_STOPPED = "stopped";
     public static final String EVENT_NAME_UPDATED = "updated";
     public static final String EVENT_NAME_NEW = "new";
+    public static final String EVENT_NAME_ASKING_CLOSED = "asking_closed";
     public static final String EVENT_NAME_CLOSED = "closed";
     public static final String EVENT_NAME_ON_CLICK = "on_click";
     public static final String EVENT_NAME_NAVIGATION = "navigation";

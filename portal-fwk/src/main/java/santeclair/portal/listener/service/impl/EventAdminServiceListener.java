@@ -45,13 +45,13 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
         this.service = null;
     }
 
-    public <SOURCE, DATA> DataPublisher<SOURCE, DATA> registerDataPublisher(SOURCE source, String... topics) {
+    public <SOURCE, DATA> DataPublisher<SOURCE, DATA> registerDataPublisher(SOURCE source, Class<DATA> dataClazz, String... topics) {
         LOGGER.info("Create a new Publisher");
-        DataPublisher<SOURCE, DATA> publisher = new DataPublisherImpl<>(this, source, topics);
+        DataPublisher<SOURCE, DATA> publisher = new DataPublisherImpl<>(this, source, dataClazz, topics);
         publishers.add(publisher);
         return publisher;
     }
-    
+
     public <SOURCE, DATA> Publisher<SOURCE> registerPublisher(SOURCE source, String... topics) {
         LOGGER.info("Create a new Publisher");
         Publisher<SOURCE> publisher = new PublisherImpl<>(this, source, topics);
@@ -80,7 +80,7 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
         public void publishEventAsynchronously(Dictionary<String, Object> dictionary);
 
     }
-    
+
     public interface DataPublisher<SOURCE, DATA> extends Serializable, Publisher<SOURCE> {
 
         public void publishEventData(DATA data, boolean synchronous);
@@ -146,7 +146,7 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
         }
 
     }
-    
+
     private class DataPublisherImpl<SOURCE, DATA> extends PublisherImpl<SOURCE> implements DataPublisher<SOURCE, DATA> {
 
         /**
@@ -154,8 +154,11 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
          */
         private static final long serialVersionUID = -1356857447344703240L;
 
-        public DataPublisherImpl(EventAdminServiceListener eventAdminServiceListener, SOURCE source, String... topics) {
+        private final Class<DATA> dataClazz;
+
+        public DataPublisherImpl(EventAdminServiceListener eventAdminServiceListener, SOURCE source, Class<DATA> dataClazz, String... topics) {
             super(eventAdminServiceListener, source, topics);
+            this.dataClazz = dataClazz;
         }
 
         @Override
@@ -224,7 +227,7 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
             Preconditions.checkArgument(data != null, "To send a data event, data must be set to a value different from null");
             props = props != null ? props : new Hashtable<String, Object>();
             props.put(PROPERTY_KEY_EVENT_DATA, data);
-            props.put(PROPERTY_KEY_EVENT_DATA_TYPE, data.getClass().getName());
+            props.put(PROPERTY_KEY_EVENT_DATA_TYPE, dataClazz.getName());
             return props;
         }
 

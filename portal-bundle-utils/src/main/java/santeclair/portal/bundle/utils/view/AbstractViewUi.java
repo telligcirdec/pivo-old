@@ -8,6 +8,7 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI_CODE;
 
@@ -17,7 +18,11 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.felix.ipojo.ComponentInstance;
+import org.apache.felix.ipojo.Factory;
+import org.apache.felix.ipojo.InstanceManager;
 import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
 import org.osgi.service.event.Event;
 import org.osgi.service.log.LogService;
@@ -29,9 +34,10 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.FontIcon;
 import com.vaadin.ui.Component;
 
-public abstract class AbstractViewUi implements ViewUi {
+public abstract class AbstractViewUi<MAIN_COMPONENT extends Component> implements ViewUi {
 
     protected LogService logService;
+    protected Factory mainComponentFactory;
 
     private String oldCodeModule;
     private String codeModule;
@@ -43,7 +49,8 @@ public abstract class AbstractViewUi implements ViewUi {
     private Boolean visibleOnMenu;
     private List<String> rolesAllowed;
 
-    private final Map<String, Component> onlyOneViewComponentMap = new HashMap<>();
+    private final Map<String, MAIN_COMPONENT> onlyOneViewMainComponentMap = new HashMap<>();
+    private final Map<String, ComponentInstance> viewMainComponentInstanceManagerMap = new HashMap<>();
 
     /*
      * Lifecycle
@@ -81,7 +88,28 @@ public abstract class AbstractViewUi implements ViewUi {
     protected void portalStopped(Event event) {
         String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
         logService.log(LogService.LOG_DEBUG, "From ViewUi " + this.libelle + " (" + this.code + ") (portalStopped(event)) => A Portal is stopping (" + sessionId + ")");
-        onlyOneViewComponentMap.remove(sessionId);
+        onlyOneViewMainComponentMap.remove(sessionId);
+        Set<String> keySet = viewMainComponentInstanceManagerMap.keySet();
+        for (String key : keySet) {
+            if (key.startsWith(sessionId)) {
+                ComponentInstance componentInstance = viewMainComponentInstanceManagerMap.get(key);
+                if (componentInstance != null) {
+                    componentInstance.dispose();
+                }
+                viewMainComponentInstanceManagerMap.remove(key);
+            }
+        }
+    }
+    
+    protected void closeTabs(org.osgi.service.event.Event event) {
+        String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
+        Integer tabHash = (Integer) event.getProperty(PROPERTY_KEY_TAB_HASH);
+        String key = sessionId + "-" + tabHash;
+        ComponentInstance componentInstance = viewMainComponentInstanceManagerMap.get(key);
+        if (componentInstance != null) {
+            componentInstance.dispose();
+        }
+        viewMainComponentInstanceManagerMap.remove(key);
     }
 
     /*
@@ -93,30 +121,35 @@ public abstract class AbstractViewUi implements ViewUi {
         this.logService = logService;
     }
 
+    protected void bindMainComponentFactory(Factory mainComponentFactory) {
+        logService.log(LogService.LOG_DEBUG, "ViewUi is binding main component factory.");
+        this.mainComponentFactory = mainComponentFactory;
+    }
+
     /*
      * Services
      */
 
     @Override
-    public Component getViewMainComponent(String sessionId, Integer tabHash, Boolean severalTabsAllowed, List<String> currentUserRoles) {
-        Component viewComponent = null;
+    public MAIN_COMPONENT getViewMainComponent(String sessionId, Integer tabHash, Boolean severalTabsAllowed, List<String> currentUserRoles) {
+        MAIN_COMPONENT viewMainComponent = null;
         try {
             if (!severalTabsAllowed) {
-                viewComponent = onlyOneViewComponentMap.get(sessionId);
-                if (viewComponent == null) {
-                    viewComponent = getMainComponent(sessionId, tabHash);
-                    onlyOneViewComponentMap.put(sessionId, viewComponent);
+                viewMainComponent = onlyOneViewMainComponentMap.get(sessionId);
+                if (viewMainComponent == null) {
+                    viewMainComponent = getMainComponent(sessionId, tabHash);
+                    onlyOneViewMainComponentMap.put(sessionId, viewMainComponent);
                 }
             } else {
-                viewComponent = getMainComponent(sessionId, tabHash);
+                viewMainComponent = getMainComponent(sessionId, tabHash);
             }
         } catch (Exception e) {
             logService.log(LogService.LOG_ERROR, "From viewUi " + getLibelle() + " (" + getCode() + ") => Error during creation of the main component.", e);
         }
-        if (viewComponent == null) {
+        if (viewMainComponent == null) {
             logService.log(LogService.LOG_WARNING, "From viewUi " + getLibelle() + " (" + getCode() + ") => No Main component declared.");
         }
-        return viewComponent;
+        return viewMainComponent;
     }
 
     /*
@@ -201,13 +234,33 @@ public abstract class AbstractViewUi implements ViewUi {
 
     protected abstract Publisher getPublisher();
 
-    protected abstract Component getMainComponent(String sessionId, Integer tabHash) throws Exception;
+    protected abstract Class<MAIN_COMPONENT> getMainComponentClass();
+
+    /*
+     * Private method
+     */
+
+    @SuppressWarnings("unchecked")
+    private MAIN_COMPONENT getMainComponent(String sessionId, Integer tabHash) throws Exception {
+        Dictionary<String, Object> props = new Hashtable<>();
+        props.put("instance.name", getCode() + "-" + getMainComponentClass().getCanonicalName() + "-" + sessionId + "-" + tabHash);
+        props.put(PROPERTY_KEY_PORTAL_SESSION_ID, new String(sessionId));
+        props.put(PROPERTY_KEY_TAB_HASH, new Integer(tabHash));
+        ComponentInstance instance = mainComponentFactory.createComponentInstance(props);
+        viewMainComponentInstanceManagerMap.put(sessionId + "-" + tabHash, instance);
+        if (instance.getState() == ComponentInstance.VALID) {
+            MAIN_COMPONENT mainComponent =
+                            (MAIN_COMPONENT) ((InstanceManager) instance).getPojoObject();
+            return mainComponent;
+        }
+        return null;
+    }
 
     /*
      * Static methods
      */
 
-    private static Dictionary<String, Object> startProperties(final AbstractViewUi viewUi) {
+    private static Dictionary<String, Object> startProperties(final AbstractViewUi<?> viewUi) {
 
         Dictionary<String, Object> eventProps = new Hashtable<>(4);
         eventProps.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_VIEW_UI);
@@ -218,11 +271,11 @@ public abstract class AbstractViewUi implements ViewUi {
         return eventProps;
     }
 
-    private static Dictionary<String, Object> stopProperties(final AbstractViewUi viewUi) {
+    private static Dictionary<String, Object> stopProperties(final AbstractViewUi<?> viewUi) {
         return stopProperties(viewUi, viewUi.codeModule, viewUi.code);
     }
 
-    private static Dictionary<String, Object> stopProperties(final AbstractViewUi viewUi, final String codeView, final String codeModule) {
+    private static Dictionary<String, Object> stopProperties(final AbstractViewUi<?> viewUi, final String codeView, final String codeModule) {
 
         Dictionary<String, Object> eventProps = new Hashtable<>(4);
         eventProps.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_VIEW_UI);
