@@ -1,4 +1,4 @@
-package santeclair.portal.bundle.test.module;
+package santeclair.portal.bundle.module;
 
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_PORTAL;

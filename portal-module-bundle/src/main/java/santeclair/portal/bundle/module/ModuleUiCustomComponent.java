@@ -1,4 +1,4 @@
-package santeclair.portal.bundle.test.module;
+package santeclair.portal.bundle.module;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<bundle.namespace>santeclair.portal.bundle.test.module</bundle.namespace>
+		<bundle.namespace>santeclair.portal.bundle.module</bundle.namespace>
 	</properties>
 
 	<parent>
