@@ -12,11 +12,11 @@
 		<version>4.57.0.PORTAL-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>portal-testModule-bundle</artifactId>
+	<artifactId>portal-module-bundle</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
-	<name>Test ModuleUi bundle</name>
+	<name>ModuleUi bundle</name>
 
 	<!-- Paramétrage de la connexion au gestionnaire de source -->
 	<scm>

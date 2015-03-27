@@ -1,4 +1,4 @@
-package santeclair.portal.bundle.test.view.component;
+package santeclair.portal.bundle.test.component;
 
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_TABS;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_ASKING_CLOSED;
@@ -22,7 +22,7 @@ import santeclair.portal.event.publisher.callback.TabsCallback;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 
-@Component(name = "santeclair.portal.bundle.test.view.component.MainComponent", propagation = false)
+@Component(name = "santeclair.portal.bundle.test.component.MainComponent", propagation = false)
 public class MainComponent extends HorizontalLayout {
 
     private static final long serialVersionUID = 8369775167208351407L;

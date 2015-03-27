@@ -141,14 +141,6 @@ public class ViewUiImpl implements ViewUi {
     }
 
     /*
-     * Bind services
-     */
-
-    /*
-     * Services
-     */
-
-    /*
      * Managed Properties (setter)
      */
 
@@ -198,7 +190,7 @@ public class ViewUiImpl implements ViewUi {
         this.rolesAllowed = Arrays.asList(rolesAllowed);
     }
 
-    @Property(name = "rolesAllowed", mandatory = true)
+    @Property(name = "mainComponentFactoryName", mandatory = true)
     private void setMainComponentFactoryName(String mainComponentFactoryName) {
         this.mainComponentFactoryName = mainComponentFactoryName;
     }
