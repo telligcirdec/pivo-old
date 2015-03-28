@@ -53,10 +53,10 @@ import com.vaadin.server.FontIcon;
 public class ModuleUiImpl implements ModuleUi {
 
     @Publishes(name = "moduleUiPublisherView", topics = TOPIC_VIEW_UI, synchronous = true)
-    private Publisher publisherView;
+    private Publisher publisherToViewUiTopic;
 
     @Publishes(name = "moduleUiPublisherPortal", topics = TOPIC_PORTAL, synchronous = true)
-    private Publisher publisherPortal;
+    private Publisher publisherToPortalTopic;
 
     @Requires
     private LogService logService;
@@ -84,8 +84,8 @@ public class ModuleUiImpl implements ModuleUi {
     private void start() {
         logService.log(LogService.LOG_INFO, "ModuleUi " + this.libelle + " (" + this.code + ") is starting");
         Dictionary<String, Object> props = startProperties(this);
-        publisherView.send(props);
-        publisherPortal.send(props);
+        publisherToViewUiTopic.send(props);
+        publisherToPortalTopic.send(props);
         logService.log(LogService.LOG_INFO, "ModuleUi " + this.libelle + " (" + this.code + ") started");
     }
 
@@ -95,7 +95,7 @@ public class ModuleUiImpl implements ModuleUi {
         viewUis.clear();
         onlyOneInstanceComponentMap.clear();
         Dictionary<String, Object> props = stopProperties(this);
-        publisherPortal.send(props);
+        publisherToPortalTopic.send(props);
         logService.log(LogService.LOG_INFO, "ModuleUi " + this.libelle + " (" + this.code + ") stopped");
     }
 
@@ -188,7 +188,7 @@ public class ModuleUiImpl implements ModuleUi {
                         + ") is starting.");
         viewUis.put(codeView, viewUi);
         logService.log(LogService.LOG_DEBUG, "From ModuleUi " + libelle + " (" + code + ") => An event 'moduleUi starting' is going to be send on portal topic");
-        publisherPortal.send(startProperties(this));
+        publisherToPortalTopic.send(startProperties(this));
     }
 
     /*
@@ -200,9 +200,9 @@ public class ModuleUiImpl implements ModuleUi {
         logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") => updtating module");
         viewUis.clear();
         Dictionary<String, Object> propsStartView = startProperties(this);
-        publisherView.send(propsStartView);
+        publisherToViewUiTopic.send(propsStartView);
         Dictionary<String, Object> propsStartPortal = startProperties(this, oldCode);
-        publisherPortal.send(propsStartPortal);
+        publisherToPortalTopic.send(propsStartPortal);
         logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") => module updated");
     }
 
@@ -305,9 +305,9 @@ public class ModuleUiImpl implements ModuleUi {
         logService.log(LogService.LOG_DEBUG, "From ModuleUi " + libelle + " (" + code + ") => An event 'moduleUi stopping' is going to be send on portal topic");
 
         if (viewUis.isEmpty()) {
-            publisherPortal.send(stopProperties(this));
+            publisherToPortalTopic.send(stopProperties(this));
         } else {
-            publisherPortal.send(startProperties(this));
+            publisherToPortalTopic.send(startProperties(this));
         }
     }
 

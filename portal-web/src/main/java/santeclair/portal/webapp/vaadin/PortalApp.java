@@ -83,9 +83,9 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
     private NavigatorEventHandler navigatorEventHandler;
 
-    private DataPublisher<PortalApp, PortalStartCallback> moduleUiTopicDataPublisher;
+    private DataPublisher<PortalApp, PortalStartCallback> dataPublisherToModuleUiTopic;
 
-    private Publisher<PortalApp> viewUiTopicPublisher;
+    private Publisher<PortalApp> publisherToViewUiTopic;
 
     /*
      * Début du Code UI
@@ -133,8 +133,8 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
         registerEventHandlerItself(context);
 
-        moduleUiTopicDataPublisher = eventAdminServiceListener.registerDataPublisher(this, PortalStartCallback.class, TOPIC_MODULE_UI);
-        viewUiTopicPublisher = eventAdminServiceListener.registerDataPublisher(this, PortalStartCallback.class, TOPIC_VIEW_UI);
+        dataPublisherToModuleUiTopic = eventAdminServiceListener.registerDataPublisher(this, PortalStartCallback.class, TOPIC_MODULE_UI);
+        publisherToViewUiTopic = eventAdminServiceListener.registerPublisher(this, TOPIC_VIEW_UI);
 
         this.setContent(main);
 
@@ -143,13 +143,11 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STARTED);
         props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
 
-        moduleUiTopicDataPublisher.publishEventDataAndDictionnarySynchronously(this, props);
+        dataPublisherToModuleUiTopic.publishEventDataAndDictionnarySynchronously(this, props);
         LOGGER.debug("Fin Initialisation de l'UI");
 
     }
 
-    
-    
     @Override
     public void detach() {
         LOGGER.info("Detachement de l'UI");
@@ -167,12 +165,12 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STOPPED);
         props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
 
-        moduleUiTopicDataPublisher.publishEventDataAndDictionnarySynchronously(this, props);
-        viewUiTopicPublisher.publishEventSynchronously(props);
+        dataPublisherToModuleUiTopic.publishEventDataAndDictionnarySynchronously(this, props);
+        publisherToViewUiTopic.publishEventSynchronously(props);
 
         unregisterEventHandlerItSelf(context);
 
-        eventAdminServiceListener.unregisterPublisher(moduleUiTopicDataPublisher, viewUiTopicPublisher);
+        eventAdminServiceListener.unregisterPublisher(dataPublisherToModuleUiTopic, publisherToViewUiTopic);
         navigatorEventHandler.unregisterEventHandlerItSelf(context);
 
         super.detach();

@@ -60,6 +60,8 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
     private final String sessionId;
     private final List<String> currentUserRoles;
 
+    private Boolean keepView = false;
+
     public Tabs(final EventAdminServiceListener eventAdminServiceListener, final String sessionId, final List<String> currentUserRoles) {
         this.eventAdminServiceListener = eventAdminServiceListener;
         this.sessionId = sessionId;
@@ -165,15 +167,25 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
     @Override
     public void onTabClose(TabSheet tabsheet, Component tabContent) {
 
+        keepView = Boolean.FALSE;
         Tab tab = tabsheet.getTab(tabContent);
-        
+        Integer tabHash = tab.hashCode();
+
         Dictionary<String, Object> props = new Hashtable<>();
         props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_TABS);
         props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_ASKING_CLOSED);
         props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
-        props.put(PROPERTY_KEY_TAB_HASH, tab.hashCode());
+        props.put(PROPERTY_KEY_TAB_HASH, tabHash);
 
         tabsDataPublisherOnComponent.publishEventDataAndDictionnarySynchronously(this, props);
+        if (!keepView) {
+            removeView(tabHash);
+        }
+    }
+
+    @Override
+    public void keepView() {
+        keepView = Boolean.TRUE;
     }
 
     @Override
@@ -182,15 +194,15 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
         for (int i = 0; i < numberOfTab; i++) {
             Tab tab = this.getTab(i);
             if (tab != null && tab.hashCode() == tabHash) {
-                
+
                 Dictionary<String, Object> props = new Hashtable<>();
                 props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_TABS);
                 props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_CLOSED);
                 props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
                 props.put(PROPERTY_KEY_TAB_HASH, tabHash);
-                
+
                 tabsDataPublisherOnView.publishEventSynchronously(props);
-                
+
                 this.removeTab(tab);
                 break;
             }

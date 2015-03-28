@@ -69,8 +69,8 @@ public class ViewUiImpl implements ViewUi {
     private final Map<String, com.vaadin.ui.Component> onlyOneViewMainComponentMap = new HashMap<>();
     private final Map<String, ComponentInstance> viewMainComponentInstanceManagerMap = new HashMap<>();
 
-    @Publishes(name = "testViewUiPublisher", topics = TOPIC_MODULE_UI, synchronous = true)
-    private Publisher publisher;
+    @Publishes(name = "viewUiPublisherToModuleUiTopic", topics = TOPIC_MODULE_UI, synchronous = true)
+    private Publisher publisherToModuleUiTopic;
 
     /*
      * Lifecycle
@@ -80,7 +80,7 @@ public class ViewUiImpl implements ViewUi {
     public void start() {
         logService.log(LogService.LOG_INFO, "ViewUi " + this.libelle + " (" + this.code + ") is starting");
 
-        publisher.send(startProperties(this));
+        publisherToModuleUiTopic.send(startProperties(this));
 
         logService.log(LogService.LOG_INFO, "ViewUi " + this.libelle + " (" + this.code + ") started");
     }
@@ -89,7 +89,7 @@ public class ViewUiImpl implements ViewUi {
     public void stop() {
         logService.log(LogService.LOG_INFO, "ViewUi " + this.libelle + " (" + this.code + ") is stopping");
 
-        publisher.send(stopProperties(this));
+        publisherToModuleUiTopic.send(stopProperties(this));
 
         logService.log(LogService.LOG_INFO, "ViewUi " + this.libelle + " (" + this.code + ") stopped");
     }
@@ -147,8 +147,8 @@ public class ViewUiImpl implements ViewUi {
     @Updated
     private void updated() {
         logService.log(LogService.LOG_DEBUG, "ViewUi " + this.libelle + " (" + this.code + ") has been modified.");
-        publisher.send(stopProperties(this, oldCode, oldCodeModule));
-        publisher.send(startProperties(this));
+        publisherToModuleUiTopic.send(stopProperties(this, oldCode, oldCodeModule));
+        publisherToModuleUiTopic.send(startProperties(this));
     }
 
     @Property(name = "codeModule", mandatory = true)

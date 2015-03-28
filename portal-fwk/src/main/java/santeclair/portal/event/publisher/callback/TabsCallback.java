@@ -9,4 +9,6 @@ public interface TabsCallback {
 
     void removeView(int tabHash);
 
+    void keepView();
+
 }
