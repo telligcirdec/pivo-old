@@ -90,9 +90,8 @@ public class ViewUiImpl implements ViewUi {
     @Invalidate
     public void stop() {
         logService.log(LogService.LOG_INFO, "ViewUi " + this.libelle + " (" + this.code + ") is stopping");
-
+        clear();
         publisherToModuleUiTopic.send(stopProperties(this));
-
         logService.log(LogService.LOG_INFO, "ViewUi " + this.libelle + " (" + this.code + ") stopped");
     }
 
@@ -120,11 +119,7 @@ public class ViewUiImpl implements ViewUi {
         Set<SessionIdTabHashKey> keySet = viewMainComponentInstanceManagerMap.keySet();
         for (SessionIdTabHashKey key : keySet) {
             if (key.isSessionIdEquals(sessionId)) {
-                ComponentInstance componentInstance = viewMainComponentInstanceManagerMap.get(key);
-                if (componentInstance != null) {
-                    componentInstance.dispose();
-                }
-                viewMainComponentInstanceManagerMap.remove(key);
+                disposeComponentInstance(key);
             }
         }
     }
@@ -134,12 +129,7 @@ public class ViewUiImpl implements ViewUi {
     public void closeTabs(org.osgi.service.event.Event event) {
         String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
         Integer tabHash = (Integer) event.getProperty(PROPERTY_KEY_TAB_HASH);
-        SessionIdTabHashKey key = new SessionIdTabHashKey(sessionId, tabHash);
-        ComponentInstance componentInstance = viewMainComponentInstanceManagerMap.get(key);
-        if (componentInstance != null) {
-            componentInstance.dispose();
-            viewMainComponentInstanceManagerMap.remove(key);
-        }
+        disposeComponentInstance(sessionId, tabHash);
     }
 
     /*
@@ -149,6 +139,7 @@ public class ViewUiImpl implements ViewUi {
     @Updated
     private void updated() {
         logService.log(LogService.LOG_DEBUG, "ViewUi " + this.libelle + " (" + this.code + ") has been modified.");
+        clear();
         publisherToModuleUiTopic.send(stopProperties(this, oldCode, oldCodeModule));
         publisherToModuleUiTopic.send(startProperties(this));
     }
@@ -216,10 +207,12 @@ public class ViewUiImpl implements ViewUi {
             if (!newMainComponentOnEachAction) {
                 viewMainComponent = onlyOneViewMainComponentMap.get(sessionId);
                 if (viewMainComponent == null) {
+                    disposeComponentInstance(sessionId, tabHash);
                     viewMainComponent = getMainComponent(sessionId, tabHash);
                     onlyOneViewMainComponentMap.put(sessionId, viewMainComponent);
                 }
             } else {
+                disposeComponentInstance(sessionId, tabHash);
                 viewMainComponent = getMainComponent(sessionId, tabHash);
             }
         } catch (Exception e) {
@@ -282,6 +275,29 @@ public class ViewUiImpl implements ViewUi {
             return mainComponent;
         }
         return null;
+    }
+
+    private void disposeComponentInstance(String sessionId, Integer tabHash) {
+        SessionIdTabHashKey key = new SessionIdTabHashKey(sessionId, tabHash);
+        disposeComponentInstance(key);
+    }
+
+    private void disposeComponentInstance(SessionIdTabHashKey key) {
+        ComponentInstance componentInstance = viewMainComponentInstanceManagerMap.get(key);
+        if (componentInstance != null) {
+            componentInstance.dispose();
+            viewMainComponentInstanceManagerMap.remove(key);
+            componentInstance = null;
+        }
+    }
+
+    private void clear() {
+        Set<SessionIdTabHashKey> keySet = viewMainComponentInstanceManagerMap.keySet();
+        for (SessionIdTabHashKey key : keySet) {
+            disposeComponentInstance(key);
+        }
+        viewMainComponentInstanceManagerMap.clear();
+        onlyOneViewMainComponentMap.clear();
     }
 
     /*

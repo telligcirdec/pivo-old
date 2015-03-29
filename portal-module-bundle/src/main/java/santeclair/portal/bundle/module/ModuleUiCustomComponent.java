@@ -37,4 +37,9 @@ public class ModuleUiCustomComponent extends CustomComponent {
         return sessionId;
     }
 
+    @Override
+    public Component getCompositionRoot() {
+        return super.getCompositionRoot();
+    }
+
 }

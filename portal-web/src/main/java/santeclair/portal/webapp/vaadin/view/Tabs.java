@@ -198,6 +198,8 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
             Tab tab = this.getTab(i);
             if (tab != null && tab.hashCode() == tabHash) {
 
+                this.removeTab(tab);
+
                 Dictionary<String, Object> props = new Hashtable<>();
                 props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_TABS);
                 props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_CLOSED);
@@ -208,7 +210,6 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
                 dataPublisherToViewUiTopic.publishEventSynchronously(props);
                 dataPublisherToModuleUiTopic.publishEventSynchronously(props);
 
-                this.removeTab(tab);
                 break;
             }
         }

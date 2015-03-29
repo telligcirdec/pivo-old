@@ -97,8 +97,7 @@ public class ModuleUiImpl implements ModuleUi {
     @Invalidate
     private void stop() {
         logService.log(LogService.LOG_INFO, "ModuleUi " + this.libelle + " (" + this.code + ") is stopping");
-        viewUis.clear();
-        moduleUiCustomComponentMap.clear();
+        clear();
         Dictionary<String, Object> props = stopProperties(this);
         publisherToPortalTopic.send(props);
         logService.log(LogService.LOG_INFO, "ModuleUi " + this.libelle + " (" + this.code + ") stopped");
@@ -126,7 +125,7 @@ public class ModuleUiImpl implements ModuleUi {
         Set<SessionIdTabHashKey> keySet = moduleUiCustomComponentMap.keySet();
         for (SessionIdTabHashKey sessionIdTabHashKey : keySet) {
             if (sessionIdTabHashKey.isSessionIdEquals(sessionId)) {
-                moduleUiCustomComponentMap.remove(sessionIdTabHashKey);
+                clearModuleUiCustomComponent(sessionIdTabHashKey);
             }
         }
 
@@ -201,8 +200,7 @@ public class ModuleUiImpl implements ModuleUi {
         if ((!keepModuleUiOnTabClose && !severalInstanceAllowed) || (severalInstanceAllowed)) {
             String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
             Integer tabHash = (Integer) event.getProperty(PROPERTY_KEY_TAB_HASH);
-            SessionIdTabHashKey sessionIdTabHashKeyToRemove = new SessionIdTabHashKey(sessionId, tabHash);
-            moduleUiCustomComponentMap.remove(sessionIdTabHashKeyToRemove);
+            clearModuleUiCustomComponent(sessionId, tabHash);
         }
     }
 
@@ -231,7 +229,7 @@ public class ModuleUiImpl implements ModuleUi {
             logService.log(LogService.LOG_WARNING, "From ModuleUi " + libelle + " (" + code
                             + ") => module parameters keepModuleUiOnTabClose and severalInstanceAllowed are both set to true. keepModuleUiOnTabClose will be ignored.");
         }
-        viewUis.clear();
+        clear();
         Dictionary<String, Object> propsStartView = startProperties(this);
         publisherToViewUiTopic.send(propsStartView);
         Dictionary<String, Object> propsStartPortal = startProperties(this, oldCode);
@@ -347,6 +345,33 @@ public class ModuleUiImpl implements ModuleUi {
         } else {
             publisherToPortalTopic.send(startProperties(this));
         }
+    }
+
+    private void clearAllModuleUiCustomComponent() {
+        Set<SessionIdTabHashKey> key = moduleUiCustomComponentMap.keySet();
+        for (SessionIdTabHashKey sessionIdTabHashKey : key) {
+            clearModuleUiCustomComponent(sessionIdTabHashKey);
+        }
+    }
+
+    private void clearModuleUiCustomComponent(SessionIdTabHashKey sessionIdTabHashKeyToRemove) {
+        ModuleUiCustomComponent moduleUiCustomComponent = moduleUiCustomComponentMap.get(sessionIdTabHashKeyToRemove);
+        if (moduleUiCustomComponent != null) {
+            moduleUiCustomComponent.getCompositionRoot().setParent(null);
+            moduleUiCustomComponent = null;
+            moduleUiCustomComponentMap.remove(sessionIdTabHashKeyToRemove);
+        }
+    }
+
+    private void clearModuleUiCustomComponent(String sessionId, Integer tabHash) {
+        SessionIdTabHashKey sessionIdTabHashKeyToRemove = new SessionIdTabHashKey(sessionId, tabHash);
+        clearModuleUiCustomComponent(sessionIdTabHashKeyToRemove);
+    }
+
+    private void clear() {
+        clearAllModuleUiCustomComponent();
+        viewUis.clear();
+        moduleUiCustomComponentMap.clear();
     }
 
     /*
