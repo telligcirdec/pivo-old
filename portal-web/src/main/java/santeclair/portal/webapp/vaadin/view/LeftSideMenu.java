@@ -27,7 +27,7 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
 
     private final EventAdminServiceListener eventAdminServiceListener;
     private final String uiId;
-    
+
     public LeftSideMenu(EventAdminServiceListener eventAdminServiceListener, String uiId) {
         super("sidebarLayout");
         this.eventAdminServiceListener = eventAdminServiceListener;
@@ -46,11 +46,18 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
         LOGGER.debug("global addModuleUi");
         MainButonModuleUi mainButonModuleUi = new MainButonModuleUi(moduleUi, viewUiMap, eventAdminServiceListener, uiId);
         TreeSet<Component> butonModuleUi = new TreeSet<>();
-        butonModuleUi.add(mainButonModuleUi);
+        boolean moduleUiCodeAlreadyExist = false;
         for (Component component : buttonContainer) {
             if (MainButonModuleUi.class.isAssignableFrom(component.getClass())) {
+                MainButonModuleUi currentMainButonModuleUi = MainButonModuleUi.class.cast(component);
+                moduleUiCodeAlreadyExist = currentMainButonModuleUi.getModuleUi().getCode().equals(moduleUi.getCode());
                 butonModuleUi.add(component);
             }
+        }
+        if (!moduleUiCodeAlreadyExist) {
+            butonModuleUi.add(mainButonModuleUi);
+        } else {
+            LOGGER.warn("A ModuleUi with code {} already exist. Please choose a different one. ModuleUi hasn't been activated.", moduleUi.getCode());
         }
         buttonContainer.removeAllComponents();
         buttonContainer.addComponents(butonModuleUi.toArray(new Component[]{}));

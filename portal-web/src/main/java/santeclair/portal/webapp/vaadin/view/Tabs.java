@@ -51,10 +51,10 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
 
     private static final String PARAMS_URI_FRAGMENT = "params";
 
-    private final DataPublisher<Tabs, TabsCallback> tabsDataPublisherOnModule;
-    private final DataPublisher<Tabs, TabsCallback> tabsDataPublisherOnView;
-    private final DataPublisher<Tabs, TabsCallback> tabsDataPublisherOnComponent;
-    private final Publisher<Tabs> navigationPublisher;
+    private final DataPublisher<Tabs, TabsCallback> dataPublisherToModuleUiTopic;
+    private final DataPublisher<Tabs, TabsCallback> dataPublisherToViewUiTopic;
+    private final DataPublisher<Tabs, TabsCallback> dataPublisherToComponentUiTopic;
+    private final Publisher<Tabs> publisherToNavigatorTopic;
 
     private final EventAdminServiceListener eventAdminServiceListener;
     private final String sessionId;
@@ -66,10 +66,10 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
         this.eventAdminServiceListener = eventAdminServiceListener;
         this.sessionId = sessionId;
         this.currentUserRoles = currentUserRoles;
-        this.tabsDataPublisherOnModule = eventAdminServiceListener.registerDataPublisher(this, TabsCallback.class, TOPIC_MODULE_UI);
-        this.tabsDataPublisherOnView = eventAdminServiceListener.registerDataPublisher(this, TabsCallback.class, TOPIC_VIEW_UI);
-        this.tabsDataPublisherOnComponent = eventAdminServiceListener.registerDataPublisher(this, TabsCallback.class, TOPIC_COMPONENT_UI);
-        this.navigationPublisher = eventAdminServiceListener.registerPublisher(this, TOPIC_NAVIGATOR);
+        this.dataPublisherToModuleUiTopic = eventAdminServiceListener.registerDataPublisher(this, TabsCallback.class, TOPIC_MODULE_UI);
+        this.dataPublisherToViewUiTopic = eventAdminServiceListener.registerDataPublisher(this, TabsCallback.class, TOPIC_VIEW_UI);
+        this.dataPublisherToComponentUiTopic = eventAdminServiceListener.registerDataPublisher(this, TabsCallback.class, TOPIC_COMPONENT_UI);
+        this.publisherToNavigatorTopic = eventAdminServiceListener.registerPublisher(this, TOPIC_NAVIGATOR);
     }
 
     public void init() {
@@ -84,13 +84,13 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
         props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STARTED);
         props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
 
-        tabsDataPublisherOnView.publishEventDataAndDictionnarySynchronously(this, props);
+        dataPublisherToViewUiTopic.publishEventDataAndDictionnarySynchronously(this, props);
     }
 
     @Override
     public void detach() {
         super.detach();
-        eventAdminServiceListener.unregisterPublisher(tabsDataPublisherOnModule, tabsDataPublisherOnView, tabsDataPublisherOnComponent, navigationPublisher);
+        eventAdminServiceListener.unregisterPublisher(dataPublisherToModuleUiTopic, dataPublisherToViewUiTopic, dataPublisherToComponentUiTopic, publisherToNavigatorTopic);
     }
 
     @Override
@@ -98,42 +98,42 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
         LOGGER.debug("enter : " + event);
         String parameters = event.getParameters();
         StringTokenizer st = new StringTokenizer(parameters, "/");
-        String container = null;
-        String moduleCode = "";
-        String moduleView = "";
+        String tabHashSt = null;
+        String moduleUiCode = "";
+        String viewUiCode = "";
 
         int count = 0;
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             if (count == 0) {
-                container = token;
+                tabHashSt = token;
             }
             if (count == 2) {
-                moduleCode = token;
+                moduleUiCode = token;
             }
             if (count == 4) {
-                moduleView = token;
+                viewUiCode = token;
             }
             count++;
         }
-        if ("NEW".equalsIgnoreCase(container) && StringUtils.isNotBlank(moduleCode) && StringUtils.isNotBlank(moduleView)) {
+        if ("NEW".equalsIgnoreCase(tabHashSt) && StringUtils.isNotBlank(moduleUiCode) && StringUtils.isNotBlank(viewUiCode)) {
             Dictionary<String, Object> props = new Hashtable<>();
 
             props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_TABS);
             props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_NEW);
-            props.put(PROPERTY_KEY_MODULE_UI_CODE, moduleCode);
-            props.put(PROPERTY_KEY_VIEW_UI_CODE, moduleView);
+            props.put(PROPERTY_KEY_MODULE_UI_CODE, moduleUiCode);
+            props.put(PROPERTY_KEY_VIEW_UI_CODE, viewUiCode);
             props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
             props.put(PROPERTY_KEY_PORTAL_CURRENT_USER_ROLES, currentUserRoles);
             addExtractedParams(parameters, props);
 
-            tabsDataPublisherOnModule.publishEventDataAndDictionnarySynchronously(this, props);
-        } else if (StringUtils.isNumeric(container)) {
-            Integer containerHash = new Integer(container);
+            dataPublisherToModuleUiTopic.publishEventDataAndDictionnarySynchronously(this, props);
+        } else if (StringUtils.isNumeric(tabHashSt)) {
+            Integer tabHash = new Integer(tabHashSt);
             Integer numberOfTab = this.getComponentCount();
             for (int i = 0; i < numberOfTab; i++) {
                 Tab tab = this.getTab(i);
-                if (tab != null && tab.hashCode() == containerHash) {
+                if (tab != null && tab.hashCode() == tabHash) {
                     this.setSelectedTab(tab);
                     break;
                 }
@@ -147,13 +147,13 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
         int tabHash = -1;
         if (tab != null) {
             tabHash = tab.hashCode();
-            navigationPublisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tabHash, sessionId));
+            publisherToNavigatorTopic.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tabHash, sessionId));
         } else {
             tab = this.addTab(moduleUiView, caption);
             tab.setIcon(icon);
             tab.setClosable(closable);
             tabHash = tab.hashCode();
-            navigationPublisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tabHash, sessionId));
+            publisherToNavigatorTopic.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tabHash, sessionId));
         }
         return tabHash;
     }
@@ -177,7 +177,10 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
         props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
         props.put(PROPERTY_KEY_TAB_HASH, tabHash);
 
-        tabsDataPublisherOnComponent.publishEventDataAndDictionnarySynchronously(this, props);
+        dataPublisherToComponentUiTopic.publishEventDataAndDictionnarySynchronously(this, props);
+        dataPublisherToViewUiTopic.publishEventDataAndDictionnarySynchronously(this, props);
+        dataPublisherToModuleUiTopic.publishEventDataAndDictionnarySynchronously(this, props);
+
         if (!keepView) {
             removeView(tabHash);
         }
@@ -201,7 +204,9 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
                 props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
                 props.put(PROPERTY_KEY_TAB_HASH, tabHash);
 
-                tabsDataPublisherOnView.publishEventSynchronously(props);
+                dataPublisherToComponentUiTopic.publishEventSynchronously(props);
+                dataPublisherToViewUiTopic.publishEventSynchronously(props);
+                dataPublisherToModuleUiTopic.publishEventSynchronously(props);
 
                 this.removeTab(tab);
                 break;
@@ -214,7 +219,7 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
         TabSheet tabSheet = event.getTabSheet();
         Tab tab = tabSheet.getTab(tabSheet.getSelectedTab());
         if (tab != null) {
-            navigationPublisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tab.hashCode(), sessionId));
+            publisherToNavigatorTopic.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tab.hashCode(), sessionId));
         }
     }
 

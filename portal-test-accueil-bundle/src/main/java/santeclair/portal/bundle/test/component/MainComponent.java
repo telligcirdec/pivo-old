@@ -41,7 +41,7 @@ public class MainComponent extends HorizontalLayout {
     // String dataType = (String) event.getProperty(PROPERTY_KEY_EVENT_DATA_TYPE);
     // if (sessionId.equals(this.sessionId) && tabHash.equals(this.tabHash) && dataType.equals(TabsCallback.class.getName())) {
     // TabsCallback tabsCallback = (TabsCallback) event.getProperty(PROPERTY_KEY_EVENT_DATA);
-    // tabsCallback.removeView(tabHash);
+    // tabsCallback.keepView();
     // }
     // }
 

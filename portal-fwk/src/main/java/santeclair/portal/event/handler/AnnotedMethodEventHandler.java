@@ -32,7 +32,7 @@ public class AnnotedMethodEventHandler implements EventHandler {
             Object argParameter = null;
             Annotation[] annotationsOnParameter = annotations[i];
             for (Annotation annotation : annotationsOnParameter) {
-                if (EventArg.class.isAssignableFrom(annotation.annotationType())) {
+                if (EventProperty.class.isAssignableFrom(annotation.annotationType())) {
                     argParameter = annotation;
                 }
             }
@@ -54,17 +54,17 @@ public class AnnotedMethodEventHandler implements EventHandler {
             Object argParameter = argParameters[i];
             Object parameterValue = null;
             if (argParameter != null) {
-                if (argParameter instanceof Annotation && EventArg.class.isAssignableFrom(((Annotation) argParameter).annotationType())) {
-                    EventArg eventArg = EventArg.class.cast(argParameter);
-                    String eventArgName = eventArg.name();
-                    Boolean eventArgRequired = eventArg.required();
+                if (argParameter instanceof Annotation && EventProperty.class.isAssignableFrom(((Annotation) argParameter).annotationType())) {
+                    EventProperty eventProperty = EventProperty.class.cast(argParameter);
+                    String eventArgName = eventProperty.propKey();
+                    Boolean eventArgRequired = eventProperty.required();
                     LOGGER.info("EvenArg annotation found on arg{} with name : {} en required : {}", i, eventArgName, eventArgRequired);
                     parameterValue = event.getProperty(eventArgName);
                     LOGGER.debug("Parameter value : {}", parameterValue);
                     if (parameterValue == null && eventArgRequired) {
                         throw new IllegalArgumentException("An event on the topic " + topicName + " has been fired. "
                                         + "Your listener method " + annotedMethod.getName() + " from your class " + className
-                                        + " has at least a parameter with annotation " + EventArg.class.getSimpleName() + " which name is " + eventArgName + " required. "
+                                        + " has at least a parameter with annotation " + EventProperty.class.getSimpleName() + " which name is " + eventArgName + " required. "
                                         + "You must fired this event with the property " + eventArgName + " set with the value you deserve or set required to false.");
                     }
                 }

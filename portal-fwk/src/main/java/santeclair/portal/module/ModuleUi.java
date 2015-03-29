@@ -17,7 +17,7 @@ public interface ModuleUi {
 
     Boolean isCloseable();
 
-    Boolean isSeveralTabsAllowed();
+    Boolean isSeveralInstanceAllowed();
 
     Integer getDisplayOrder();
 
@@ -25,6 +25,6 @@ public interface ModuleUi {
 
     void registerViewUi(ViewUi viewUi);
 
-    //void unregisterViewUi(ViewUi viewUi);
+    // void unregisterViewUi(ViewUi viewUi);
 
 }

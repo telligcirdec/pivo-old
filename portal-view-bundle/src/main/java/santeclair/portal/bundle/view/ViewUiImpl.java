@@ -41,6 +41,7 @@ import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
 import org.osgi.service.event.Event;
 import org.osgi.service.log.LogService;
 
+import santeclair.portal.bundle.utils.SessionIdTabHashKey;
 import santeclair.portal.module.ModuleUi;
 import santeclair.portal.view.ViewUi;
 
@@ -62,12 +63,13 @@ public class ViewUiImpl implements ViewUi {
     private String libelle;
     private FontIcon icon;
     private Boolean openOnInitialization;
+    private Boolean newMainComponentOnEachAction;
     private Boolean visibleOnMenu;
     private List<String> rolesAllowed;
     private String mainComponentFactoryName;
 
     private final Map<String, com.vaadin.ui.Component> onlyOneViewMainComponentMap = new HashMap<>();
-    private final Map<String, ComponentInstance> viewMainComponentInstanceManagerMap = new HashMap<>();
+    private final Map<SessionIdTabHashKey, ComponentInstance> viewMainComponentInstanceManagerMap = new HashMap<>();
 
     @Publishes(name = "viewUiPublisherToModuleUiTopic", topics = TOPIC_MODULE_UI, synchronous = true)
     private Publisher publisherToModuleUiTopic;
@@ -115,9 +117,9 @@ public class ViewUiImpl implements ViewUi {
         String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
         logService.log(LogService.LOG_DEBUG, "From ViewUi " + this.libelle + " (" + this.code + ") (portalStopped(event)) => A Portal is stopping (" + sessionId + ")");
         onlyOneViewMainComponentMap.remove(sessionId);
-        Set<String> keySet = viewMainComponentInstanceManagerMap.keySet();
-        for (String key : keySet) {
-            if (key.startsWith(sessionId)) {
+        Set<SessionIdTabHashKey> keySet = viewMainComponentInstanceManagerMap.keySet();
+        for (SessionIdTabHashKey key : keySet) {
+            if (key.isSessionIdEquals(sessionId)) {
                 ComponentInstance componentInstance = viewMainComponentInstanceManagerMap.get(key);
                 if (componentInstance != null) {
                     componentInstance.dispose();
@@ -127,17 +129,17 @@ public class ViewUiImpl implements ViewUi {
         }
     }
 
-    @Subscriber(name = "", topics = TOPIC_VIEW_UI, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_TABS + ")(" + PROPERTY_KEY_EVENT_NAME + "="
+    @Subscriber(name = "closeTabs", topics = TOPIC_VIEW_UI, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_TABS + ")(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_NAME_CLOSED + ")(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)(" + PROPERTY_KEY_TAB_HASH + "=*))")
     public void closeTabs(org.osgi.service.event.Event event) {
         String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
         Integer tabHash = (Integer) event.getProperty(PROPERTY_KEY_TAB_HASH);
-        String key = sessionId + "-" + tabHash;
+        SessionIdTabHashKey key = new SessionIdTabHashKey(sessionId, tabHash);
         ComponentInstance componentInstance = viewMainComponentInstanceManagerMap.get(key);
         if (componentInstance != null) {
             componentInstance.dispose();
+            viewMainComponentInstanceManagerMap.remove(key);
         }
-        viewMainComponentInstanceManagerMap.remove(key);
     }
 
     /*
@@ -180,9 +182,14 @@ public class ViewUiImpl implements ViewUi {
         this.openOnInitialization = openOnInitialization;
     }
 
-    @Property(name = "openOnInitialization", value = "false")
+    @Property(name = "visibleOnMenu", value = "false")
     private void setVisibleOnMenu(Boolean visibleOnMenu) {
         this.visibleOnMenu = visibleOnMenu;
+    }
+
+    @Property(name = "newMainComponentOnEachAction", value = "true")
+    private void setNewMainComponentOnEachAction(Boolean newMainComponentOnEachAction) {
+        this.newMainComponentOnEachAction = newMainComponentOnEachAction;
     }
 
     @Property(name = "rolesAllowed", value = "{NONE}")
@@ -200,10 +207,13 @@ public class ViewUiImpl implements ViewUi {
      */
 
     @Override
-    public com.vaadin.ui.Component getViewMainComponent(String sessionId, Integer tabHash, Boolean severalTabsAllowed, List<String> currentUserRoles) {
+    public com.vaadin.ui.Component getViewMainComponent(String sessionId, Integer tabHash, List<String> currentUserRoles) {
+        logService.log(LogService.LOG_DEBUG, "From viewUi " + getLibelle() + " (" + getCode() + ") => getViewMainComponent(sessionId : " + sessionId + " / tabHash : " + tabHash
+                        + " / currentUserRoles : " + currentUserRoles + ")");
         com.vaadin.ui.Component viewMainComponent = null;
         try {
-            if (!severalTabsAllowed) {
+            logService.log(LogService.LOG_DEBUG, "From viewUi " + getLibelle() + " (" + getCode() + ") => newMainComponentOnEachAction is set to " + newMainComponentOnEachAction);
+            if (!newMainComponentOnEachAction) {
                 viewMainComponent = onlyOneViewMainComponentMap.get(sessionId);
                 if (viewMainComponent == null) {
                     viewMainComponent = getMainComponent(sessionId, tabHash);
@@ -265,7 +275,7 @@ public class ViewUiImpl implements ViewUi {
         props.put(PROPERTY_KEY_PORTAL_SESSION_ID, new String(sessionId));
         props.put(PROPERTY_KEY_TAB_HASH, new Integer(tabHash));
         ComponentInstance instance = mainComponentFactory.createComponentInstance(props);
-        viewMainComponentInstanceManagerMap.put(sessionId + "-" + tabHash, instance);
+        viewMainComponentInstanceManagerMap.put(new SessionIdTabHashKey(sessionId, tabHash), instance);
         if (instance.getState() == ComponentInstance.VALID) {
             com.vaadin.ui.Component mainComponent =
                             (com.vaadin.ui.Component) ((InstanceManager) instance).getPojoObject();

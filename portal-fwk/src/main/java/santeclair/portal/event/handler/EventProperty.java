@@ -7,9 +7,9 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-public @interface EventArg {
+public @interface EventProperty {
 
-    String name();
+    String propKey();
 
     boolean required() default true;
 

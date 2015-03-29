@@ -7,7 +7,7 @@ public class ModuleUiCustomComponent extends CustomComponent {
 
     private static final long serialVersionUID = 6503344094828946218L;
 
-    private int tabHash;
+    private Integer tabHash;
     private final String sessionId;
 
     public ModuleUiCustomComponent(String sessionId) {
@@ -25,11 +25,11 @@ public class ModuleUiCustomComponent extends CustomComponent {
         super.setCompositionRoot(compositionRoot);
     }
 
-    public int getTabHash() {
+    public Integer getTabHash() {
         return tabHash;
     }
 
-    public void setTabHash(int tabHash) {
+    public void setTabHash(Integer tabHash) {
         this.tabHash = tabHash;
     }
 

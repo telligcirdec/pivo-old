@@ -30,7 +30,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import santeclair.portal.event.handler.AbstractEventHandler;
-import santeclair.portal.event.handler.EventArg;
+import santeclair.portal.event.handler.EventProperty;
 import santeclair.portal.event.handler.PortalEventHandler;
 import santeclair.portal.event.handler.Subscriber;
 import santeclair.portal.event.publisher.callback.PortalStartCallback;
@@ -197,7 +197,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
     @Override
     @Subscriber(topic = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_NAME_STARTED + ")(" + PROPERTY_KEY_MODULE_UI + "=*)(" + PROPERTY_KEY_MODULE_UI_CODE + "=*))")
-    public void addModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI) final ModuleUi moduleUi, @EventArg(name = PROPERTY_KEY_MODULE_UI_CODE) final String moduleCode) {
+    public void addModuleUi(@EventProperty(propKey = PROPERTY_KEY_MODULE_UI) final ModuleUi moduleUi, @EventProperty(propKey = PROPERTY_KEY_MODULE_UI_CODE) final String moduleCode) {
         String moduleLibelle = moduleUi.getLibelle();
         LOGGER.info("Adding module {} ({}) => Check view roles allowed", moduleLibelle, moduleCode);
         Map<String, ViewUi> viewUiMap = moduleUi.getViewUis(getCurrentUserRoles());
@@ -218,7 +218,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
     @Subscriber(topic = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_MODULE_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_NAME_STOPPED + ")(" + PROPERTY_KEY_MODULE_UI + "=*))")
-    public void removeModuleUi(@EventArg(name = PROPERTY_KEY_MODULE_UI) final ModuleUi moduleUi) {
+    public void removeModuleUi(@EventProperty(propKey = PROPERTY_KEY_MODULE_UI) final ModuleUi moduleUi) {
         String moduleCode = moduleUi.getCode();
         String moduleLibelle = moduleUi.getLibelle();
         LOGGER.info("Removing module {} ({})", moduleLibelle, moduleCode);

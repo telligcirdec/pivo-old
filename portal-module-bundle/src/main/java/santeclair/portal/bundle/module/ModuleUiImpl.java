@@ -4,6 +4,7 @@ import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_MODU
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_PORTAL;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_TABS;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_VIEW_UI;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_CLOSED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_NEW;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STARTED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STOPPED;
@@ -13,6 +14,7 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI_CODE;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
@@ -24,6 +26,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -40,6 +43,7 @@ import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
 import org.osgi.service.event.Event;
 import org.osgi.service.log.LogService;
 
+import santeclair.portal.bundle.utils.SessionIdTabHashKey;
 import santeclair.portal.event.publisher.callback.PortalStartCallback;
 import santeclair.portal.event.publisher.callback.TabsCallback;
 import santeclair.portal.module.ModuleUi;
@@ -69,12 +73,13 @@ public class ModuleUiImpl implements ModuleUi {
     private String libelle;
     private FontIcon icon;
     private Boolean closeable;
-    private Boolean severalTabsAllowed;
+    private Boolean severalInstanceAllowed;
+    private Boolean keepModuleUiOnTabClose;
     private Integer displayOrder;
 
     private final Map<String, ViewUi> viewUis = new HashMap<>();
 
-    private final Map<String, ModuleUiCustomComponent> onlyOneInstanceComponentMap = new HashMap<>();
+    private final Map<SessionIdTabHashKey, ModuleUiCustomComponent> moduleUiCustomComponentMap = new HashMap<>();
 
     /*
      * Lifecycle
@@ -93,7 +98,7 @@ public class ModuleUiImpl implements ModuleUi {
     private void stop() {
         logService.log(LogService.LOG_INFO, "ModuleUi " + this.libelle + " (" + this.code + ") is stopping");
         viewUis.clear();
-        onlyOneInstanceComponentMap.clear();
+        moduleUiCustomComponentMap.clear();
         Dictionary<String, Object> props = stopProperties(this);
         publisherToPortalTopic.send(props);
         logService.log(LogService.LOG_INFO, "ModuleUi " + this.libelle + " (" + this.code + ") stopped");
@@ -118,7 +123,13 @@ public class ModuleUiImpl implements ModuleUi {
     private void portalStopped(Event event) {
         String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
         logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") / portalStopped(event) => A Portal is stooping (" + sessionId + ")");
-        onlyOneInstanceComponentMap.remove(sessionId);
+        Set<SessionIdTabHashKey> keySet = moduleUiCustomComponentMap.keySet();
+        for (SessionIdTabHashKey sessionIdTabHashKey : keySet) {
+            if (sessionIdTabHashKey.isSessionIdEquals(sessionId)) {
+                moduleUiCustomComponentMap.remove(sessionIdTabHashKey);
+            }
+        }
+
     }
 
     @Subscriber(name = "viewStarted", topics = TOPIC_MODULE_UI,
@@ -161,19 +172,37 @@ public class ModuleUiImpl implements ModuleUi {
             String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
             TabsCallback tabsCallback = (TabsCallback) event.getProperty(PROPERTY_KEY_EVENT_DATA);
             ModuleUiCustomComponent moduleUiCustomComponent = null;
-            if (!severalTabsAllowed) {
-                moduleUiCustomComponent = onlyOneInstanceComponentMap.get(sessionId);
+            if (!severalInstanceAllowed) {
+                Set<SessionIdTabHashKey> keySet = moduleUiCustomComponentMap.keySet();
+                for (SessionIdTabHashKey sessionIdTabHashKey : keySet) {
+                    if (sessionIdTabHashKey.isSessionIdEquals(sessionId)) {
+                        moduleUiCustomComponent = moduleUiCustomComponentMap.get(sessionIdTabHashKey);
+                        break;
+                    }
+                }
                 if (moduleUiCustomComponent == null) {
                     moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId);
-                    onlyOneInstanceComponentMap.put(sessionId, moduleUiCustomComponent);
                 }
             } else {
                 moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId);
             }
             int tabHash = tabsCallback.addView(this.libelle + " - " + viewUi.getLibelle(), icon, closeable, moduleUiCustomComponent);
-            com.vaadin.ui.Component component = viewUi.getViewMainComponent(sessionId, tabHash, severalTabsAllowed, null);
+            com.vaadin.ui.Component component = viewUi.getViewMainComponent(sessionId, tabHash, null);
             moduleUiCustomComponent.setTabHash(tabHash);
             moduleUiCustomComponent.setCompositionRoot(component);
+            moduleUiCustomComponentMap.put(new SessionIdTabHashKey(sessionId, tabHash), moduleUiCustomComponent);
+        }
+    }
+
+    @Subscriber(name = "closeTabs", topics = TOPIC_MODULE_UI, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_TABS + ")(" +
+                    PROPERTY_KEY_EVENT_NAME + "="
+                    + EVENT_NAME_CLOSED + ")(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)(" + PROPERTY_KEY_TAB_HASH + "=*))")
+    public void closeTabs(org.osgi.service.event.Event event) {
+        if ((!keepModuleUiOnTabClose && !severalInstanceAllowed) || (severalInstanceAllowed)) {
+            String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
+            Integer tabHash = (Integer) event.getProperty(PROPERTY_KEY_TAB_HASH);
+            SessionIdTabHashKey sessionIdTabHashKeyToRemove = new SessionIdTabHashKey(sessionId, tabHash);
+            moduleUiCustomComponentMap.remove(sessionIdTabHashKeyToRemove);
         }
     }
 
@@ -198,6 +227,10 @@ public class ModuleUiImpl implements ModuleUi {
     @Updated
     private void updated() {
         logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") => updtating module");
+        if (keepModuleUiOnTabClose && severalInstanceAllowed) {
+            logService.log(LogService.LOG_WARNING, "From ModuleUi " + libelle + " (" + code
+                            + ") => module parameters keepModuleUiOnTabClose and severalInstanceAllowed are both set to true. keepModuleUiOnTabClose will be ignored.");
+        }
         viewUis.clear();
         Dictionary<String, Object> propsStartView = startProperties(this);
         publisherToViewUiTopic.send(propsStartView);
@@ -232,9 +265,14 @@ public class ModuleUiImpl implements ModuleUi {
         this.closeable = closeable;
     }
 
-    @Property(name = "severalTabsAllowed", value = "false")
-    private void setSeveralTabsAllowed(Boolean severalTabsAllowed) {
-        this.severalTabsAllowed = severalTabsAllowed;
+    @Property(name = "severalInstanceAllowed", value = "false")
+    private void setSeveralInstanceAllowed(Boolean severalInstanceAllowed) {
+        this.severalInstanceAllowed = severalInstanceAllowed;
+    }
+
+    @Property(name = "keepModuleUiOnTabClose", value = "false")
+    private void setKeepModuleUiOnTabClose(Boolean keepModuleUiOnTabClose) {
+        this.keepModuleUiOnTabClose = keepModuleUiOnTabClose;
     }
 
     @Property(name = "displayOrder", value = "100000")
@@ -267,8 +305,8 @@ public class ModuleUiImpl implements ModuleUi {
     }
 
     @Override
-    public Boolean isSeveralTabsAllowed() {
-        return severalTabsAllowed;
+    public Boolean isSeveralInstanceAllowed() {
+        return severalInstanceAllowed;
     }
 
     @Override
