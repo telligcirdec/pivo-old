@@ -7,6 +7,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.jouni.animator.AnimatorProxy;
 
 import santeclair.portal.event.handler.AbstractEventHandler;
 import santeclair.portal.event.handler.PortalEventHandler;
@@ -27,12 +28,15 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
 
     private final EventAdminServiceListener eventAdminServiceListener;
     private final String uiId;
+    private final AnimatorProxy proxy;
 
     public LeftSideMenu(EventAdminServiceListener eventAdminServiceListener, String uiId) {
         super("sidebarLayout");
         this.eventAdminServiceListener = eventAdminServiceListener;
         this.uiId = uiId;
         buttonContainer = new VerticalLayout();
+        proxy = new AnimatorProxy();
+        this.addComponent(proxy);
     }
 
     public void init(BundleContext bundleContext) {
@@ -44,7 +48,7 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
 
     public synchronized void addModuleUi(final ModuleUi moduleUi, final Map<String, ViewUi> viewUiMap) {
         LOGGER.debug("global addModuleUi");
-        ModuleUiButon moduleUiButon = new ModuleUiButon(moduleUi, viewUiMap, eventAdminServiceListener, uiId);
+        ModuleUiButon moduleUiButon = new ModuleUiButon(moduleUi, viewUiMap, eventAdminServiceListener, uiId, proxy);
         TreeSet<Component> butonModuleUi = new TreeSet<>();
         boolean moduleUiCodeAlreadyExist = false;
         for (Component component : buttonContainer) {

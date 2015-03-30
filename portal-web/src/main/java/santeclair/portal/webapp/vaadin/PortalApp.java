@@ -240,7 +240,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
             @Override
             public void error(com.vaadin.server.ErrorEvent event) {
                 String uriFragment = Page.getCurrent().getUriFragment();
-                StringBuilder sbCodeErreur = new StringBuilder(uriFragment);
+                StringBuilder sbCodeErreur = new StringBuilder(uriFragment != null ? uriFragment : "No uriFragment");
                 sbCodeErreur.append(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
                 String codeErreur = sbCodeErreur.toString();
                 Throwable t = event.getThrowable();
