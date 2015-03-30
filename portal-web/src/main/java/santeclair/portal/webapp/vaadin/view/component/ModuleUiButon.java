@@ -7,6 +7,8 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.jouni.animator.Animator;
+import org.vaadin.jouni.dom.client.Css;
 
 import santeclair.portal.listener.service.impl.EventAdminServiceListener;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener.Publisher;
@@ -16,11 +18,12 @@ import santeclair.portal.webapp.vaadin.navigator.NavigatorEventHandler;
 
 import com.vaadin.server.FontIcon;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-public class MainButonModuleUi extends Button implements Comparable<MainButonModuleUi>, Button.ClickListener {
+public class ModuleUiButon extends Button implements Comparable<ModuleUiButon>, Button.ClickListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MainButonModuleUi.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModuleUiButon.class);
 
     private static final long serialVersionUID = 2401506522651257986L;
 
@@ -29,13 +32,13 @@ public class MainButonModuleUi extends Button implements Comparable<MainButonMod
     private final ModuleUi moduleUi;
     private final Map<String, ViewUi> viewUiMap;
     private final EventAdminServiceListener eventAdminServiceListener;
-    private final Publisher<MainButonModuleUi> publisher;
+    private final Publisher<ModuleUiButon> publisher;
     private final String uiId;
 
-    public MainButonModuleUi(final ModuleUi moduleUi,
-                             final Map<String, ViewUi> viewUiMap,
-                             final EventAdminServiceListener eventAdminServiceListener,
-                             final String uiId) {
+    public ModuleUiButon(final ModuleUi moduleUi,
+                       final Map<String, ViewUi> viewUiMap,
+                       final EventAdminServiceListener eventAdminServiceListener,
+                       final String uiId) {
         this.moduleUi = moduleUi;
         this.viewUiMap = viewUiMap;
         this.publisher = eventAdminServiceListener.registerPublisher(this, TOPIC_NAVIGATOR);
@@ -60,7 +63,7 @@ public class MainButonModuleUi extends Button implements Comparable<MainButonMod
     }
 
     @Override
-    public int compareTo(MainButonModuleUi mainButonModuleUiFactoryToCompare) {
+    public int compareTo(ModuleUiButon mainButonModuleUiFactoryToCompare) {
         String moduleUiLibelleToCompare = mainButonModuleUiFactoryToCompare.getModuleUi().getLibelle();
         String moduleUiLibelleSource = this.getModuleUi().getLibelle();
         Integer displayOrderToCompare = mainButonModuleUiFactoryToCompare.getModuleUi().getDisplayOrder();
@@ -87,7 +90,22 @@ public class MainButonModuleUi extends Button implements Comparable<MainButonMod
                 viewCode = key;
             }
             publisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/new/modules/" + this.moduleUi.getCode() + "/views/" + viewCode, uiId));
-        } else {
+        } else if (!viewUiMap.isEmpty() && viewUiMap.size() > 1) {
+            Set<String> keySet = viewUiMap.keySet();
+            final VerticalLayout viewUiButtonVl = new VerticalLayout();
+            for (String key : keySet) {
+                ViewUi viewUi = viewUiMap.get(key);
+                Button viewUiButton = new Button(viewUi.getLibelle(), viewUi.getIcon());
+                viewUiButtonVl.addComponent(viewUiButton);
+            }
+            if (VerticalLayout.class.isAssignableFrom(this.getParent().getClass())) {
+                VerticalLayout parent = (VerticalLayout) this.getParent();
+                int mainButtonIndex = parent.getComponentIndex(this);
+                parent.addComponent(viewUiButtonVl, ++mainButtonIndex);
+                Animator.animate(viewUiButtonVl, new Css().translateY("100px")).duration(2000);
+            } else {
+                LOGGER.warn("Parent of ModuleUiButton is not a vertical layout.");
+            }
 
         }
     }

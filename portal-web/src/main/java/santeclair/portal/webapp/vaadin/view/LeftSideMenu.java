@@ -13,7 +13,7 @@ import santeclair.portal.event.handler.PortalEventHandler;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener;
 import santeclair.portal.module.ModuleUi;
 import santeclair.portal.view.ViewUi;
-import santeclair.portal.webapp.vaadin.view.component.MainButonModuleUi;
+import santeclair.portal.webapp.vaadin.view.component.ModuleUiButon;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
@@ -44,18 +44,18 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
 
     public synchronized void addModuleUi(final ModuleUi moduleUi, final Map<String, ViewUi> viewUiMap) {
         LOGGER.debug("global addModuleUi");
-        MainButonModuleUi mainButonModuleUi = new MainButonModuleUi(moduleUi, viewUiMap, eventAdminServiceListener, uiId);
+        ModuleUiButon moduleUiButon = new ModuleUiButon(moduleUi, viewUiMap, eventAdminServiceListener, uiId);
         TreeSet<Component> butonModuleUi = new TreeSet<>();
         boolean moduleUiCodeAlreadyExist = false;
         for (Component component : buttonContainer) {
-            if (MainButonModuleUi.class.isAssignableFrom(component.getClass())) {
-                MainButonModuleUi currentMainButonModuleUi = MainButonModuleUi.class.cast(component);
+            if (ModuleUiButon.class.isAssignableFrom(component.getClass())) {
+                ModuleUiButon currentMainButonModuleUi = ModuleUiButon.class.cast(component);
                 moduleUiCodeAlreadyExist = currentMainButonModuleUi.getModuleUi().getCode().equals(moduleUi.getCode());
                 butonModuleUi.add(component);
             }
         }
         if (!moduleUiCodeAlreadyExist) {
-            butonModuleUi.add(mainButonModuleUi);
+            butonModuleUi.add(moduleUiButon);
         } else {
             LOGGER.warn("A ModuleUi with code {} already exist. Please choose a different one. ModuleUi hasn't been activated.", moduleUi.getCode());
         }
@@ -67,8 +67,8 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
         LOGGER.debug("removeModuleUi : {}", moduleUiCode);
         boolean modulehasBeenRemoved = false;
         for (Component component : buttonContainer) {
-            if (MainButonModuleUi.class.isAssignableFrom(component.getClass())) {
-                MainButonModuleUi currentComponent = MainButonModuleUi.class.cast(component);
+            if (ModuleUiButon.class.isAssignableFrom(component.getClass())) {
+                ModuleUiButon currentComponent = ModuleUiButon.class.cast(component);
                 if (currentComponent.getModuleUi().getCode().equals(moduleUiCode)) {
                     buttonContainer.removeComponent(component);
                     modulehasBeenRemoved = true;

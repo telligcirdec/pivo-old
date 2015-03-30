@@ -30,20 +30,21 @@ public class MainComponent extends HorizontalLayout {
         this.addComponent(new Label("tabHash => " + tabHash));
     }
 
-    // @Subscriber(name = "", topics = TOPIC_COMPONENT_UI, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_TABS + ")(" +
-    // PROPERTY_KEY_EVENT_NAME + "="
-    // + EVENT_NAME_ASKING_CLOSED + ")(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)(" + PROPERTY_KEY_TAB_HASH + "=*)(" +
-    // PROPERTY_KEY_EVENT_DATA_TYPE + "=*)("
-    // + PROPERTY_KEY_EVENT_DATA + "=*))")
-    // public void closeTabs(org.osgi.service.event.Event event) {
-    // String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
-    // Integer tabHash = (Integer) event.getProperty(PROPERTY_KEY_TAB_HASH);
-    // String dataType = (String) event.getProperty(PROPERTY_KEY_EVENT_DATA_TYPE);
-    // if (sessionId.equals(this.sessionId) && tabHash.equals(this.tabHash) && dataType.equals(TabsCallback.class.getName())) {
-    // TabsCallback tabsCallback = (TabsCallback) event.getProperty(PROPERTY_KEY_EVENT_DATA);
-    // tabsCallback.keepView();
-    // }
-    // }
+//    @Subscriber(name = "", topics = TOPIC_COMPONENT_UI, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_TABS + ")(" +
+//                    PROPERTY_KEY_EVENT_NAME + "="
+//                    + EVENT_NAME_ASKING_CLOSED + ")(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)(" + PROPERTY_KEY_TAB_HASH + "=*)(" +
+//                    PROPERTY_KEY_EVENT_DATA_TYPE + "=*)("
+//                    + PROPERTY_KEY_EVENT_DATA + "=*))")
+//    public void closeTabs(org.osgi.service.event.Event event) {
+//        String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
+//        Integer tabHash = (Integer) event.getProperty(PROPERTY_KEY_TAB_HASH);
+//        String dataType = (String) event.getProperty(PROPERTY_KEY_EVENT_DATA_TYPE);
+//        if (sessionId.equals(this.sessionId) && tabHash.equals(this.tabHash) && dataType.equals(TabsCallback.class.getName())) {
+//            final TabsCallback tabsCallback = (TabsCallback) event.getProperty(PROPERTY_KEY_EVENT_DATA);
+//            tabsCallback.keepView();
+//                       
+//        }
+//    }
 
     @Property(name = PROPERTY_KEY_PORTAL_SESSION_ID)
     public void setSessionId(String sessionId) {
