@@ -34,7 +34,7 @@ public class ModuleUiButon extends Button implements Comparable<ModuleUiButon>, 
     private final Map<String, ViewUi> viewUiMap;
     private final EventAdminServiceListener eventAdminServiceListener;
     private final Publisher<ModuleUiButon> publisher;
-    private final String uiId;
+    private final String sessionId;
     private VerticalLayout viewUiButtonVl;
     private boolean secoundaryMenuOpen = false;
     final AnimatorProxy proxy;
@@ -42,11 +42,11 @@ public class ModuleUiButon extends Button implements Comparable<ModuleUiButon>, 
     public ModuleUiButon(final ModuleUi moduleUi,
                          final Map<String, ViewUi> viewUiMap,
                          final EventAdminServiceListener eventAdminServiceListener,
-                         final String uiId, final AnimatorProxy proxy) {
+                         final String sessionId, final AnimatorProxy proxy) {
         this.moduleUi = moduleUi;
         this.viewUiMap = viewUiMap;
         this.publisher = eventAdminServiceListener.registerPublisher(this, TOPIC_NAVIGATOR);
-        this.uiId = uiId;
+        this.sessionId = sessionId;
         this.eventAdminServiceListener = eventAdminServiceListener;
         this.proxy = proxy;
         init(moduleUi.getLibelle(), moduleUi.getIcon());
@@ -92,12 +92,8 @@ public class ModuleUiButon extends Button implements Comparable<ModuleUiButon>, 
     public void buttonClick(ClickEvent event) {
         LOGGER.debug("Click event : {}", event);
         if (!viewUiMap.isEmpty() && viewUiMap.size() == 1) {
-            Set<String> keySet = viewUiMap.keySet();
-            String viewCode = null;
-            for (String key : keySet) {
-                viewCode = key;
-            }
-            publisher.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/new/modules/" + this.moduleUi.getCode() + "/views/" + viewCode, uiId));
+            String viewCode = viewUiMap.keySet().toArray(new String[]{})[0];
+            publisher.publishEventSynchronously(NavigatorEventHandler.getNavigateEventProperty("container/new/modules/" + this.moduleUi.getCode() + "/views/" + viewCode, sessionId));
         } else if (severalViewUi()) {
             VerticalLayout parent = getVerticalLayoutParent();
             createSecoundaryButtonVerticalLayoutAndAddIt(parent);
@@ -115,10 +111,20 @@ public class ModuleUiButon extends Button implements Comparable<ModuleUiButon>, 
             viewUiButtonVl = new VerticalLayout();
             viewUiButtonVl.setStyleName("menu-button-layout");
             for (String key : keySet) {
-                ViewUi viewUi = viewUiMap.get(key);
+                final ViewUi viewUi = viewUiMap.get(key);
                 Button viewUiButton = new Button(viewUi.getLibelle(), viewUi.getIcon());
                 viewUiButton.setSizeFull();
                 viewUiButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+                viewUiButton.addClickListener(new ClickListener() {
+                    private static final long serialVersionUID = 4846606842901609607L;
+
+                    @Override
+                    public void buttonClick(ClickEvent event) {
+                        publisher.publishEventSynchronously(NavigatorEventHandler.getNavigateEventProperty(
+                                        "container/new/modules/" + moduleUi.getCode() + "/views/" + viewUi.getCode(),
+                                        sessionId));
+                    }
+                });
                 viewUiButtonVl.addComponent(viewUiButton);
                 viewUiButtonVl.setComponentAlignment(
                                 viewUiButton, Alignment.MIDDLE_RIGHT);

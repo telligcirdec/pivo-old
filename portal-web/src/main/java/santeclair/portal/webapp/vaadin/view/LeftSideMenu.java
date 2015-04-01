@@ -27,13 +27,13 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
     private final VerticalLayout buttonContainer;
 
     private final EventAdminServiceListener eventAdminServiceListener;
-    private final String uiId;
+    private final String sessionId;
     private final AnimatorProxy proxy;
 
-    public LeftSideMenu(EventAdminServiceListener eventAdminServiceListener, String uiId) {
+    public LeftSideMenu(EventAdminServiceListener eventAdminServiceListener, String sessionId) {
         super("sidebarLayout");
         this.eventAdminServiceListener = eventAdminServiceListener;
-        this.uiId = uiId;
+        this.sessionId = sessionId;
         buttonContainer = new VerticalLayout();
         proxy = new AnimatorProxy();
         this.addComponent(proxy);
@@ -48,7 +48,7 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
 
     public synchronized void addModuleUi(final ModuleUi moduleUi, final Map<String, ViewUi> viewUiMap) {
         LOGGER.debug("global addModuleUi");
-        ModuleUiButon moduleUiButon = new ModuleUiButon(moduleUi, viewUiMap, eventAdminServiceListener, uiId, proxy);
+        ModuleUiButon moduleUiButon = new ModuleUiButon(moduleUi, viewUiMap, eventAdminServiceListener, sessionId, proxy);
         TreeSet<Component> butonModuleUi = new TreeSet<>();
         boolean moduleUiCodeAlreadyExist = false;
         for (Component component : buttonContainer) {

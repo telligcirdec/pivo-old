@@ -40,13 +40,13 @@ public class NavigatorEventHandler extends AbstractEventHandler {
         }
     }
 
-    public static Dictionary<String, Object> getNavigateToProps(String uri, String sessionId) {
-        Dictionary<String, Object> props = getGlobalNavigateToProps(uri);
+    public static Dictionary<String, Object> getNavigateEventProperty(String uri, String sessionId) {
+        Dictionary<String, Object> props = getGlobalNavigateEventProperties(uri);
         props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
         return props;
     }
 
-    public static Dictionary<String, Object> getGlobalNavigateToProps(String uri) {
+    public static Dictionary<String, Object> getGlobalNavigateEventProperties(String uri) {
 
         Dictionary<String, Object> props = new Hashtable<>();
         props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_NAVIGATION);

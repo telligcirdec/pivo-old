@@ -147,13 +147,16 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
         int tabHash = -1;
         if (tab != null) {
             tabHash = tab.hashCode();
-            publisherToNavigatorTopic.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tabHash, sessionId));
+            tab.setCaption(caption);
+            tab.setIcon(icon);
+            tab.setClosable(closable);
+            publisherToNavigatorTopic.publishEventSynchronously(NavigatorEventHandler.getNavigateEventProperty("container/" + tabHash, sessionId));
         } else {
             tab = this.addTab(moduleUiView, caption);
             tab.setIcon(icon);
             tab.setClosable(closable);
             tabHash = tab.hashCode();
-            publisherToNavigatorTopic.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tabHash, sessionId));
+            publisherToNavigatorTopic.publishEventSynchronously(NavigatorEventHandler.getNavigateEventProperty("container/" + tabHash, sessionId));
         }
         return tabHash;
     }
@@ -220,7 +223,7 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
         TabSheet tabSheet = event.getTabSheet();
         Tab tab = tabSheet.getTab(tabSheet.getSelectedTab());
         if (tab != null) {
-            publisherToNavigatorTopic.publishEventSynchronously(NavigatorEventHandler.getNavigateToProps("container/" + tab.hashCode(), sessionId));
+            publisherToNavigatorTopic.publishEventSynchronously(NavigatorEventHandler.getNavigateEventProperty("container/" + tab.hashCode(), sessionId));
         }
     }
 
