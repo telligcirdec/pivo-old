@@ -1,77 +1,31 @@
-<?xml version="1.0" encoding="ISO-8859-15" ?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<bundle.namespace>santeclair.portal.bundle.utils</bundle.namespace>
+		<bundle.namespace>santeclair.reclamation</bundle.namespace>
 	</properties>
 
+	<!-- Description du parent -->
 	<parent>
-		<groupId>santeclair</groupId>
 		<artifactId>super-pom</artifactId>
+		<groupId>santeclair</groupId>
 		<version>4.57.0.PORTAL-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>portal-bundle-utils</artifactId>
-	<packaging>bundle</packaging>
-	<name>Bundle utils</name>
+	<artifactId>reclamation-api</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
-	
-	<!-- Param�trage de la connexion au gestionnaire de source -->
+	<packaging>bundle</packaging>
+	<name>${project.artifactId}</name>
+	<description>API du webservice de demande de document</description>
+	<inceptionYear>2013</inceptionYear>
+
+	<!-- Paramétrage de la connexion au gestionnaire de source -->
 	<scm>
-		<developerConnection>scm:svn:http://hephaistos/svn/framework/portal-bundle-fwk/trunk</developerConnection>
+		<developerConnection>scm:svn:http://hephaistos/svn/interne/reclamation-api/trunk</developerConnection>
 	</scm>
 
-	<!-- Injection d�pendances manag�es -->
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>santeclair</groupId>
-				<artifactId>infra-bom</artifactId>
-				<type>pom</type>
-				<version>${santeclair.infra.bom.version}</version>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
-	<dependencies>
-		<!-- Santeclair -->
-		<dependency>
-			<groupId>santeclair</groupId>
-			<artifactId>lunar-fwk</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>santeclair</groupId>
-			<artifactId>portal-fwk</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.ipojo.annotations</artifactId>
-			<version>1.12.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.ipojo.handler.eventadmin</artifactId>
-			<version>1.8.0</version>
-			<scope>provided</scope>
-		</dependency>
-		
-
-		<!-- Vaadin -->
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-server</artifactId>
-		</dependency>
-		
-	</dependencies>
-
+	<!-- Paramétrage de la construction du package -->
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -182,6 +136,7 @@
 						<Export-Package>!${bundle.namespace}.*.impl.*,${bundle.namespace}.*;version="${project.version}"</Export-Package>
 						<Private-Package>${bundle.namespace}.*.impl.*</Private-Package>
 						<Import-Package>
+							javax.ws.rs.core,
 							*
 						</Import-Package>
 					</instructions>
@@ -245,7 +200,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>C:\ProgramData\Santeclair\portal-exp\config</outputDirectory>
+							<outputDirectory>C:\ProgramData\Santeclair\portal-exp\config\view</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${project.basedir}/config</directory>
@@ -257,8 +212,197 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+			<!-- Génération de la javadoc -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+			</plugin>
+
+			<!-- Génération du jar source -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+
+			<!-- Génération du jar des tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generation-jar-tests</id>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Configuration du plugin d'exécution des tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>-Dtest-group=${environnement}</argLine>
+					<testFailureIgnore>${testFailureIgnore}</testFailureIgnore>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
+	<!-- Paramétrage des profils de génération -->
+	<profiles>
+		<profile>
+			<id>local</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<environnement>local</environnement>
+				<testFailureIgnore>false</testFailureIgnore>
+			</properties>
+		</profile>
+		<profile>
+			<id>developpement</id>
+			<properties>
+				<environnement>developpement</environnement>
+				<testFailureIgnore>false</testFailureIgnore>
+			</properties>
+		</profile>
+		<profile>
+			<id>integration</id>
+			<properties>
+				<environnement>integration</environnement>
+				<testFailureIgnore>true</testFailureIgnore>
+			</properties>
+		</profile>
+		<profile>
+			<id>production</id>
+			<properties>
+				<environnement>production</environnement>
+				<testFailureIgnore>true</testFailureIgnore>
+			</properties>
+		</profile>
+	</profiles>
+
+
+	<!-- Injection dépendances managées -->
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>santeclair</groupId>
+				<artifactId>infra-bom</artifactId>
+				<type>pom</type>
+				<version>${santeclair.infra.bom.version}</version>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+
+	<!-- Paramétrage des dépendances -->
+	<dependencies>
+		<dependency>
+			<groupId>santeclair</groupId>
+			<artifactId>portal-fwk</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>santeclair</groupId>
+			<artifactId>portal-bundle-utils</artifactId>
+			<scope>provided</scope>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.ipojo.annotations</artifactId>
+			<version>1.12.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Commons -->
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- WS CXF -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxrs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-jaxrs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-xc</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Logs -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Dépendances pour les tests unitaires -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>log4j-over-slf4j</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>

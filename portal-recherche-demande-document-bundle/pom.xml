@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="ISO-8859-15" ?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<bundle.namespace>santeclair.portal.bundle.utils</bundle.namespace>
+		<bundle.namespace>santeclair.portal.bundle.recherche.demande.document</bundle.namespace>
 	</properties>
 
 	<parent>
@@ -13,17 +12,18 @@
 		<version>4.57.0.PORTAL-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>portal-bundle-utils</artifactId>
-	<packaging>bundle</packaging>
-	<name>Bundle utils</name>
+	<artifactId>portal-recherche-demande-document-bundle</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
-	
-	<!-- Paramétrage de la connexion au gestionnaire de source -->
+	<packaging>bundle</packaging>
+
+	<name>Test ViewUi bundle</name>
+
+	<!-- ParamÃ©trage de la connexion au gestionnaire de source -->
 	<scm>
-		<developerConnection>scm:svn:http://hephaistos/svn/framework/portal-bundle-fwk/trunk</developerConnection>
+		<developerConnection>scm:svn:http://hephaistos/svn/interne/portal-vaadin-module-service-bundle/trunk</developerConnection>
 	</scm>
 
-	<!-- Injection dépendances managées -->
+	<!-- Injection dÃ©pendances managÃ©es -->
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -37,19 +37,22 @@
 	</dependencyManagement>
 
 	<dependencies>
-		<!-- Santeclair -->
-		<dependency>
-			<groupId>santeclair</groupId>
-			<artifactId>lunar-fwk</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>santeclair</groupId>
 			<artifactId>portal-fwk</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
+		<dependency>
+			<groupId>santeclair</groupId>
+			<artifactId>portal-bundle-utils</artifactId>
+			<scope>provided</scope>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>santeclair</groupId>
+			<artifactId>reclamation-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.ipojo.annotations</artifactId>
@@ -61,13 +64,6 @@
 			<artifactId>org.apache.felix.ipojo.handler.eventadmin</artifactId>
 			<version>1.8.0</version>
 			<scope>provided</scope>
-		</dependency>
-		
-
-		<!-- Vaadin -->
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-server</artifactId>
 		</dependency>
 		
 	</dependencies>
@@ -245,7 +241,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>C:\ProgramData\Santeclair\portal-exp\config</outputDirectory>
+							<outputDirectory>C:\ProgramData\Santeclair\portal-exp\config\view</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${project.basedir}/config</directory>
@@ -257,7 +253,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			
 		</plugins>
 	</build>
 

@@ -24,7 +24,7 @@ public class FileInstallConfig implements InitConfig {
         Map<String, Object> fileInstallConfig = new HashMap<>();
 
         fileInstallConfig
-                        .put("felix.fileinstall.dir", rootDir + "/auto-bundle," + rootDir + "/config/module," + rootDir + "/config/view");
+                        .put("felix.fileinstall.dir", rootDir + "/auto-bundle," + rootDir + "/config," + rootDir + "/config/module," + rootDir + "/config/view");
         fileInstallConfig.put("felix.fileinstall.tmpdir", rootDir
                         + "/config/tmp");
 
