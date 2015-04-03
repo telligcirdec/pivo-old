@@ -1,4 +1,4 @@
-package santeclair.portal.bundle.recherche.demande.document.component;
+package santeclair.portal.bundle.recherche.demande.document.component.sub;
 
 import java.util.Dictionary;
 import java.util.EnumSet;
@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Provides;
+import org.apache.felix.ipojo.handlers.event.Publishes;
 import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.button.PrimaryButton;
@@ -15,6 +16,7 @@ import org.vaadin.viritin.layouts.MFormLayout;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
+import santeclair.portal.bundle.recherche.demande.document.component.InitComponent;
 import santeclair.portal.bundle.recherche.demande.document.component.callback.FormComponentCallback;
 import santeclair.portal.bundle.recherche.demande.document.form.RechercheForm;
 import santeclair.portal.event.EventDictionaryConstant;
@@ -33,9 +35,9 @@ import com.vaadin.ui.DateField;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ValoTheme;
 
-@Component(name="santeclair.portal.bundle.recherche.demande.document.component.FormComponent")
+@Component
 @Provides(specifications = {FormComponent.class})
-public class FormComponent extends Panel implements FormComponentCallback {
+public class FormComponent extends Panel implements FormComponentCallback, InitComponent {
 
     private String sessionId;
     private Integer tabHash;
@@ -46,7 +48,7 @@ public class FormComponent extends Panel implements FormComponentCallback {
 
     private static final String MSG_ERROR = "Veuillez saisir au moins un critère de recherche.";
 
-    //@Publishes(name = "formComponentPublisher", topics = "RechercheDemandeDocument")
+    @Publishes(name = "formComponentPublisher", topics = "RechercheDemandeDocument")
     private Publisher formComponentPublisher;
 
     private MTextField nomBeneficiaire;
@@ -60,7 +62,8 @@ public class FormComponent extends Panel implements FormComponentCallback {
     private MButton boutonRechercher;
     private RechercheForm form;
 
-    public void init(String sessionId, Integer tabHash) {
+    @Override
+    public void init(String sessionId, Integer tabHash, String moduleCode, String viewCode) {
 
         this.sessionId = sessionId;
         this.tabHash = tabHash;
@@ -133,17 +136,17 @@ public class FormComponent extends Panel implements FormComponentCallback {
 
             @Override
             public void buttonClick(ClickEvent event) {
-//                ValidationNotification validation = controleDonnees();
-//                if (validation.isError()) {
-//                    validation.show();
-//                } else {
+                // ValidationNotification validation = controleDonnees();
+                // if (validation.isError()) {
+                // validation.show();
+                // } else {
 
-                    Dictionary<String, Object> props = new Hashtable<>();
-                    props.put(EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME, "rechercherDemandeDocument");
-                    props.put("form", form);
-                    props.put("formComponent", this);
-                    formComponentPublisher.send(props);
-//                }
+                Dictionary<String, Object> props = new Hashtable<>();
+                props.put(EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME, "rechercherDemandeDocument");
+                props.put("form", form);
+                props.put("formComponent", this);
+                formComponentPublisher.send(props);
+                // }
             }
         });
     }
@@ -188,22 +191,22 @@ public class FormComponent extends Panel implements FormComponentCallback {
         binder.bindMemberFields(this);
     }
 
-//    /** Controle les données du formulaire de recherche. */
-//    private ValidationNotification controleDonnees() {
-//        ValidationNotification result = new ValidationNotification();
-//
-//        if (StringUtils.isBlank(form.getNomBeneficiaire())
-//                        && StringUtils.isBlank(form.getPrenomBeneficiaire())
-//                        && StringUtils.isBlank(form.getNumeroDossier())
-//                        && StringUtils.isBlank(form.getTelephonePS())
-//                        && StringUtils.isBlank(form.getTrigrammeDemandeur())
-//                        && null != form.getDateDebut()
-//                        && null != form.getDateFin()
-//                        && null != form.getEtatDossier()) {
-//            result.addMessage(MSG_ERROR);
-//        }
-//        return result;
-//    }
+    // /** Controle les données du formulaire de recherche. */
+    // private ValidationNotification controleDonnees() {
+    // ValidationNotification result = new ValidationNotification();
+    //
+    // if (StringUtils.isBlank(form.getNomBeneficiaire())
+    // && StringUtils.isBlank(form.getPrenomBeneficiaire())
+    // && StringUtils.isBlank(form.getNumeroDossier())
+    // && StringUtils.isBlank(form.getTelephonePS())
+    // && StringUtils.isBlank(form.getTrigrammeDemandeur())
+    // && null != form.getDateDebut()
+    // && null != form.getDateFin()
+    // && null != form.getEtatDossier()) {
+    // result.addMessage(MSG_ERROR);
+    // }
+    // return result;
+    // }
 
     @Override
     public void rechercheSuccessfull(List<DemandeDocumentDto> listeDemandesDocumentDto) {
@@ -218,6 +221,16 @@ public class FormComponent extends Panel implements FormComponentCallback {
     @Override
     public void rechercheFailed(String message) {
 
+    }
+
+    @Override
+    public int getDisplayOrder() {
+        return 30;
+    }
+
+    @Override
+    public int compareTo(InitComponent o) {
+        return this.getDisplayOrder() - o.getDisplayOrder();
     }
 
 }

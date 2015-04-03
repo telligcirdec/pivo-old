@@ -1,4 +1,4 @@
-package santeclair.portal.bundle.recherche.demande.document.component;
+package santeclair.portal.bundle.recherche.demande.document.component.sub;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Provides;
+import org.apache.felix.ipojo.handlers.event.Publishes;
 import org.apache.felix.ipojo.handlers.event.Subscriber;
 import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
 import org.vaadin.viritin.button.DownloadButton;
@@ -13,6 +14,7 @@ import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.fields.MTable;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
+import santeclair.portal.bundle.recherche.demande.document.component.InitComponent;
 import santeclair.portal.bundle.recherche.demande.document.form.ResultatRechercheForm;
 import santeclair.portal.event.EventDictionaryConstant;
 import santeclair.reclamation.demande.document.dto.DemandeDocumentDto;
@@ -28,19 +30,18 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.themes.ValoTheme;
 
-@Component(name="santeclair.portal.bundle.recherche.demande.document.component.ResultatComponent")
+@Component
 @Provides(specifications = {ResultatComponent.class})
-public class ResultatComponent extends Panel {
+public class ResultatComponent extends Panel implements InitComponent {
 
     private String sessionId;
     private Integer tabHash;
     private String moduleCode;
     private String viewCode;
 
-    
     private static final long serialVersionUID = 8369775167208351407L;
 
-    //@Publishes(name = "myComponenentPublisher", topics = "ResultatDemandeDocument")
+    @Publishes(name = "myComponenentPublisher", topics = "ResultatDemandeDocument")
     private Publisher myComponenentPublisher;
 
     private MButton boutonExporter;
@@ -52,6 +53,7 @@ public class ResultatComponent extends Panel {
     /* (non-Javadoc)
      * @see santeclair.portal.bundle.recherche.demande.document.component.ResultatComponentCallback#init(java.lang.String, java.lang.Integer, java.lang.String, java.lang.String)
      */
+    @Override
     public void init(String sessionId, Integer tabHash, String moduleCode, String viewCode) {
 
         this.sessionId = sessionId;
@@ -171,4 +173,13 @@ public class ResultatComponent extends Panel {
         // Ie8CssFontHack.showFonts();
     }
 
+    @Override
+    public int getDisplayOrder() {
+        return 40;
+    }
+
+    @Override
+    public int compareTo(InitComponent o) {
+        return this.getDisplayOrder() - o.getDisplayOrder();
+    }
 }

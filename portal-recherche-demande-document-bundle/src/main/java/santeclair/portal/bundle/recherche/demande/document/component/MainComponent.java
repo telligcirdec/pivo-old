@@ -5,6 +5,11 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTA
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI_CODE;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.felix.ipojo.ComponentInstance;
 import org.apache.felix.ipojo.ConfigurationException;
 import org.apache.felix.ipojo.Factory;
@@ -25,8 +30,7 @@ public class MainComponent extends MVerticalLayout {
 
     private static final long serialVersionUID = 1L;
 
-    private ComponentInstance formComponentInstance;
-    private ComponentInstance resultatComponentInstance;
+    private final List<ComponentInstance> componentInstances = new ArrayList<>();
 
     private String sessionId;
     private Integer tabHash;
@@ -45,32 +49,22 @@ public class MainComponent extends MVerticalLayout {
      */
     @Validate
     private void init() throws UnacceptableConfiguration, MissingHandlerException, ConfigurationException {
-        if (formComponentInstance.getState() == ComponentInstance.VALID && resultatComponentInstance.getState() == ComponentInstance.VALID) {
+        if (componentInstanceValid(componentInstances)) {
             logService.log(LogService.LOG_DEBUG, "Oh fuck yeah !!!!");
-            FormComponent formComponent =
-                            (FormComponent) ((InstanceManager) formComponentInstance).getPojoObject();
-            ResultatComponent resultatComponent =
-                            (ResultatComponent) ((InstanceManager) resultatComponentInstance).getPojoObject();
-
-            formComponent.init(sessionId, tabHash);
-            resultatComponent.init(sessionId, tabHash, moduleCode, viewCode);
-            this.withFullWidth().withMargin(true).withSpacing(true).with(formComponent, resultatComponent);
+            this.withFullWidth().withMargin(true).withSpacing(true).with(getVaadinComponentFromComponentInstances(componentInstances, sessionId, tabHash, moduleCode, viewCode));
         }
     }
 
     @Invalidate
     private void dispose() {
-        formComponentInstance.dispose();
-        resultatComponentInstance.dispose();
+        for (ComponentInstance componentInstance : componentInstances) {
+            componentInstance.dispose();
+        }
     }
 
-    @Bind(aggregate = true, filter = "(|(factory.name=santeclair.portal.bundle.recherche.demande.document.component.FormComponent)(factory.name=santeclair.portal.bundle.recherche.demande.document.component.ResultatComponent))")
+    @Bind(aggregate = true, filter = "(factory.name=santeclair.portal.bundle.recherche.demande.document.component.sub*)")
     private void getFormComponentFactory(Factory factory) throws UnacceptableConfiguration, MissingHandlerException, ConfigurationException {
-        if (factory.getName().equals("santeclair.portal.bundle.recherche.demande.document.component.FormComponent")) {
-            formComponentInstance = factory.createComponentInstance(null);
-        } else if (factory.getName().equals("santeclair.portal.bundle.recherche.demande.document.component.ResultatComponent")) {
-            resultatComponentInstance = factory.createComponentInstance(null);
-        }
+        componentInstances.add(factory.createComponentInstance(null));
     }
 
     @Property(name = PROPERTY_KEY_PORTAL_SESSION_ID)
@@ -91,6 +85,33 @@ public class MainComponent extends MVerticalLayout {
     @Property(name = PROPERTY_KEY_VIEW_UI_CODE)
     public void setViewCode(String viewCode) {
         this.viewCode = viewCode;
+    }
+
+    private static boolean componentInstanceValid(List<ComponentInstance> componentInstances) {
+        boolean isValid = false;
+        if (CollectionUtils.isNotEmpty(componentInstances)) {
+            for (ComponentInstance componentInstance : componentInstances) {
+                isValid = componentInstance.getState() == ComponentInstance.VALID;
+                if (!isValid) {
+                    break;
+                }
+            }
+        }
+        return isValid;
+    }
+
+    private static InitComponent[] getVaadinComponentFromComponentInstances(List<ComponentInstance> componentInstances, String sessionId, Integer tabHash, String moduleCode,
+                    String viewCode) {
+        List<InitComponent> vaadinComponents = new ArrayList<>();
+
+        for (ComponentInstance componentInstance : componentInstances) {
+            InitComponent component =
+                            (InitComponent) ((InstanceManager) componentInstance).getPojoObject();
+            vaadinComponents.add(component);
+            component.init(sessionId, tabHash, moduleCode, viewCode);
+        }
+        Collections.sort(vaadinComponents);
+        return vaadinComponents.toArray(new InitComponent[]{});
     }
 
 }
