@@ -4,10 +4,10 @@ import java.util.List;
 
 import santeclair.reclamation.demande.document.dto.DemandeDocumentDto;
 
-public interface RechercheFormComponentCallback {
+public interface FormComponentCallback {
 
-    public void rechercheSuccessfull(List<DemandeDocumentDto> listeDemandeDocument);
+    public void rechercheSuccessfull(List<DemandeDocumentDto> listeDemandesDocument);
     
     public void rechercheFailed(String message);
-    
+
 }
