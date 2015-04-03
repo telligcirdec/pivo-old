@@ -267,6 +267,9 @@ public class ViewUiImpl implements ViewUi {
         props.put("instance.name", getCode() + "-" + mainComponentFactoryName + "-" + sessionId + "-" + tabHash);
         props.put(PROPERTY_KEY_PORTAL_SESSION_ID, new String(sessionId));
         props.put(PROPERTY_KEY_TAB_HASH, new Integer(tabHash));
+        props.put(PROPERTY_KEY_MODULE_UI_CODE, codeModule);
+        props.put(PROPERTY_KEY_VIEW_UI_CODE, code);
+        
         ComponentInstance instance = mainComponentFactory.createComponentInstance(props);
         viewMainComponentInstanceManagerMap.put(new SessionIdTabHashKey(sessionId, tabHash), instance);
         if (instance.getState() == ComponentInstance.VALID) {
