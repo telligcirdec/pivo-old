@@ -1,16 +1,13 @@
 package santeclair.reclamation.osgi.service.impl;
 
-import java.util.Collections;
 import java.util.List;
 
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Modified;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.Validate;
-import org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider;
 
 import santeclair.portal.bundle.utils.config.UrlWebservicesConfig;
 import santeclair.reclamation.demande.document.dto.DemandeDocumentCriteresDto;
@@ -36,8 +33,8 @@ public class DemandeDocumentOsgiServiceImpl implements DemandeDocumentWebService
      */
     @Validate
     public void init() {
-        demandeDocumentWebService = JAXRSClientFactory.create(urlWebservicesConfig.getReclamationUrl(), DemandeDocumentWebService.class,
-                        Collections.singletonList(new JacksonJaxbJsonProvider()), true);
+        // demandeDocumentWebService = JAXRSClientFactory.create(urlWebservicesConfig.getReclamationUrl(), DemandeDocumentWebService.class,
+        // Collections.singletonList(new JacksonJaxbJsonProvider()), true);
     }
 
     @Modified

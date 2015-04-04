@@ -1,4 +1,9 @@
-package santeclair.portal.bundle.recherche.demande.document.component.sub;
+package santeclair.portal.reclamation.demande.document.recherche.component.sub;
+
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI_CODE;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,9 +19,11 @@ import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.fields.MTable;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
-import santeclair.portal.bundle.recherche.demande.document.component.InitComponent;
-import santeclair.portal.bundle.recherche.demande.document.form.ResultatRechercheForm;
 import santeclair.portal.event.EventDictionaryConstant;
+import santeclair.portal.reclamation.demande.document.recherche.component.SubComponent;
+import santeclair.portal.reclamation.demande.document.recherche.component.SubComponentInit;
+import santeclair.portal.reclamation.demande.document.recherche.component.SubComponentInitProperty;
+import santeclair.portal.reclamation.demande.document.recherche.form.ResultatRechercheForm;
 import santeclair.reclamation.demande.document.dto.DemandeDocumentDto;
 
 import com.vaadin.data.util.BeanContainer;
@@ -30,9 +37,10 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.themes.ValoTheme;
 
+@SubComponent(displayOrder = 1)
 @Component
 @Provides(specifications = {ResultatComponent.class})
-public class ResultatComponent extends Panel implements InitComponent {
+public class ResultatComponent extends Panel {
 
     private String sessionId;
     private Integer tabHash;
@@ -51,10 +59,12 @@ public class ResultatComponent extends Panel implements InitComponent {
     private MVerticalLayout tableResultLayout;
 
     /* (non-Javadoc)
-     * @see santeclair.portal.bundle.recherche.demande.document.component.ResultatComponentCallback#init(java.lang.String, java.lang.Integer, java.lang.String, java.lang.String)
+     * @see santeclair.portal.reclamation.demande.document.recherche.component.ResultatComponentCallback#init(java.lang.String, java.lang.Integer, java.lang.String, java.lang.String)
      */
-    @Override
-    public void init(String sessionId, Integer tabHash, String moduleCode, String viewCode) {
+    @SubComponentInit
+    public void init(@SubComponentInitProperty(name = PROPERTY_KEY_PORTAL_SESSION_ID) String sessionId, @SubComponentInitProperty(name = PROPERTY_KEY_TAB_HASH) Integer tabHash,
+                    @SubComponentInitProperty(name = PROPERTY_KEY_MODULE_UI_CODE) String moduleCode,
+                    @SubComponentInitProperty(name = PROPERTY_KEY_VIEW_UI_CODE) String viewCode) {
 
         this.sessionId = sessionId;
         this.tabHash = tabHash;
@@ -173,13 +183,4 @@ public class ResultatComponent extends Panel implements InitComponent {
         // Ie8CssFontHack.showFonts();
     }
 
-    @Override
-    public int getDisplayOrder() {
-        return 40;
-    }
-
-    @Override
-    public int compareTo(InitComponent o) {
-        return this.getDisplayOrder() - o.getDisplayOrder();
-    }
 }

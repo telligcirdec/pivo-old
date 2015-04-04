@@ -1,4 +1,4 @@
-package santeclair.portal.bundle.recherche.demande.document.component.callback;
+package santeclair.portal.reclamation.demande.document.recherche.component.callback;
 
 import java.util.List;
 

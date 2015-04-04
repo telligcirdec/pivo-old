@@ -1,4 +1,4 @@
-package santeclair.portal.bundle.recherche.demande.document.presenter;
+package santeclair.portal.reclamation.demande.document.recherche.presenter;
 
 import java.util.List;
 
@@ -8,9 +8,9 @@ import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.handlers.event.Subscriber;
 import org.osgi.service.event.Event;
 
-import santeclair.portal.bundle.recherche.demande.document.component.callback.FormComponentCallback;
-import santeclair.portal.bundle.recherche.demande.document.form.RechercheForm;
 import santeclair.portal.event.EventDictionaryConstant;
+import santeclair.portal.reclamation.demande.document.recherche.component.callback.FormComponentCallback;
+import santeclair.portal.reclamation.demande.document.recherche.form.RechercheForm;
 import santeclair.reclamation.demande.document.dto.DemandeDocumentCriteresDto;
 import santeclair.reclamation.demande.document.dto.DemandeDocumentDto;
 import santeclair.reclamation.demande.document.webservice.DemandeDocumentWebService;

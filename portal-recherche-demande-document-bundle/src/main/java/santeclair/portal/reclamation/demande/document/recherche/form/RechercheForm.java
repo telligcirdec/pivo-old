@@ -1,4 +1,4 @@
-package santeclair.portal.bundle.recherche.demande.document.form;
+package santeclair.portal.reclamation.demande.document.recherche.form;
 
 import java.util.Date;
 

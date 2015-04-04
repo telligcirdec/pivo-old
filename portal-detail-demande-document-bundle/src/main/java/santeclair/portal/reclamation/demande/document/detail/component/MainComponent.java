@@ -1,4 +1,4 @@
-package santeclair.portal.bundle.demande.document.component;
+package santeclair.portal.reclamation.demande.document.detail.component;
 
 import java.util.Date;
 import java.util.EnumSet;
@@ -33,8 +33,8 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-@Component(name = "santeclair.portal.bundle.demande.document.component.DemandeDocumentComponent")
-public class DemandeDocumentComponent extends VerticalLayout {
+@Component(name = "santeclair.portal.reclamation.demande.document.detail.component.MainComponent")
+public class MainComponent extends VerticalLayout {
 
     private static final long serialVersionUID = 8369775167208351407L;
 
@@ -79,7 +79,7 @@ public class DemandeDocumentComponent extends VerticalLayout {
     private VerticalLayout suiviEnvoisLayout;
     private VerticalLayout traitementDocumentsLayout;
 
-    public DemandeDocumentComponent() {
+    public MainComponent() {
 
         DemandeDocumentDto demandeDocumentDto = demandeDocumentWebService.rechercherDemandeDocumentParId(1000);
         

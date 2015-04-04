@@ -1,4 +1,4 @@
-package santeclair.portal.bundle.demande.document.form;
+package santeclair.portal.reclamation.demande.document.detail.form;
 
 /**
  * Formulaire de demande de document.

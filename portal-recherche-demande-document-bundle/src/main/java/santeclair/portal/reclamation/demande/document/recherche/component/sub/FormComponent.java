@@ -1,4 +1,7 @@
-package santeclair.portal.bundle.recherche.demande.document.component.sub;
+package santeclair.portal.reclamation.demande.document.recherche.component.sub;
+
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
 
 import java.util.Dictionary;
 import java.util.EnumSet;
@@ -16,10 +19,12 @@ import org.vaadin.viritin.layouts.MFormLayout;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
-import santeclair.portal.bundle.recherche.demande.document.component.InitComponent;
-import santeclair.portal.bundle.recherche.demande.document.component.callback.FormComponentCallback;
-import santeclair.portal.bundle.recherche.demande.document.form.RechercheForm;
 import santeclair.portal.event.EventDictionaryConstant;
+import santeclair.portal.reclamation.demande.document.recherche.component.SubComponent;
+import santeclair.portal.reclamation.demande.document.recherche.component.SubComponentInit;
+import santeclair.portal.reclamation.demande.document.recherche.component.SubComponentInitProperty;
+import santeclair.portal.reclamation.demande.document.recherche.component.callback.FormComponentCallback;
+import santeclair.portal.reclamation.demande.document.recherche.form.RechercheForm;
 import santeclair.reclamation.demande.document.dto.DemandeDocumentDto;
 import santeclair.reclamation.demande.document.enumeration.EtatDemandeEnum;
 
@@ -35,9 +40,10 @@ import com.vaadin.ui.DateField;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ValoTheme;
 
+@SubComponent(displayOrder = 2)
 @Component
 @Provides(specifications = {FormComponent.class})
-public class FormComponent extends Panel implements FormComponentCallback, InitComponent {
+public class FormComponent extends Panel implements FormComponentCallback {
 
     private String sessionId;
     private Integer tabHash;
@@ -62,8 +68,8 @@ public class FormComponent extends Panel implements FormComponentCallback, InitC
     private MButton boutonRechercher;
     private RechercheForm form;
 
-    @Override
-    public void init(String sessionId, Integer tabHash, String moduleCode, String viewCode) {
+    @SubComponentInit
+    public void init(@SubComponentInitProperty(name = PROPERTY_KEY_PORTAL_SESSION_ID) String sessionId, @SubComponentInitProperty(name = PROPERTY_KEY_TAB_HASH) Integer tabHash) {
 
         this.sessionId = sessionId;
         this.tabHash = tabHash;
@@ -221,16 +227,6 @@ public class FormComponent extends Panel implements FormComponentCallback, InitC
     @Override
     public void rechercheFailed(String message) {
 
-    }
-
-    @Override
-    public int getDisplayOrder() {
-        return 30;
-    }
-
-    @Override
-    public int compareTo(InitComponent o) {
-        return this.getDisplayOrder() - o.getDisplayOrder();
     }
 
 }
