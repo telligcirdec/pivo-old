@@ -1,4 +1,4 @@
-package santeclair.portal.bundle.utils.config;
+package santeclair.portal.utils.config;
 
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;

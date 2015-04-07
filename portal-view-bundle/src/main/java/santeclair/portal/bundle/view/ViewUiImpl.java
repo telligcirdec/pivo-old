@@ -41,8 +41,8 @@ import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
 import org.osgi.service.event.Event;
 import org.osgi.service.log.LogService;
 
-import santeclair.portal.bundle.utils.SessionIdTabHashKey;
 import santeclair.portal.module.ModuleUi;
+import santeclair.portal.utils.SessionIdTabHashKey;
 import santeclair.portal.view.ViewUi;
 
 import com.vaadin.server.FontAwesome;

@@ -6,7 +6,6 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_H
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI_CODE;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.felix.ipojo.annotations.Component;
@@ -20,13 +19,12 @@ import org.vaadin.viritin.fields.MTable;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import santeclair.portal.event.EventDictionaryConstant;
-import santeclair.portal.reclamation.demande.document.recherche.component.SubComponent;
-import santeclair.portal.reclamation.demande.document.recherche.component.SubComponentInit;
-import santeclair.portal.reclamation.demande.document.recherche.component.SubComponentInitProperty;
 import santeclair.portal.reclamation.demande.document.recherche.form.ResultatRechercheForm;
+import santeclair.portal.utils.component.SubComponent;
+import santeclair.portal.utils.component.SubComponentInit;
+import santeclair.portal.utils.component.SubComponentInitProperty;
 import santeclair.reclamation.demande.document.dto.DemandeDocumentDto;
 
-import com.vaadin.data.util.BeanContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -34,10 +32,9 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.themes.ValoTheme;
 
-@SubComponent(displayOrder = 1)
+@SubComponent
 @Component
 @Provides(specifications = {ResultatComponent.class})
 public class ResultatComponent extends Panel {
@@ -54,15 +51,18 @@ public class ResultatComponent extends Panel {
 
     private MButton boutonExporter;
 
-    private MTable tableauResultDemande;
+    private MTable<ResultatRechercheForm> tableauResultDemande;
 
     private MVerticalLayout tableResultLayout;
+    
+    List<ResultatRechercheForm> resultatsRecherche = new ArrayList<ResultatRechercheForm>();    
 
     /* (non-Javadoc)
      * @see santeclair.portal.reclamation.demande.document.recherche.component.ResultatComponentCallback#init(java.lang.String, java.lang.Integer, java.lang.String, java.lang.String)
      */
     @SubComponentInit
-    public void init(@SubComponentInitProperty(name = PROPERTY_KEY_PORTAL_SESSION_ID) String sessionId, @SubComponentInitProperty(name = PROPERTY_KEY_TAB_HASH) Integer tabHash,
+    public void init(@SubComponentInitProperty(name = PROPERTY_KEY_PORTAL_SESSION_ID) String sessionId,
+                    @SubComponentInitProperty(name = PROPERTY_KEY_TAB_HASH) Integer tabHash,
                     @SubComponentInitProperty(name = PROPERTY_KEY_MODULE_UI_CODE) String moduleCode,
                     @SubComponentInitProperty(name = PROPERTY_KEY_VIEW_UI_CODE) String viewCode) {
 
@@ -71,6 +71,7 @@ public class ResultatComponent extends Panel {
         this.moduleCode = moduleCode;
         this.viewCode = viewCode;
 
+        resultatsRecherche.add(new ResultatRechercheForm());
         initExporter();
         initTableauResultDemandeDocument();
         initLayout();
@@ -86,42 +87,19 @@ public class ResultatComponent extends Panel {
 
     /** Initialise le tableau de resultats de demandes de document. */
     private void initTableauResultDemandeDocument() {
-        tableauResultDemande = new MTable();
-        tableauResultDemande.setPageLength(0);
-        tableauResultDemande.setSizeFull();
-        tableauResultDemande.setSelectable(true);
-        tableauResultDemande.addContainerProperty("dto.numeroDossier", String.class, null);
-        tableauResultDemande.setColumnHeader("dto.numeroDossier", "Numéro de dossier");
-        tableauResultDemande.setColumnWidth("dto.numeroDossier", 180);
-        tableauResultDemande.addContainerProperty("dto.trigrammeDemandeur", String.class, null);
-        tableauResultDemande.setColumnHeader("dto.trigrammeDemandeur", "Trigramme");
-        tableauResultDemande.setColumnWidth("dto.trigrammeDemandeur", 130);
-        tableauResultDemande.addContainerProperty("dto.dateDemandeDocument", Date.class, null);
-        tableauResultDemande.setColumnHeader("dto.dateDemandeDocument", "Date");
-        tableauResultDemande.setColumnWidth("dto.dateDemandeDocument", 150);
-        tableauResultDemande.addContainerProperty("dto.nomBeneficiaire", String.class, null);
-        tableauResultDemande.setColumnHeader("dto.nomBeneficiaire", "Nom Bénéficiaire");
-        tableauResultDemande.setColumnExpandRatio("dto.nomBeneficiaire", 3);
-        tableauResultDemande.addContainerProperty("dto.prenomBeneficiaire", String.class, null);
-        tableauResultDemande.setColumnHeader("dto.prenomBeneficiaire", "Prénom Bénéficiaire");
-        tableauResultDemande.setColumnExpandRatio("dto.prenomBeneficiaire", 2);
-        tableauResultDemande.addContainerProperty("dto.telephonePS", String.class, null);
-        tableauResultDemande.setColumnHeader("dto.telephonePS", "Numéro de téléphone du PS");
-        tableauResultDemande.setColumnWidth("dto.telephonePS", 180);
-        tableauResultDemande.addContainerProperty("dto.etat.code", String.class, null);
-        tableauResultDemande.setColumnHeader("dto.etat.code", "Etat du dossier");
-        tableauResultDemande.setColumnWidth("dto.etat.code", 150);
-        tableauResultDemande.addContainerProperty("buttonLayout", HorizontalLayout.class, null);
-        tableauResultDemande.setColumnHeader("buttonLayout", "Action");
-        tableauResultDemande.setColumnWidth("buttonLayout", 100);
-        tableauResultDemande.setColumnAlignment("buttonLayout", Align.CENTER);
-        tableauResultDemande.setSortContainerPropertyId("dto.numeroDossier");
-        tableauResultDemande.setSortAscending(false);
+        
+        tableauResultDemande = new MTable<ResultatRechercheForm>(resultatsRecherche).withFullWidth()
+                        .withProperties("numeroDossier", "trigrammeDemandeur", "dateDemandeDocument", "nomBeneficiaire",
+                                        "prenomBeneficiaire", "telephonePS", "etat", "buttonLayout")
+                        .withColumnHeaders("Numéro de dossier", "Trigramme", "Date", "Nom Bénéficiaire", "Prénom Bénéficiaire", "Numéro de téléphone du PS",
+                                        "Etat du dossier", "Action");
+        
     }
 
     /** Initialise la vue principale. */
     private void initLayout() {
-        tableResultLayout = new MVerticalLayout().withMargin(true)
+        tableResultLayout = new MVerticalLayout()
+                        .withMargin(true)
                         .withSpacing(true)
                         .withFullWidth()
                         .with(boutonExporter, tableauResultDemande)
@@ -166,20 +144,20 @@ public class ResultatComponent extends Panel {
                     + EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME + "=rechercheOk)(listeDemandesDocumentDto=*))", topics = "RechercheDemandeDocument")
     private void setTableauRechercheItemsList(org.osgi.service.event.Event event) {
         List<DemandeDocumentDto> listeDemandesDocumentDto = (List<DemandeDocumentDto>) event.getProperty("listeDemandesDocumentDto");
-        List<ResultatRechercheForm> resultatsRecherche = new ArrayList<ResultatRechercheForm>();
+
+        resultatsRecherche.clear();
         for (final DemandeDocumentDto demandeDocumentDto : listeDemandesDocumentDto) {
             ResultatRechercheForm resultatRechercheForm = new ResultatRechercheForm(demandeDocumentDto);
             resultatRechercheForm.setButtonLayout(buildButtonLayout(demandeDocumentDto));
             resultatsRecherche.add(resultatRechercheForm);
         }
-        BeanContainer<String, ResultatRechercheForm> dataSource = new BeanContainer<String, ResultatRechercheForm>(ResultatRechercheForm.class);
-        dataSource.addNestedContainerBean("dto");
-        dataSource.setBeanIdProperty("dto.id");
-        dataSource.addAll(resultatsRecherche);
 
-        tableauResultDemande.setContainerDataSource(dataSource);
-        tableauResultDemande.sort();
+//        tableauResultDemande.setBeans(resultatsRecherche);
 
+//        tableauResultDemande.sort();
+
+//        tableauResultDemande.markAsDirty();
+        tableauResultDemande.setImmediate(true);
         // Ie8CssFontHack.showFonts();
     }
 

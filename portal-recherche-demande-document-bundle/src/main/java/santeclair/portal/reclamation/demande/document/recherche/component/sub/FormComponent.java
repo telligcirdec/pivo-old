@@ -4,10 +4,9 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTA
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
 
 import java.util.Dictionary;
-import java.util.EnumSet;
 import java.util.Hashtable;
-import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.handlers.event.Publishes;
@@ -20,16 +19,14 @@ import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import santeclair.portal.event.EventDictionaryConstant;
-import santeclair.portal.reclamation.demande.document.recherche.component.SubComponent;
-import santeclair.portal.reclamation.demande.document.recherche.component.SubComponentInit;
-import santeclair.portal.reclamation.demande.document.recherche.component.SubComponentInitProperty;
-import santeclair.portal.reclamation.demande.document.recherche.component.callback.FormComponentCallback;
 import santeclair.portal.reclamation.demande.document.recherche.form.RechercheForm;
-import santeclair.reclamation.demande.document.dto.DemandeDocumentDto;
+import santeclair.portal.utils.component.SubComponent;
+import santeclair.portal.utils.component.SubComponentInit;
+import santeclair.portal.utils.component.SubComponentInitProperty;
+import santeclair.portal.utils.notification.ValidationNotification;
 import santeclair.reclamation.demande.document.enumeration.EtatDemandeEnum;
 
 import com.vaadin.data.fieldgroup.FieldGroup;
-import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Alignment;
@@ -40,10 +37,10 @@ import com.vaadin.ui.DateField;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ValoTheme;
 
-@SubComponent(displayOrder = 2)
+@SubComponent
 @Component
 @Provides(specifications = {FormComponent.class})
-public class FormComponent extends Panel implements FormComponentCallback {
+public class FormComponent extends Panel {
 
     private String sessionId;
     private Integer tabHash;
@@ -127,32 +124,32 @@ public class FormComponent extends Panel implements FormComponentCallback {
     private void initEtatDossier() {
         etatDossier = new ComboBox("Etat du dossier : ");
         etatDossier.setWidth(TAILLE_STANDARD + 1, Unit.EM);
-        BeanContainer<String, EtatDemandeEnum> enumContainer = new BeanContainer<String, EtatDemandeEnum>(EtatDemandeEnum.class);
-        enumContainer.setBeanIdProperty("code");
-        enumContainer.addAll(EnumSet.allOf(EtatDemandeEnum.class));
-        etatDossier.setContainerDataSource(enumContainer);
-        etatDossier.setItemCaptionPropertyId("libelle");
+        for (EtatDemandeEnum etatDemandeEnum : EtatDemandeEnum.values()) {
+            etatDossier.addItem(etatDemandeEnum);
+            etatDossier.setItemCaption(etatDemandeEnum, etatDemandeEnum.getLibelle());
+        }
     }
 
     /** Initialise le bouton rechercher. */
     private void initRechercher() {
         boutonRechercher = new PrimaryButton("Rechercher").withIcon(FontAwesome.SEARCH).withStyleName(ValoTheme.BUTTON_PRIMARY);
         boutonRechercher.addClickListener(new ClickListener() {
+
             private static final long serialVersionUID = 1L;
 
             @Override
             public void buttonClick(ClickEvent event) {
-                // ValidationNotification validation = controleDonnees();
-                // if (validation.isError()) {
-                // validation.show();
-                // } else {
-
-                Dictionary<String, Object> props = new Hashtable<>();
-                props.put(EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME, "rechercherDemandeDocument");
-                props.put("form", form);
-                props.put("formComponent", this);
-                formComponentPublisher.send(props);
-                // }
+                ValidationNotification validation = controleDonnees();
+              if (validation.isError()) {
+                  validation.show();
+              } else {
+                  Dictionary<String, Object> props = new Hashtable<>();
+                  props.put(EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME, "rechercherDemandeDocument");
+                  props.put("sessionId", sessionId);
+                  props.put("tabHash", tabHash);
+                  props.put("form", form);
+                  formComponentPublisher.send(props);
+              }
             }
         });
     }
@@ -185,7 +182,7 @@ public class FormComponent extends Panel implements FormComponentCallback {
                         .withFullWidth();
 
         this.setCaption("Recherche de demandes de document");
-        this.setContent(new MVerticalLayout().withFullWidth().withMargin(true).add(horizontalLayout));
+        this.setContent(new MVerticalLayout().withFullWidth().withMargin(true).with(horizontalLayout));
 
     }
 
@@ -197,36 +194,61 @@ public class FormComponent extends Panel implements FormComponentCallback {
         binder.bindMemberFields(this);
     }
 
-    // /** Controle les données du formulaire de recherche. */
-    // private ValidationNotification controleDonnees() {
-    // ValidationNotification result = new ValidationNotification();
-    //
-    // if (StringUtils.isBlank(form.getNomBeneficiaire())
-    // && StringUtils.isBlank(form.getPrenomBeneficiaire())
-    // && StringUtils.isBlank(form.getNumeroDossier())
-    // && StringUtils.isBlank(form.getTelephonePS())
-    // && StringUtils.isBlank(form.getTrigrammeDemandeur())
-    // && null != form.getDateDebut()
-    // && null != form.getDateFin()
-    // && null != form.getEtatDossier()) {
-    // result.addMessage(MSG_ERROR);
-    // }
-    // return result;
-    // }
+    /** Controle les données du formulaire de recherche. */
+    private ValidationNotification controleDonnees() {
+        ValidationNotification result = new ValidationNotification();
 
-    @Override
-    public void rechercheSuccessfull(List<DemandeDocumentDto> listeDemandesDocumentDto) {
-        Dictionary<String, Object> props = new Hashtable<>();
-        props.put(EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME, "rechercheOk");
-        props.put(EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
-        props.put(EventDictionaryConstant.PROPERTY_KEY_TAB_HASH, tabHash);
-        props.put("listeDemandesDocumentDto", listeDemandesDocumentDto);
-        formComponentPublisher.send(props);
+        if (StringUtils.isBlank(form.getNomBeneficiaire())
+                        && StringUtils.isBlank(form.getPrenomBeneficiaire())
+                        && StringUtils.isBlank(form.getNumeroDossier())
+                        && StringUtils.isBlank(form.getTelephonePS())
+                        && StringUtils.isBlank(form.getTrigrammeDemandeur())
+                        && null == form.getDateDebut()
+                        && null == form.getDateFin()
+                        && null == form.getEtatDossier()) {
+            result.addMessage(MSG_ERROR);
+        }
+        return result;
     }
 
-    @Override
-    public void rechercheFailed(String message) {
+//    @Override
+//    public void rechercheSuccessfull(List<DemandeDocumentDto> listeDemandesDocumentDto) {
+//        Dictionary<String, Object> props = new Hashtable<>();
+//        props.put(EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME, "rechercheOk");
+//        props.put(EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
+//        props.put(EventDictionaryConstant.PROPERTY_KEY_TAB_HASH, tabHash);
+//        props.put("listeDemandesDocumentDto", listeDemandesDocumentDto);
+//        formComponentPublisher.send(props);
+//    }
+//
+//    @Override
+//    public void rechercheFailed(String message) {
+//
+//    }
 
-    }
+//    private class FormRechercherClickListener implements ClickListener {
+//
+//        private static final long serialVersionUID = -894998593011734769L;
+//        
+//        private final FormComponentCallback formComponentCallback;
+//
+//        public FormRechercherClickListener(FormComponentCallback formComponentCallback) {
+//            this.formComponentCallback = formComponentCallback;
+//        }
+//
+//        @Override
+//        public void buttonClick(ClickEvent event) {
+//            ValidationNotification validation = controleDonnees();
+//            if (validation.isError()) {
+//                validation.show();
+//            } else {
+//                Dictionary<String, Object> props = new Hashtable<>();
+//                props.put(EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME, "rechercherDemandeDocument");
+//                props.put("form", form);
+//                formComponentPublisher.send(props);
+//            }
+//        }
+//
+//    }
 
 }

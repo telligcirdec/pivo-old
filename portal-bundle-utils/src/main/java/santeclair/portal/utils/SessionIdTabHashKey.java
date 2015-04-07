@@ -1,4 +1,4 @@
-package santeclair.portal.bundle.utils;
+package santeclair.portal.utils;
 
 
 public class SessionIdTabHashKey {

@@ -1,4 +1,4 @@
-package santeclair.portal.bundle.notification;
+package santeclair.portal.utils.notification;
 
 import java.util.ArrayList;
 import java.util.List;

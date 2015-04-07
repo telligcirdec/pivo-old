@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<bundle.namespace>santeclair.portal.bundle.utils</bundle.namespace>
+		<bundle.namespace>santeclair.portal.utils</bundle.namespace>
 	</properties>
 
 	<parent>
