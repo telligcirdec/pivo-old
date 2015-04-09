@@ -8,6 +8,7 @@ import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STARTED
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CONTEXT;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PARAMS;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_CURRENT_USER_ROLES;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
@@ -18,8 +19,10 @@ import static santeclair.portal.event.EventDictionaryConstant.TOPIC_NAVIGATOR;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_VIEW_UI;
 
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
@@ -125,6 +128,7 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
             props.put(PROPERTY_KEY_VIEW_UI_CODE, viewUiCode);
             props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
             props.put(PROPERTY_KEY_PORTAL_CURRENT_USER_ROLES, currentUserRoles);
+            
             addExtractedParams(parameters, props);
 
             dataPublisherToModuleUiTopic.publishEventDataAndDictionnarySynchronously(this, props);
@@ -228,29 +232,33 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
     }
 
     private void addExtractedParams(String fragment, Dictionary<String, Object> props) {
+        Map<String, Object> mapParams = new HashMap<>();
         if (fragment != null && fragment.contains(PARAMS_URI_FRAGMENT)) {
             String paramsUriFragement = fragment.split(PARAMS_URI_FRAGMENT
                             + "/")[1];
             if (StringUtils.isNotBlank(paramsUriFragement)) {
-                addParsedParameters(paramsUriFragement, props);
+                mapParams = addParsedParameters(paramsUriFragement, props);
             }
         }
+        props.put(PROPERTY_KEY_PARAMS, mapParams);
     }
 
     /**
      * @param parameters
      * @param paramsAsArray
      */
-    private void addParsedParameters(String paramsFromUri, Dictionary<String, Object> props) {
+    private Map<String, Object> addParsedParameters(String paramsFromUri, Dictionary<String, Object> props) {
         String[] paramsAsArray = paramsFromUri.split("/");
+        Map<String, Object> mapParams = new HashMap<>();
         String currentKey = null;
         for (int i = 0; i < paramsAsArray.length; i++) {
             if (i % 2 == 0) {
                 currentKey = paramsAsArray[i];
             } else {
-                props.put(currentKey, paramsAsArray[i]);
+                mapParams.put(currentKey, paramsAsArray[i]);
             }
         }
+        return mapParams;
     }
 
 }

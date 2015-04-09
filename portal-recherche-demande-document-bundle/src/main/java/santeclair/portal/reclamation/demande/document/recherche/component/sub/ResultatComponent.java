@@ -1,30 +1,37 @@
 package santeclair.portal.reclamation.demande.document.recherche.component.sub;
 
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_NAVIGATION;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_NAVIGATOR_URI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI_CODE;
+import static santeclair.portal.event.EventDictionaryConstant.TOPIC_NAVIGATOR;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.felix.ipojo.annotations.Component;
+import org.apache.felix.ipojo.annotations.Property;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.handlers.event.Publishes;
 import org.apache.felix.ipojo.handlers.event.Subscriber;
 import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
 import org.vaadin.viritin.button.DownloadButton;
 import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.fields.MTable;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
-import santeclair.portal.event.EventDictionaryConstant;
+import santeclair.portal.reclamation.demande.document.recherche.EventConstant;
 import santeclair.portal.reclamation.demande.document.recherche.form.ResultatRechercheForm;
 import santeclair.portal.utils.component.SubComponent;
 import santeclair.portal.utils.component.SubComponentInit;
-import santeclair.portal.utils.component.SubComponentInitProperty;
 import santeclair.reclamation.demande.document.dto.DemandeDocumentDto;
 
+import com.vaadin.data.util.BeanContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -32,6 +39,8 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.themes.ValoTheme;
 
 @SubComponent
@@ -39,70 +48,83 @@ import com.vaadin.ui.themes.ValoTheme;
 @Provides(specifications = {ResultatComponent.class})
 public class ResultatComponent extends Panel {
 
+    @Property(name = PROPERTY_KEY_PORTAL_SESSION_ID)
     private String sessionId;
-    private Integer tabHash;
+    @Property(name = PROPERTY_KEY_MODULE_UI_CODE)
     private String moduleCode;
-    private String viewCode;
 
     private static final long serialVersionUID = 8369775167208351407L;
 
-    @Publishes(name = "myComponenentPublisher", topics = "ResultatDemandeDocument")
-    private Publisher myComponenentPublisher;
+    @Publishes(name = "resultatComponentPublisher", topics = TOPIC_NAVIGATOR, synchronous = true)
+    private Publisher resultatComponentPublisher;
 
     private MButton boutonExporter;
 
-    private MTable<ResultatRechercheForm> tableauResultDemande;
+    private Table tableauResultDemande;
 
     private MVerticalLayout tableResultLayout;
-    
-    List<ResultatRechercheForm> resultatsRecherche = new ArrayList<ResultatRechercheForm>();    
 
-    /* (non-Javadoc)
-     * @see santeclair.portal.reclamation.demande.document.recherche.component.ResultatComponentCallback#init(java.lang.String, java.lang.Integer, java.lang.String, java.lang.String)
-     */
     @SubComponentInit
-    public void init(@SubComponentInitProperty(name = PROPERTY_KEY_PORTAL_SESSION_ID) String sessionId,
-                    @SubComponentInitProperty(name = PROPERTY_KEY_TAB_HASH) Integer tabHash,
-                    @SubComponentInitProperty(name = PROPERTY_KEY_MODULE_UI_CODE) String moduleCode,
-                    @SubComponentInitProperty(name = PROPERTY_KEY_VIEW_UI_CODE) String viewCode) {
-
-        this.sessionId = sessionId;
-        this.tabHash = tabHash;
-        this.moduleCode = moduleCode;
-        this.viewCode = viewCode;
-
-        resultatsRecherche.add(new ResultatRechercheForm());
+    public void init() {
         initExporter();
-        initTableauResultDemandeDocument();
+        initGridResultDemandeDocument();
         initLayout();
     }
 
     /** Initialise le bouton exporter. */
     private void initExporter() {
-        boutonExporter = new DownloadButton().withCaption("Export Excel")
+        boutonExporter = new DownloadButton()
+                        .withCaption("Export Excel")
                         .withStyleName(ValoTheme.BUTTON_PRIMARY)
                         .withStyleName(ValoTheme.BUTTON_LARGE)
                         .withIcon(FontAwesome.DOWNLOAD);
     }
 
     /** Initialise le tableau de resultats de demandes de document. */
-    private void initTableauResultDemandeDocument() {
+    private void initGridResultDemandeDocument() {
+//        gridResultDemande = new Grid();
+//        gridResultDemande.setSizeFull();
         
-        tableauResultDemande = new MTable<ResultatRechercheForm>(resultatsRecherche).withFullWidth()
-                        .withProperties("numeroDossier", "trigrammeDemandeur", "dateDemandeDocument", "nomBeneficiaire",
-                                        "prenomBeneficiaire", "telephonePS", "etat", "buttonLayout")
-                        .withColumnHeaders("Numéro de dossier", "Trigramme", "Date", "Nom Bénéficiaire", "Prénom Bénéficiaire", "Numéro de téléphone du PS",
-                                        "Etat du dossier", "Action");
-        
+        tableauResultDemande = new Table();
+        tableauResultDemande.setSizeFull();
+        tableauResultDemande.setSelectable(false);
+        tableauResultDemande.setImmediate(true);
+        tableauResultDemande.setPageLength(0);
+        tableauResultDemande.addContainerProperty("dto.numeroDossier", String.class, null);
+        tableauResultDemande.setColumnHeader("dto.numeroDossier", "Numéro de dossier");
+        tableauResultDemande.setColumnWidth("dto.numeroDossier", 180);
+        tableauResultDemande.addContainerProperty("dto.trigrammeDemandeur", String.class, null);
+        tableauResultDemande.setColumnHeader("dto.trigrammeDemandeur", "Trigramme");
+        tableauResultDemande.setColumnWidth("dto.trigrammeDemandeur", 130);
+        tableauResultDemande.addContainerProperty("dto.dateDemandeDocument", Date.class, null);
+        tableauResultDemande.setColumnHeader("dto.dateDemandeDocument", "Date");
+        tableauResultDemande.setColumnWidth("dto.dateDemandeDocument", 150);
+        tableauResultDemande.addContainerProperty("dto.nomBeneficiaire", String.class, null);
+        tableauResultDemande.setColumnHeader("dto.nomBeneficiaire", "Nom Bénéficiaire");
+        tableauResultDemande.setColumnExpandRatio("dto.nomBeneficiaire", 3);
+        tableauResultDemande.addContainerProperty("dto.prenomBeneficiaire", String.class, null);
+        tableauResultDemande.setColumnHeader("dto.prenomBeneficiaire", "Prénom Bénéficiaire");
+        tableauResultDemande.setColumnExpandRatio("dto.prenomBeneficiaire", 2);
+        tableauResultDemande.addContainerProperty("dto.telephonePS", String.class, null);
+        tableauResultDemande.setColumnHeader("dto.telephonePS", "Numéro de téléphone du PS");
+        tableauResultDemande.setColumnWidth("dto.telephonePS", 180);
+        tableauResultDemande.addContainerProperty("dto.etat", String.class, null);
+        tableauResultDemande.setColumnHeader("dto.etat", "Etat du dossier");
+        tableauResultDemande.setColumnWidth("dto.etat", 150);
+        tableauResultDemande.addContainerProperty("buttonLayout", HorizontalLayout.class, null);
+        tableauResultDemande.setColumnHeader("buttonLayout", "Action");
+        tableauResultDemande.setColumnWidth("buttonLayout", 100);
+        tableauResultDemande.setColumnAlignment("buttonLayout", Align.CENTER);
+        tableauResultDemande.setSortContainerPropertyId("dto.numeroDossier");
+        tableauResultDemande.setSortAscending(false);
     }
 
     /** Initialise la vue principale. */
     private void initLayout() {
-        tableResultLayout = new MVerticalLayout()
+        tableResultLayout = new MVerticalLayout(boutonExporter, tableauResultDemande)
                         .withMargin(true)
                         .withSpacing(true)
                         .withFullWidth()
-                        .with(boutonExporter, tableauResultDemande)
                         .withAlign(boutonExporter, Alignment.TOP_RIGHT);
         this.setCaption("Résultat de la recherche");
         this.setContent(tableResultLayout);
@@ -110,9 +132,7 @@ public class ResultatComponent extends Panel {
 
     /** Construit les bouton action pour une ligne dans le tableau */
     private HorizontalLayout buildButtonLayout(final DemandeDocumentDto demandeDocumentDto) {
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.addComponent(creerBtnConsulter(demandeDocumentDto));
-        return buttonLayout;
+        return new MHorizontalLayout(creerBtnConsulter(demandeDocumentDto));
     }
 
     /**
@@ -122,42 +142,50 @@ public class ResultatComponent extends Panel {
      * @return le bouton
      */
     private Button creerBtnConsulter(final DemandeDocumentDto demandeDocumentDto) {
-        Button btnConsulter = new Button();
-        btnConsulter.setStyleName(ValoTheme.BUTTON_PRIMARY);
-        btnConsulter.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
-        btnConsulter.addStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED);
-        btnConsulter.setIcon(FontAwesome.EDIT);
-        btnConsulter.setDescription("Consultation");
-        btnConsulter.setHtmlContentAllowed(true);
-        btnConsulter.addClickListener(new ClickListener() {
-            private static final long serialVersionUID = 1L;
+        MButton btnConsulter = new MButton("Consultation")
+                        .withStyleName(ValoTheme.BUTTON_PRIMARY)
+                        .withStyleName(ValoTheme.BUTTON_ICON_ONLY)
+                        .withStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED)
+                        .withIcon(FontAwesome.EDIT)
+                        .withListener(new ClickListener() {
+                            private static final long serialVersionUID = 1L;
 
-            @Override
-            public void buttonClick(ClickEvent event) {
-                // Event
-            }
-        });
+                            @Override
+                            public void buttonClick(ClickEvent event) {
+                                Dictionary<String, Object> props = new Hashtable<>();
+                                props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_NAVIGATION);
+                                props.put(PROPERTY_KEY_NAVIGATOR_URI,
+                                                "container/new/modules/" + moduleCode + "/views/DEMANDE/params/idDemandeDocument/" + demandeDocumentDto.getId());
+                                props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
+                                resultatComponentPublisher.send(props);
+                            }
+                        });
         return btnConsulter;
     }
 
-    @Subscriber(name = "rechercheOk", filter = "(&(" + EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID + "=*)(" + EventDictionaryConstant.PROPERTY_KEY_TAB_HASH + "=*)("
-                    + EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME + "=rechercheOk)(listeDemandesDocumentDto=*))", topics = "RechercheDemandeDocument")
+    @Subscriber(name = EventConstant.EVENT_RECHERCHE_DEMANDE_DOCUMENT_OK, filter = "(&(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)(" + PROPERTY_KEY_TAB_HASH + "=*)("
+                    + PROPERTY_KEY_EVENT_NAME + "=" + EventConstant.EVENT_RECHERCHE_DEMANDE_DOCUMENT_OK + ")(" + EventConstant.PROPERTY_KEY_LISTE_DEMANDE_DOCUMENT + "=*))", 
+                    topics = EventConstant.TOPIC_RECHERCHER_DEMANDE_DOCUMENT)
     private void setTableauRechercheItemsList(org.osgi.service.event.Event event) {
-        List<DemandeDocumentDto> listeDemandesDocumentDto = (List<DemandeDocumentDto>) event.getProperty("listeDemandesDocumentDto");
-
-        resultatsRecherche.clear();
+        List<DemandeDocumentDto> listeDemandesDocumentDto = (List<DemandeDocumentDto>) event.getProperty(EventConstant.PROPERTY_KEY_LISTE_DEMANDE_DOCUMENT);
+        List<ResultatRechercheForm> resultatsRecherche = new ArrayList<ResultatRechercheForm>();
         for (final DemandeDocumentDto demandeDocumentDto : listeDemandesDocumentDto) {
             ResultatRechercheForm resultatRechercheForm = new ResultatRechercheForm(demandeDocumentDto);
             resultatRechercheForm.setButtonLayout(buildButtonLayout(demandeDocumentDto));
             resultatsRecherche.add(resultatRechercheForm);
         }
 
-//        tableauResultDemande.setBeans(resultatsRecherche);
+        BeanContainer<String, ResultatRechercheForm> dataSource = new BeanContainer<String, ResultatRechercheForm>(ResultatRechercheForm.class);
+        dataSource.addNestedContainerBean("dto");
+        dataSource.setBeanIdProperty("dto.id");
+        dataSource.addAll(resultatsRecherche);
 
-//        tableauResultDemande.sort();
+        tableauResultDemande.setContainerDataSource(dataSource);
+        tableauResultDemande.setVisibleColumns("dto.numeroDossier", "dto.trigrammeDemandeur", "dto.dateDemandeDocument",
+                        "dto.nomBeneficiaire", "dto.prenomBeneficiaire", "dto.telephonePS", "dto.etat", "buttonLayout");
 
-//        tableauResultDemande.markAsDirty();
-        tableauResultDemande.setImmediate(true);
+        tableauResultDemande.sort();
+
         // Ie8CssFontHack.showFonts();
     }
 

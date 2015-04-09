@@ -65,6 +65,7 @@ public class ViewUiImpl implements ViewUi {
     private Boolean openOnInitialization;
     private Boolean newMainComponentOnEachAction;
     private Boolean visibleOnMenu;
+    private Boolean severalTabsAllowed;
     private List<String> rolesAllowed;
     private String mainComponentFactoryName;
 
@@ -177,6 +178,11 @@ public class ViewUiImpl implements ViewUi {
     private void setVisibleOnMenu(Boolean visibleOnMenu) {
         this.visibleOnMenu = visibleOnMenu;
     }
+    
+    @Property(name = "severalTabsAllowed", value = "false")
+    private void setSeveralTabsAllowed(Boolean severalTabsAllowed) {
+        this.severalTabsAllowed = severalTabsAllowed;
+    }
 
     @Property(name = "newMainComponentOnEachAction", value = "true")
     private void setNewMainComponentOnEachAction(Boolean newMainComponentOnEachAction) {
@@ -198,7 +204,7 @@ public class ViewUiImpl implements ViewUi {
      */
 
     @Override
-    public com.vaadin.ui.Component getViewMainComponent(String sessionId, Integer tabHash, List<String> currentUserRoles) {
+    public com.vaadin.ui.Component getViewMainComponent(String sessionId, Integer tabHash, List<String> currentUserRoles, Map<String, Object> mapParams) {
         logService.log(LogService.LOG_DEBUG, "From viewUi " + getLibelle() + " (" + getCode() + ") => getViewMainComponent(sessionId : " + sessionId + " / tabHash : " + tabHash
                         + " / currentUserRoles : " + currentUserRoles + ")");
         com.vaadin.ui.Component viewMainComponent = null;
@@ -208,12 +214,12 @@ public class ViewUiImpl implements ViewUi {
                 viewMainComponent = onlyOneViewMainComponentMap.get(sessionId);
                 if (viewMainComponent == null) {
                     disposeComponentInstance(sessionId, tabHash);
-                    viewMainComponent = getMainComponent(sessionId, tabHash);
+                    viewMainComponent = getMainComponent(sessionId, tabHash, mapParams);
                     onlyOneViewMainComponentMap.put(sessionId, viewMainComponent);
                 }
             } else {
                 disposeComponentInstance(sessionId, tabHash);
-                viewMainComponent = getMainComponent(sessionId, tabHash);
+                viewMainComponent = getMainComponent(sessionId, tabHash, mapParams);
             }
         } catch (Exception e) {
             logService.log(LogService.LOG_ERROR, "From viewUi " + getLibelle() + " (" + getCode() + ") => Error during creation of the main component.", e);
@@ -252,6 +258,11 @@ public class ViewUiImpl implements ViewUi {
     public Boolean getVisibleOnMenu() {
         return visibleOnMenu;
     }
+    
+    @Override
+    public Boolean getSeveralTabsAllowed() {
+        return severalTabsAllowed;
+    }
 
     @Override
     public List<String> getRolesAllowed() {
@@ -262,13 +273,16 @@ public class ViewUiImpl implements ViewUi {
      * Private method
      */
 
-    private com.vaadin.ui.Component getMainComponent(String sessionId, Integer tabHash) throws Exception {
+    private com.vaadin.ui.Component getMainComponent(String sessionId, Integer tabHash, Map<String, Object> mapParams) throws Exception {
         Dictionary<String, Object> props = new Hashtable<>();
         props.put("instance.name", getCode() + "-" + mainComponentFactoryName + "-" + sessionId + "-" + tabHash);
         props.put(PROPERTY_KEY_PORTAL_SESSION_ID, new String(sessionId));
         props.put(PROPERTY_KEY_TAB_HASH, new Integer(tabHash));
         props.put(PROPERTY_KEY_MODULE_UI_CODE, codeModule);
         props.put(PROPERTY_KEY_VIEW_UI_CODE, code);
+        for (String key : mapParams.keySet()) {
+            props.put(key, mapParams.get(key));
+        }
         
         ComponentInstance instance = mainComponentFactory.createComponentInstance(props);
         viewMainComponentInstanceManagerMap.put(new SessionIdTabHashKey(sessionId, tabHash), instance);

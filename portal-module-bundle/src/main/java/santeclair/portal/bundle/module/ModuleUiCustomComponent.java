@@ -9,6 +9,7 @@ public class ModuleUiCustomComponent extends CustomComponent {
 
     private Integer tabHash;
     private final String sessionId;
+    private String codeViewUi;
 
     public ModuleUiCustomComponent(String sessionId) {
         super();
@@ -35,6 +36,14 @@ public class ModuleUiCustomComponent extends CustomComponent {
 
     public String getSessionId() {
         return sessionId;
+    }
+    
+    public String getCodeViewUi() {
+        return codeViewUi;
+    }
+
+    public void setCodeViewUi(String codeViewUi) {
+        this.codeViewUi = codeViewUi;
     }
 
     @Override

@@ -1,11 +1,7 @@
 package santeclair.portal.reclamation.demande.document.recherche.component;
 
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI_CODE;
-
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 
@@ -17,8 +13,8 @@ import org.apache.felix.ipojo.UnacceptableConfiguration;
 import org.apache.felix.ipojo.annotations.Bind;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Invalidate;
-import org.apache.felix.ipojo.annotations.Property;
 import org.apache.felix.ipojo.annotations.Requires;
+import org.apache.felix.ipojo.annotations.Updated;
 import org.apache.felix.ipojo.annotations.Validate;
 import org.osgi.service.log.LogService;
 import org.vaadin.viritin.layouts.MVerticalLayout;
@@ -34,11 +30,6 @@ public class MainComponent extends MVerticalLayout {
 
     private final List<ComponentInstance> componentInstances = new ArrayList<>();
 
-    private String sessionId;
-    private Integer tabHash;
-    private String moduleCode;
-    private String viewCode;
-
     @Requires
     private LogService logService;
 
@@ -52,9 +43,7 @@ public class MainComponent extends MVerticalLayout {
     @Validate
     private void init() throws UnacceptableConfiguration, MissingHandlerException, ConfigurationException {
         if (ComponentUtil.componentInstanceValid(componentInstances)) {
-            logService.log(LogService.LOG_DEBUG, "Oh fuck yeah !!!!");
-            Map<Class<? extends com.vaadin.ui.Component>, com.vaadin.ui.Component> components = ComponentUtil.getVaadinComponentFromComponentInstances(componentInstances, sessionId, tabHash,
-                            moduleCode, viewCode);
+            Map<Class<? extends com.vaadin.ui.Component>, com.vaadin.ui.Component> components = ComponentUtil.getVaadinComponentFromComponentInstances(componentInstances);
             this.withFullWidth().withMargin(true).withSpacing(true).with(components.get(FormComponent.class), components.get(ResultatComponent.class));
         }
     }
@@ -71,24 +60,12 @@ public class MainComponent extends MVerticalLayout {
         componentInstances.add(factory.createComponentInstance(null));
     }
 
-    @Property(name = PROPERTY_KEY_PORTAL_SESSION_ID)
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+    @Updated
+    public void updated(Dictionary<?,?> conf) {
+        for (ComponentInstance componentInstance : componentInstances) {
+            componentInstance.reconfigure(conf);
+        }
     }
-
-    @Property(name = PROPERTY_KEY_TAB_HASH)
-    public void setTabHash(Integer tabHash) {
-        this.tabHash = tabHash;
-    }
-
-    @Property(name = PROPERTY_KEY_MODULE_UI_CODE)
-    public void setModuleCode(String moduleCode) {
-        this.moduleCode = moduleCode;
-    }
-
-    @Property(name = PROPERTY_KEY_VIEW_UI_CODE)
-    public void setViewCode(String viewCode) {
-        this.viewCode = viewCode;
-    }
+    
 
 }

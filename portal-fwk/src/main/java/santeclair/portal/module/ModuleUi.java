@@ -17,7 +17,7 @@ public interface ModuleUi {
 
     Boolean isCloseable();
 
-    Boolean isSeveralInstanceAllowed();
+    Boolean isOnlyOneTabAllowed();
 
     Integer getDisplayOrder();
 

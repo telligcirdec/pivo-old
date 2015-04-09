@@ -1,6 +1,7 @@
 package santeclair.portal.view;
 
 import java.util.List;
+import java.util.Map;
 
 import com.vaadin.server.FontIcon;
 import com.vaadin.ui.Component;
@@ -17,7 +18,9 @@ public interface ViewUi {
 
     Boolean getVisibleOnMenu();
 
+    Boolean getSeveralTabsAllowed();
+
     List<String> getRolesAllowed();
 
-    Component getViewMainComponent(String sessionId, Integer tabHash, List<String> currentUserRoles);
+    Component getViewMainComponent(String sessionId, Integer tabHash, List<String> currentUserRoles, Map<String, Object> mapParams);
 }

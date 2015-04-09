@@ -1,5 +1,6 @@
 package santeclair.portal.reclamation.demande.document.recherche.component.sub;
 
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
 
@@ -8,6 +9,7 @@ import java.util.Hashtable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.ipojo.annotations.Component;
+import org.apache.felix.ipojo.annotations.Property;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.handlers.event.Publishes;
 import org.apache.felix.ipojo.handlers.event.publisher.Publisher;
@@ -18,11 +20,10 @@ import org.vaadin.viritin.layouts.MFormLayout;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
-import santeclair.portal.event.EventDictionaryConstant;
+import santeclair.portal.reclamation.demande.document.recherche.EventConstant;
 import santeclair.portal.reclamation.demande.document.recherche.form.RechercheForm;
 import santeclair.portal.utils.component.SubComponent;
 import santeclair.portal.utils.component.SubComponentInit;
-import santeclair.portal.utils.component.SubComponentInitProperty;
 import santeclair.portal.utils.notification.ValidationNotification;
 import santeclair.reclamation.demande.document.enumeration.EtatDemandeEnum;
 
@@ -34,6 +35,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -42,16 +44,19 @@ import com.vaadin.ui.themes.ValoTheme;
 @Provides(specifications = {FormComponent.class})
 public class FormComponent extends Panel {
 
+    @Property(name = PROPERTY_KEY_PORTAL_SESSION_ID) 
     private String sessionId;
+    @Property(name = PROPERTY_KEY_TAB_HASH) 
     private Integer tabHash;
 
     private static final long serialVersionUID = 8369775167208351407L;
 
-    private static final float TAILLE_STANDARD = 12;
+    private static final float TAILLE_STANDARD = 16;
 
-    private static final String MSG_ERROR = "Veuillez saisir au moins un critère de recherche.";
+    private static final String TITRE_MSG_ERROR = "Erreur dans la saisie des critères de recherche";
+    private static final String MSG_ERROR = "Veuillez saisir au moins un critère de recherche";
 
-    @Publishes(name = "formComponentPublisher", topics = "RechercheDemandeDocument")
+    @Publishes(name = "formComponentPublisher", topics = EventConstant.TOPIC_RECHERCHER_DEMANDE_DOCUMENT, synchronous = true)
     private Publisher formComponentPublisher;
 
     private MTextField nomBeneficiaire;
@@ -66,10 +71,7 @@ public class FormComponent extends Panel {
     private RechercheForm form;
 
     @SubComponentInit
-    public void init(@SubComponentInitProperty(name = PROPERTY_KEY_PORTAL_SESSION_ID) String sessionId, @SubComponentInitProperty(name = PROPERTY_KEY_TAB_HASH) Integer tabHash) {
-
-        this.sessionId = sessionId;
-        this.tabHash = tabHash;
+    public void init() {
 
         initDateDebut();
         initDateFin();
@@ -123,7 +125,7 @@ public class FormComponent extends Panel {
     /** Initialise le menu deroulant "Etat du dossier" */
     private void initEtatDossier() {
         etatDossier = new ComboBox("Etat du dossier : ");
-        etatDossier.setWidth(TAILLE_STANDARD + 1, Unit.EM);
+        etatDossier.setWidth(TAILLE_STANDARD, Unit.EM);
         for (EtatDemandeEnum etatDemandeEnum : EtatDemandeEnum.values()) {
             etatDossier.addItem(etatDemandeEnum);
             etatDossier.setItemCaption(etatDemandeEnum, etatDemandeEnum.getLibelle());
@@ -132,26 +134,27 @@ public class FormComponent extends Panel {
 
     /** Initialise le bouton rechercher. */
     private void initRechercher() {
-        boutonRechercher = new PrimaryButton("Rechercher").withIcon(FontAwesome.SEARCH).withStyleName(ValoTheme.BUTTON_PRIMARY);
-        boutonRechercher.addClickListener(new ClickListener() {
+        boutonRechercher = new PrimaryButton("Rechercher")
+                        .withIcon(FontAwesome.SEARCH)
+                        .withStyleName(ValoTheme.BUTTON_PRIMARY)
+                        .withListener(new ClickListener() {
 
-            private static final long serialVersionUID = 1L;
+                            private static final long serialVersionUID = 1L;
 
-            @Override
-            public void buttonClick(ClickEvent event) {
-                ValidationNotification validation = controleDonnees();
-              if (validation.isError()) {
-                  validation.show();
-              } else {
-                  Dictionary<String, Object> props = new Hashtable<>();
-                  props.put(EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME, "rechercherDemandeDocument");
-                  props.put("sessionId", sessionId);
-                  props.put("tabHash", tabHash);
-                  props.put("form", form);
-                  formComponentPublisher.send(props);
-              }
-            }
-        });
+                            @Override
+                            public void buttonClick(ClickEvent event) {
+                                if (!controleDonnees()) {
+                                    ValidationNotification.showOneMessage(TITRE_MSG_ERROR, MSG_ERROR, Type.ERROR_MESSAGE);
+                                } else {
+                                    Dictionary<String, Object> props = new Hashtable<>();
+                                    props.put(PROPERTY_KEY_EVENT_NAME, EventConstant.EVENT_RECHERCHER_DEMANDE_DOCUMENT);
+                                    props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
+                                    props.put(PROPERTY_KEY_TAB_HASH, tabHash);
+                                    props.put(EventConstant.PROPERTY_KEY_FORM, form);
+                                    formComponentPublisher.send(props);
+                                }
+                            }
+                        });
     }
 
     /** Initialisation de l'ordre de tabulation. */
@@ -182,7 +185,7 @@ public class FormComponent extends Panel {
                         .withFullWidth();
 
         this.setCaption("Recherche de demandes de document");
-        this.setContent(new MVerticalLayout().withFullWidth().withMargin(true).with(horizontalLayout));
+        this.setContent(new MVerticalLayout(horizontalLayout).withFullWidth().withMargin(true));
 
     }
 
@@ -195,9 +198,7 @@ public class FormComponent extends Panel {
     }
 
     /** Controle les données du formulaire de recherche. */
-    private ValidationNotification controleDonnees() {
-        ValidationNotification result = new ValidationNotification();
-
+    private boolean controleDonnees() {
         if (StringUtils.isBlank(form.getNomBeneficiaire())
                         && StringUtils.isBlank(form.getPrenomBeneficiaire())
                         && StringUtils.isBlank(form.getNumeroDossier())
@@ -206,49 +207,8 @@ public class FormComponent extends Panel {
                         && null == form.getDateDebut()
                         && null == form.getDateFin()
                         && null == form.getEtatDossier()) {
-            result.addMessage(MSG_ERROR);
+            return false;
         }
-        return result;
+        return true;
     }
-
-//    @Override
-//    public void rechercheSuccessfull(List<DemandeDocumentDto> listeDemandesDocumentDto) {
-//        Dictionary<String, Object> props = new Hashtable<>();
-//        props.put(EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME, "rechercheOk");
-//        props.put(EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
-//        props.put(EventDictionaryConstant.PROPERTY_KEY_TAB_HASH, tabHash);
-//        props.put("listeDemandesDocumentDto", listeDemandesDocumentDto);
-//        formComponentPublisher.send(props);
-//    }
-//
-//    @Override
-//    public void rechercheFailed(String message) {
-//
-//    }
-
-//    private class FormRechercherClickListener implements ClickListener {
-//
-//        private static final long serialVersionUID = -894998593011734769L;
-//        
-//        private final FormComponentCallback formComponentCallback;
-//
-//        public FormRechercherClickListener(FormComponentCallback formComponentCallback) {
-//            this.formComponentCallback = formComponentCallback;
-//        }
-//
-//        @Override
-//        public void buttonClick(ClickEvent event) {
-//            ValidationNotification validation = controleDonnees();
-//            if (validation.isError()) {
-//                validation.show();
-//            } else {
-//                Dictionary<String, Object> props = new Hashtable<>();
-//                props.put(EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME, "rechercherDemandeDocument");
-//                props.put("form", form);
-//                formComponentPublisher.send(props);
-//            }
-//        }
-//
-//    }
-
 }

@@ -51,7 +51,6 @@ public class NavigatorEventHandler extends AbstractEventHandler {
         Dictionary<String, Object> props = new Hashtable<>();
         props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_NAVIGATION);
         props.put(PROPERTY_KEY_NAVIGATOR_URI, uri);
-        
         return props;
     }
 }

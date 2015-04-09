@@ -13,6 +13,7 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PARAMS;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI;
@@ -73,7 +74,7 @@ public class ModuleUiImpl implements ModuleUi {
     private String libelle;
     private FontIcon icon;
     private Boolean closeable;
-    private Boolean severalInstanceAllowed;
+    private Boolean onlyOneTabAllowed;
     private Boolean keepModuleUiOnTabClose;
     private Integer displayOrder;
 
@@ -162,7 +163,7 @@ public class ModuleUiImpl implements ModuleUi {
 
     @Subscriber(name = "newViewUi", topics = TOPIC_MODULE_UI, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_TABS + ")(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_NAME_NEW + ")(" + PROPERTY_KEY_MODULE_UI_CODE + "=*)(" + PROPERTY_KEY_VIEW_UI_CODE + "=*)(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)("
-                    + PROPERTY_KEY_EVENT_DATA + "=*))")
+                    + PROPERTY_KEY_EVENT_DATA + "=*)(" + PROPERTY_KEY_PARAMS + "=*))")
     private void newViewUi(Event event) {
         String moduleCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_MODULE_UI_CODE);
         String viewCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_VIEW_UI_CODE);
@@ -170,23 +171,20 @@ public class ModuleUiImpl implements ModuleUi {
             ViewUi viewUi = viewUis.get(viewCodeFromEvent);
             String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
             TabsCallback tabsCallback = (TabsCallback) event.getProperty(PROPERTY_KEY_EVENT_DATA);
+            Map<String, Object> mapParams = (Map<String, Object>) event.getProperty(PROPERTY_KEY_PARAMS);
             ModuleUiCustomComponent moduleUiCustomComponent = null;
-            if (!severalInstanceAllowed) {
-                Set<SessionIdTabHashKey> keySet = moduleUiCustomComponentMap.keySet();
-                for (SessionIdTabHashKey sessionIdTabHashKey : keySet) {
-                    if (sessionIdTabHashKey.isSessionIdEquals(sessionId)) {
-                        moduleUiCustomComponent = moduleUiCustomComponentMap.get(sessionIdTabHashKey);
-                        break;
-                    }
-                }
-                if (moduleUiCustomComponent == null) {
-                    moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId);
-                }
+            if (onlyOneTabAllowed) {
+                moduleUiCustomComponent = checkModuleUiInstanceExistForSessionId(sessionId);
             } else {
-                moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId);
+                if (viewUi.getSeveralTabsAllowed()) {
+                    moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId);
+                } else {
+                    moduleUiCustomComponent = checkModuleUiInstanceExistForSessionAndViewUiCodeId(sessionId, viewUi.getCode());
+                }
             }
             int tabHash = tabsCallback.addView(this.libelle + " - " + viewUi.getLibelle(), icon, closeable, moduleUiCustomComponent);
-            com.vaadin.ui.Component component = viewUi.getViewMainComponent(sessionId, tabHash, null);
+            com.vaadin.ui.Component component = viewUi.getViewMainComponent(sessionId, tabHash, null, mapParams);
+            moduleUiCustomComponent.setCodeViewUi(viewUi.getCode());
             moduleUiCustomComponent.setTabHash(tabHash);
             moduleUiCustomComponent.setCompositionRoot(component);
             moduleUiCustomComponentMap.put(new SessionIdTabHashKey(sessionId, tabHash), moduleUiCustomComponent);
@@ -197,7 +195,7 @@ public class ModuleUiImpl implements ModuleUi {
                     PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_NAME_CLOSED + ")(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)(" + PROPERTY_KEY_TAB_HASH + "=*))")
     public void closeTabs(org.osgi.service.event.Event event) {
-        if ((!keepModuleUiOnTabClose && !severalInstanceAllowed) || (severalInstanceAllowed)) {
+        if ((!keepModuleUiOnTabClose && onlyOneTabAllowed) || (!onlyOneTabAllowed)) {
             String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
             Integer tabHash = (Integer) event.getProperty(PROPERTY_KEY_TAB_HASH);
             clearModuleUiCustomComponent(sessionId, tabHash);
@@ -225,9 +223,9 @@ public class ModuleUiImpl implements ModuleUi {
     @Updated
     private void updated() {
         logService.log(LogService.LOG_INFO, "From ModuleUi " + libelle + " (" + code + ") => updtating module");
-        if (keepModuleUiOnTabClose && severalInstanceAllowed) {
+        if (keepModuleUiOnTabClose && !onlyOneTabAllowed) {
             logService.log(LogService.LOG_WARNING, "From ModuleUi " + libelle + " (" + code
-                            + ") => module parameters keepModuleUiOnTabClose and severalInstanceAllowed are both set to true. keepModuleUiOnTabClose will be ignored.");
+                            + ") => module parameters keepModuleUiOnTabClose are set to true and severalInstanceAllowed are set to false. keepModuleUiOnTabClose will be ignored.");
         }
         clear();
         Dictionary<String, Object> propsStartView = startProperties(this);
@@ -263,9 +261,9 @@ public class ModuleUiImpl implements ModuleUi {
         this.closeable = closeable;
     }
 
-    @Property(name = "severalInstanceAllowed", value = "false")
-    private void setSeveralInstanceAllowed(Boolean severalInstanceAllowed) {
-        this.severalInstanceAllowed = severalInstanceAllowed;
+    @Property(name = "onlyOneTabAllowed", value = "false")
+    private void setOnlyOneTabAllowed(Boolean onlyOneTabAllowed) {
+        this.onlyOneTabAllowed = onlyOneTabAllowed;
     }
 
     @Property(name = "keepModuleUiOnTabClose", value = "false")
@@ -303,8 +301,8 @@ public class ModuleUiImpl implements ModuleUi {
     }
 
     @Override
-    public Boolean isSeveralInstanceAllowed() {
-        return severalInstanceAllowed;
+    public Boolean isOnlyOneTabAllowed() {
+        return onlyOneTabAllowed;
     }
 
     @Override
@@ -372,6 +370,40 @@ public class ModuleUiImpl implements ModuleUi {
         clearAllModuleUiCustomComponent();
         viewUis.clear();
         moduleUiCustomComponentMap.clear();
+    }
+
+    private ModuleUiCustomComponent checkModuleUiInstanceExistForSessionId(String sessionId) {
+        ModuleUiCustomComponent moduleUiCustomComponent = null;
+        Set<SessionIdTabHashKey> keySet = moduleUiCustomComponentMap.keySet();
+        for (SessionIdTabHashKey sessionIdTabHashKey : keySet) {
+            if (sessionIdTabHashKey.isSessionIdEquals(sessionId)) {
+                moduleUiCustomComponent = moduleUiCustomComponentMap.get(sessionIdTabHashKey);
+                break;
+            }
+        }
+        if (moduleUiCustomComponent == null) {
+            moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId);
+        }
+        return moduleUiCustomComponent;
+    }
+
+    private ModuleUiCustomComponent checkModuleUiInstanceExistForSessionAndViewUiCodeId(String sessionId, String viewUiCode) {
+        ModuleUiCustomComponent moduleUiCustomComponent = null;
+        Set<SessionIdTabHashKey> keySet = moduleUiCustomComponentMap.keySet();
+        for (SessionIdTabHashKey sessionIdTabHashKey : keySet) {
+            if (sessionIdTabHashKey.isSessionIdEquals(sessionId)) {
+                moduleUiCustomComponent = moduleUiCustomComponentMap.get(sessionIdTabHashKey);
+                if (moduleUiCustomComponent.getCodeViewUi() != null && moduleUiCustomComponent.getCodeViewUi().equals(viewUiCode)) {
+                    break;
+                } else {
+                    moduleUiCustomComponent = null;
+                }
+            }
+        }
+        if (moduleUiCustomComponent == null) {
+            moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId);
+        }
+        return moduleUiCustomComponent;
     }
 
     /*

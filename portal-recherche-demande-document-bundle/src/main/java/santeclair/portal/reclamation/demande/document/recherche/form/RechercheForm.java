@@ -10,21 +10,34 @@ import santeclair.reclamation.demande.document.enumeration.EtatDemandeEnum;
 public class RechercheForm {
     /** Nom du bénéficiaire. */
     private String nomBeneficiaire;
+    
     /** Prénom du bénéficiaire. */
     private String prenomBeneficiaire;
+    
     /** Téléphone du PS. */
     private String telephonePS;
+    
     /** Numéro du dossier. */
     private String numeroDossier;
+    
     /** Trigramme du demandeur. */
     private String trigrammeDemandeur;
+    
     /** Date de début. */
     private Date dateDebut;
+    
     /** Date de fin. */
     private Date dateFin;
+    
     /** Etat du dossier. */
     private EtatDemandeEnum etatDossier;
 
+    /**
+     * Constructeur par défaut.
+     */
+    public RechercheForm() {
+    }
+    
     public String getNomBeneficiaire() {
         return nomBeneficiaire;
     }

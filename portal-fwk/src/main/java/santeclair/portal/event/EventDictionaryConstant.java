@@ -79,6 +79,11 @@ public interface EventDictionaryConstant {
     public static final String PROPERTY_KEY_VIEW_UI = "property.key.view.ui";
     public static final String PROPERTY_KEY_VIEW_UI_CODE = "property.key.view.ui.code";
 
+    /**
+     * Propriété des paramètres
+     */
+    public static final String PROPERTY_KEY_PARAMS = "property.key.params";
+    
     /*
      * Event context
      */

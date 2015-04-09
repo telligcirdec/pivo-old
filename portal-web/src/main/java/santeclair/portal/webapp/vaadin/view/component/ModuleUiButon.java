@@ -112,22 +112,24 @@ public class ModuleUiButon extends Button implements Comparable<ModuleUiButon>, 
             viewUiButtonVl.setStyleName("menu-button-layout");
             for (String key : keySet) {
                 final ViewUi viewUi = viewUiMap.get(key);
-                Button viewUiButton = new Button(viewUi.getLibelle(), viewUi.getIcon());
-                viewUiButton.setSizeFull();
-                viewUiButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
-                viewUiButton.addClickListener(new ClickListener() {
-                    private static final long serialVersionUID = 4846606842901609607L;
-
-                    @Override
-                    public void buttonClick(ClickEvent event) {
-                        publisher.publishEventSynchronously(NavigatorEventHandler.getNavigateEventProperty(
-                                        "container/new/modules/" + moduleUi.getCode() + "/views/" + viewUi.getCode(),
-                                        sessionId));
-                    }
-                });
-                viewUiButtonVl.addComponent(viewUiButton);
-                viewUiButtonVl.setComponentAlignment(
-                                viewUiButton, Alignment.MIDDLE_RIGHT);
+                if (viewUi.getVisibleOnMenu()) {
+                    Button viewUiButton = new Button(viewUi.getLibelle(), viewUi.getIcon());
+                    viewUiButton.setSizeFull();
+                    viewUiButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+                    viewUiButton.addClickListener(new ClickListener() {
+                        private static final long serialVersionUID = 4846606842901609607L;
+    
+                        @Override
+                        public void buttonClick(ClickEvent event) {
+                            publisher.publishEventSynchronously(NavigatorEventHandler.getNavigateEventProperty(
+                                            "container/new/modules/" + moduleUi.getCode() + "/views/" + viewUi.getCode(),
+                                            sessionId));
+                        }
+                    });
+                    viewUiButtonVl.addComponent(viewUiButton);
+                    viewUiButtonVl.setComponentAlignment(
+                                    viewUiButton, Alignment.MIDDLE_RIGHT);
+                }
             }
         }
         int mainButtonIndex = parent.getComponentIndex(this);
