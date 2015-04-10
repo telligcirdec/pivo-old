@@ -1,6 +1,7 @@
 package santeclair.portal.webapp.vaadin.view;
 
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_TABS;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_VIEW_UI;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_ASKING_CLOSED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_CLOSED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_NEW;
@@ -16,6 +17,7 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_COMPONENT_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_NAVIGATOR;
+import static santeclair.portal.event.EventDictionaryConstant.TOPIC_TABS;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_VIEW_UI;
 
 import java.util.Dictionary;
@@ -26,9 +28,15 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import santeclair.portal.event.handler.AbstractEventHandler;
+import santeclair.portal.event.handler.EventProperty;
+import santeclair.portal.event.handler.PortalEventHandler;
+import santeclair.portal.event.handler.Subscriber;
 import santeclair.portal.event.publisher.callback.TabsCallback;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener.DataPublisher;
@@ -46,7 +54,7 @@ import com.vaadin.ui.TabSheet.SelectedTabChangeListener;
 import com.vaadin.ui.themes.ValoTheme;
 
 public class Tabs extends TabSheet implements View, SelectedTabChangeListener, CloseHandler,
-                ComponentDetachListener, TabsCallback {
+                ComponentDetachListener, TabsCallback, PortalEventHandler {
 
     private static final long serialVersionUID = 5672663000761618207L;
 
@@ -63,9 +71,11 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
     private final String sessionId;
     private final List<String> currentUserRoles;
 
+    private final BundleContext bundleContext;
+
     private Boolean keepView = false;
 
-    public Tabs(final EventAdminServiceListener eventAdminServiceListener, final String sessionId, final List<String> currentUserRoles) {
+    public Tabs(final EventAdminServiceListener eventAdminServiceListener, final String sessionId, final List<String> currentUserRoles, final BundleContext bundleContext) {
         this.eventAdminServiceListener = eventAdminServiceListener;
         this.sessionId = sessionId;
         this.currentUserRoles = currentUserRoles;
@@ -73,6 +83,8 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
         this.dataPublisherToViewUiTopic = eventAdminServiceListener.registerDataPublisher(this, TabsCallback.class, TOPIC_VIEW_UI);
         this.dataPublisherToComponentUiTopic = eventAdminServiceListener.registerDataPublisher(this, TabsCallback.class, TOPIC_COMPONENT_UI);
         this.publisherToNavigatorTopic = eventAdminServiceListener.registerPublisher(this, TOPIC_NAVIGATOR);
+        this.bundleContext = bundleContext;
+        registerEventHandlerItself(bundleContext);
     }
 
     public void init() {
@@ -94,6 +106,7 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
     public void detach() {
         super.detach();
         eventAdminServiceListener.unregisterPublisher(dataPublisherToModuleUiTopic, dataPublisherToViewUiTopic, dataPublisherToComponentUiTopic, publisherToNavigatorTopic);
+        unregisterEventHandlerItSelf(bundleContext);
     }
 
     @Override
@@ -128,7 +141,7 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
             props.put(PROPERTY_KEY_VIEW_UI_CODE, viewUiCode);
             props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
             props.put(PROPERTY_KEY_PORTAL_CURRENT_USER_ROLES, currentUserRoles);
-            
+
             addExtractedParams(parameters, props);
 
             dataPublisherToModuleUiTopic.publishEventDataAndDictionnarySynchronously(this, props);
@@ -199,7 +212,43 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
     }
 
     @Override
-    public void removeView(int tabHash) {
+    public void selectedTabChange(SelectedTabChangeEvent event) {
+        TabSheet tabSheet = event.getTabSheet();
+        Tab tab = tabSheet.getTab(tabSheet.getSelectedTab());
+        if (tab != null) {
+            publisherToNavigatorTopic.publishEventSynchronously(NavigatorEventHandler.getNavigateEventProperty("container/" + tab.hashCode(), sessionId));
+        }
+    }
+
+    @Override
+    public void registerEventHandlerItself(BundleContext bundleContext) {
+        try {
+            AbstractEventHandler.registerEventHandler(bundleContext, this);
+        } catch (InvalidSyntaxException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void unregisterEventHandlerItSelf(BundleContext bundleContext) {
+        try {
+            AbstractEventHandler.unregisterEventHandler(bundleContext, this);
+        } catch (InvalidSyntaxException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Subscriber(topic = TOPIC_TABS, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_VIEW_UI + ")(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_ASKING_CLOSED + ")("
+                    + PROPERTY_KEY_TAB_HASH + "=*)("
+                    + PROPERTY_KEY_PORTAL_SESSION_ID + "=*))")
+    public void removeView(@EventProperty(propKey = PROPERTY_KEY_TAB_HASH, required = true) Integer tabHash,
+                    @EventProperty(propKey = PROPERTY_KEY_PORTAL_SESSION_ID, required = true) String sessionId) {
+        if (sessionId.equals(this.sessionId)) {
+            removeView(tabHash);
+        }
+    }
+
+    private void removeView(Integer tabHash) {
         Integer numberOfTab = this.getComponentCount();
         for (int i = 0; i < numberOfTab; i++) {
             Tab tab = this.getTab(i);
@@ -219,15 +268,6 @@ public class Tabs extends TabSheet implements View, SelectedTabChangeListener, C
 
                 break;
             }
-        }
-    }
-
-    @Override
-    public void selectedTabChange(SelectedTabChangeEvent event) {
-        TabSheet tabSheet = event.getTabSheet();
-        Tab tab = tabSheet.getTab(tabSheet.getSelectedTab());
-        if (tab != null) {
-            publisherToNavigatorTopic.publishEventSynchronously(NavigatorEventHandler.getNavigateEventProperty("container/" + tab.hashCode(), sessionId));
         }
     }
 

@@ -1,5 +1,8 @@
 package santeclair.reclamation.demande.document.enumeration;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 
@@ -17,7 +20,11 @@ public enum ResultatAnalyseEnum implements
     @XmlEnumValue("NO_CONF")
     NON_CONFORME("NO_CONF", "Non conforme"),
     @XmlEnumValue("ABAND")
-    ABANDON("ABAND", "Abandon");
+    ABANDON("ABAND", "Abandon",
+                    DetailResultatAnalyseEnum.VENTE_NON_FINALISEE,
+                    DetailResultatAnalyseEnum.ABANDON_SANTECLAIR,
+                    DetailResultatAnalyseEnum.PS_RESILIE,
+                    DetailResultatAnalyseEnum.DOCS_NON_ENVOYES);
 
     /**
      * Le code du résultat d'analyse
@@ -29,13 +36,19 @@ public enum ResultatAnalyseEnum implements
      */
     private String libelle;
 
+    /**
+     * Liste des DetailResultatAnalyseEnum dans le cas d'un résultat d'analyse "Abandon"
+     */
+    private List<DetailResultatAnalyseEnum> detailsResultatAnalyseEnum;
+
     /* ======================================================= *
      *                      constructeur 		   		   	   *
      * ======================================================= */
 
-    private ResultatAnalyseEnum(String code, String libelle) {
+    private ResultatAnalyseEnum(String code, String libelle, DetailResultatAnalyseEnum... detailsResultatAnalyseEnum) {
         this.code = code;
         this.libelle = libelle;
+        this.detailsResultatAnalyseEnum = Arrays.asList(detailsResultatAnalyseEnum);
     }
 
     /* ======================================================= *
@@ -45,6 +58,7 @@ public enum ResultatAnalyseEnum implements
     /**
      * @return the code
      */
+    @Override
     public String getCode() {
         return code;
     }
@@ -52,8 +66,16 @@ public enum ResultatAnalyseEnum implements
     /**
      * @return the libelle
      */
+    @Override
     public String getLibelle() {
         return libelle;
+    }
+    
+    /**
+     * @return the detailsResultatAnalyseEnum
+     */
+    public List<DetailResultatAnalyseEnum> getDetailsResultatAnalyseEnum() {
+        return detailsResultatAnalyseEnum;
     }
 
     /**

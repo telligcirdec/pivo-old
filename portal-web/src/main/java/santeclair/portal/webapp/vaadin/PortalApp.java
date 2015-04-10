@@ -112,7 +112,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
         // Création du composant contenant les tabsheet
         LOGGER.info("Initialisation du container d'onglet");
-        tabs = new Tabs(eventAdminServiceListener, sessionId, getCurrentUserRoles());
+        tabs = new Tabs(eventAdminServiceListener, sessionId, getCurrentUserRoles(),context);
         tabs.init();
 
         navigator.addView("", tabs);

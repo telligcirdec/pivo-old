@@ -45,11 +45,11 @@ public enum TypeDocumentEnum implements
     @XmlEnumValue("TIERS_P")
     DEMANDE_TIERS_PAYANT("TIERS_P", "Demande de tiers payant",
                     DetailResultatAnalyseEnum.ABSENCE_SIGNATURE,
-                    DetailResultatAnalyseEnum.FAUSSE_SIGNTAURE),
+                    DetailResultatAnalyseEnum.FAUSSE_SIGNATURE),
     @XmlEnumValue("SUBRO")
     FACTURE_SUBROGATOIRE("SUBRO", "Facture subrogatoire",
                     DetailResultatAnalyseEnum.ABSENCE_SIGNATURE,
-                    DetailResultatAnalyseEnum.FAUSSE_SIGNTAURE);
+                    DetailResultatAnalyseEnum.FAUSSE_SIGNATURE);
 
     /**
      * Le code du type de document

@@ -22,6 +22,11 @@ public interface EventDictionaryConstant {
     public static final String TOPIC_NAVIGATOR = TOPIC_PORTAL + "/navigator";
 
     /**
+     * Nom du topic portail
+     */
+    public static final String TOPIC_TABS = TOPIC_PORTAL + "/tabs";
+    
+    /**
      * Nom du topic ou sont firé les event en rapport avec les modules ui
      */
     public static final String TOPIC_MODULE_UI = TOPIC_PORTAL + "/module/ModuleUiEvent";

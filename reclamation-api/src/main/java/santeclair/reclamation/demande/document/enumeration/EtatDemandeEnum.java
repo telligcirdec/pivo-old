@@ -47,6 +47,7 @@ public enum EtatDemandeEnum implements
     /**
      * @return the code
      */
+    @Override
     public String getCode() {
         return code;
     }
@@ -54,6 +55,7 @@ public enum EtatDemandeEnum implements
     /**
      * @return the libelle
      */
+    @Override
     public String getLibelle() {
         return libelle;
     }

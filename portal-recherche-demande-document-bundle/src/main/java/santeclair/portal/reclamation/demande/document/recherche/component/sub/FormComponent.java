@@ -35,7 +35,6 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
-import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -53,10 +52,12 @@ public class FormComponent extends Panel {
 
     private static final float TAILLE_STANDARD = 16;
 
-    private static final String TITRE_MSG_ERROR = "Erreur dans la saisie des critères de recherche";
-    private static final String MSG_ERROR = "Veuillez saisir au moins un critère de recherche";
+    private static final String MSG_ERROR_SAISIE = "Vous devez renseigner au moins un critère pour effectuer une recherche";
+    private static final String MSG_ERROR_SAISIE_NOM = "Le nom du bénéficiaire doit contenir au moins 3 caractères";
+    private static final String MSG_ERROR_SAISIE_PRENOM = "Le prénom du bénéficiaire doit contenir au moins 3 caractères";
+    private static final String MSG_ERROR_SAISIE_TELEPHONE = "Le téléphone PS doit contenir 10 caractères numérique";
 
-    @Publishes(name = "formComponentPublisher", topics = EventConstant.TOPIC_RECHERCHER_DEMANDE_DOCUMENT, synchronous = true)
+    @Publishes(name = "formComponentPublisher", topics = EventConstant.TOPIC_RECHERCHE_DEMANDE_DOCUMENT, synchronous = true)
     private Publisher formComponentPublisher;
 
     private MTextField nomBeneficiaire;
@@ -143,8 +144,9 @@ public class FormComponent extends Panel {
 
                             @Override
                             public void buttonClick(ClickEvent event) {
-                                if (!controleDonnees()) {
-                                    ValidationNotification.showOneMessage(TITRE_MSG_ERROR, MSG_ERROR, Type.ERROR_MESSAGE);
+                                ValidationNotification validation = controleDonnees();
+                                if (validation.isError()) {
+                                    validation.show();
                                 } else {
                                     Dictionary<String, Object> props = new Hashtable<>();
                                     props.put(PROPERTY_KEY_EVENT_NAME, EventConstant.EVENT_RECHERCHER_DEMANDE_DOCUMENT);
@@ -198,7 +200,9 @@ public class FormComponent extends Panel {
     }
 
     /** Controle les données du formulaire de recherche. */
-    private boolean controleDonnees() {
+    private ValidationNotification controleDonnees() {
+        ValidationNotification result = new ValidationNotification();
+
         if (StringUtils.isBlank(form.getNomBeneficiaire())
                         && StringUtils.isBlank(form.getPrenomBeneficiaire())
                         && StringUtils.isBlank(form.getNumeroDossier())
@@ -207,8 +211,19 @@ public class FormComponent extends Panel {
                         && null == form.getDateDebut()
                         && null == form.getDateFin()
                         && null == form.getEtatDossier()) {
-            return false;
+            result.addMessage(MSG_ERROR_SAISIE);
+        } else {
+            if (!StringUtils.isBlank(form.getNomBeneficiaire()) && form.getNomBeneficiaire().length() <= 3) {
+                result.addMessage(MSG_ERROR_SAISIE_NOM);
+            }
+            if (!StringUtils.isBlank(form.getPrenomBeneficiaire()) && form.getPrenomBeneficiaire().length() <= 3) {
+                result.addMessage(MSG_ERROR_SAISIE_PRENOM);
+            }
+            if (!StringUtils.isBlank(form.getTelephonePS()) && (!StringUtils.isNumeric(form.getTelephonePS()) || form.getTelephonePS().length() != 10)) {
+                result.addMessage(MSG_ERROR_SAISIE_TELEPHONE);
+            }
+            
         }
-        return true;
+        return result;
     }
 }

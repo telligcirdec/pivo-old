@@ -7,8 +7,6 @@ public interface TabsCallback {
 
     int addView(String caption, FontIcon icon, Boolean closable, Component moduleUiView);
 
-    void removeView(int tabHash);
-
     void keepView();
 
 }

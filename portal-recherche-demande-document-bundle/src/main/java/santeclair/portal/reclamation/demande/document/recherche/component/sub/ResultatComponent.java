@@ -26,7 +26,7 @@ import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import santeclair.portal.reclamation.demande.document.recherche.EventConstant;
-import santeclair.portal.reclamation.demande.document.recherche.form.ResultatRechercheForm;
+import santeclair.portal.reclamation.demande.document.recherche.form.ResultatRecherche;
 import santeclair.portal.utils.component.SubComponent;
 import santeclair.portal.utils.component.SubComponentInit;
 import santeclair.reclamation.demande.document.dto.DemandeDocumentDto;
@@ -38,6 +38,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.Align;
@@ -55,6 +56,8 @@ public class ResultatComponent extends Panel {
 
     private static final long serialVersionUID = 8369775167208351407L;
 
+    private static final String MSG_NO_RESULTAT = "Aucun résultat pour cette recherche de demande de document";
+
     @Publishes(name = "resultatComponentPublisher", topics = TOPIC_NAVIGATOR, synchronous = true)
     private Publisher resultatComponentPublisher;
 
@@ -63,12 +66,22 @@ public class ResultatComponent extends Panel {
     private Table tableauResultDemande;
 
     private MVerticalLayout tableResultLayout;
+    private MVerticalLayout emptyTableauLayout;
+
+    private Label labelEmptyTableau;
 
     @SubComponentInit
     public void init() {
+        initEmptyTableau();
         initExporter();
-        initGridResultDemandeDocument();
+        initTableauResultDemandeDocument();
         initLayout();
+    }
+
+    /** Initialise le bouton exporter. */
+    private void initEmptyTableau() {
+        labelEmptyTableau = new Label(MSG_NO_RESULTAT);
+        labelEmptyTableau.setSizeUndefined();
     }
 
     /** Initialise le bouton exporter. */
@@ -81,10 +94,8 @@ public class ResultatComponent extends Panel {
     }
 
     /** Initialise le tableau de resultats de demandes de document. */
-    private void initGridResultDemandeDocument() {
-//        gridResultDemande = new Grid();
-//        gridResultDemande.setSizeFull();
-        
+    private void initTableauResultDemandeDocument() {
+
         tableauResultDemande = new Table();
         tableauResultDemande.setSizeFull();
         tableauResultDemande.setSelectable(false);
@@ -92,31 +103,23 @@ public class ResultatComponent extends Panel {
         tableauResultDemande.setPageLength(0);
         tableauResultDemande.addContainerProperty("dto.numeroDossier", String.class, null);
         tableauResultDemande.setColumnHeader("dto.numeroDossier", "Numéro de dossier");
-        tableauResultDemande.setColumnWidth("dto.numeroDossier", 180);
         tableauResultDemande.addContainerProperty("dto.trigrammeDemandeur", String.class, null);
         tableauResultDemande.setColumnHeader("dto.trigrammeDemandeur", "Trigramme");
-        tableauResultDemande.setColumnWidth("dto.trigrammeDemandeur", 130);
         tableauResultDemande.addContainerProperty("dto.dateDemandeDocument", Date.class, null);
         tableauResultDemande.setColumnHeader("dto.dateDemandeDocument", "Date");
-        tableauResultDemande.setColumnWidth("dto.dateDemandeDocument", 150);
         tableauResultDemande.addContainerProperty("dto.nomBeneficiaire", String.class, null);
         tableauResultDemande.setColumnHeader("dto.nomBeneficiaire", "Nom Bénéficiaire");
-        tableauResultDemande.setColumnExpandRatio("dto.nomBeneficiaire", 3);
         tableauResultDemande.addContainerProperty("dto.prenomBeneficiaire", String.class, null);
         tableauResultDemande.setColumnHeader("dto.prenomBeneficiaire", "Prénom Bénéficiaire");
-        tableauResultDemande.setColumnExpandRatio("dto.prenomBeneficiaire", 2);
         tableauResultDemande.addContainerProperty("dto.telephonePS", String.class, null);
         tableauResultDemande.setColumnHeader("dto.telephonePS", "Numéro de téléphone du PS");
-        tableauResultDemande.setColumnWidth("dto.telephonePS", 180);
         tableauResultDemande.addContainerProperty("dto.etat", String.class, null);
         tableauResultDemande.setColumnHeader("dto.etat", "Etat du dossier");
-        tableauResultDemande.setColumnWidth("dto.etat", 150);
         tableauResultDemande.addContainerProperty("buttonLayout", HorizontalLayout.class, null);
         tableauResultDemande.setColumnHeader("buttonLayout", "Action");
-        tableauResultDemande.setColumnWidth("buttonLayout", 100);
         tableauResultDemande.setColumnAlignment("buttonLayout", Align.CENTER);
         tableauResultDemande.setSortContainerPropertyId("dto.numeroDossier");
-        tableauResultDemande.setSortAscending(false);
+        tableauResultDemande.setSortAscending(true);
     }
 
     /** Initialise la vue principale. */
@@ -126,12 +129,18 @@ public class ResultatComponent extends Panel {
                         .withSpacing(true)
                         .withFullWidth()
                         .withAlign(boutonExporter, Alignment.TOP_RIGHT);
+        emptyTableauLayout = new MVerticalLayout(labelEmptyTableau)
+                        .withMargin(true)
+                        .withSpacing(true)
+                        .withFullWidth()
+                        .withAlign(labelEmptyTableau, Alignment.TOP_CENTER);
+
         this.setCaption("Résultat de la recherche");
-        this.setContent(tableResultLayout);
+        this.setVisible(false);
     }
 
     /** Construit les bouton action pour une ligne dans le tableau */
-    private HorizontalLayout buildButtonLayout(final DemandeDocumentDto demandeDocumentDto) {
+    private MHorizontalLayout buildButtonLayout(final DemandeDocumentDto demandeDocumentDto) {
         return new MHorizontalLayout(creerBtnConsulter(demandeDocumentDto));
     }
 
@@ -164,29 +173,35 @@ public class ResultatComponent extends Panel {
     }
 
     @Subscriber(name = EventConstant.EVENT_RECHERCHE_DEMANDE_DOCUMENT_OK, filter = "(&(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)(" + PROPERTY_KEY_TAB_HASH + "=*)("
-                    + PROPERTY_KEY_EVENT_NAME + "=" + EventConstant.EVENT_RECHERCHE_DEMANDE_DOCUMENT_OK + ")(" + EventConstant.PROPERTY_KEY_LISTE_DEMANDE_DOCUMENT + "=*))", 
-                    topics = EventConstant.TOPIC_RECHERCHER_DEMANDE_DOCUMENT)
+                    + PROPERTY_KEY_EVENT_NAME + "=" + EventConstant.EVENT_RECHERCHE_DEMANDE_DOCUMENT_OK + ")(" + EventConstant.PROPERTY_KEY_LISTE_DEMANDE_DOCUMENT + "=*))",
+                    topics = EventConstant.TOPIC_RECHERCHE_DEMANDE_DOCUMENT)
     private void setTableauRechercheItemsList(org.osgi.service.event.Event event) {
         List<DemandeDocumentDto> listeDemandesDocumentDto = (List<DemandeDocumentDto>) event.getProperty(EventConstant.PROPERTY_KEY_LISTE_DEMANDE_DOCUMENT);
-        List<ResultatRechercheForm> resultatsRecherche = new ArrayList<ResultatRechercheForm>();
-        for (final DemandeDocumentDto demandeDocumentDto : listeDemandesDocumentDto) {
-            ResultatRechercheForm resultatRechercheForm = new ResultatRechercheForm(demandeDocumentDto);
-            resultatRechercheForm.setButtonLayout(buildButtonLayout(demandeDocumentDto));
-            resultatsRecherche.add(resultatRechercheForm);
+
+        if (null != listeDemandesDocumentDto && !listeDemandesDocumentDto.isEmpty()) {
+            List<ResultatRecherche> resultatsRecherche = new ArrayList<ResultatRecherche>();
+            for (final DemandeDocumentDto demandeDocumentDto : listeDemandesDocumentDto) {
+                ResultatRecherche resultatRecherche = new ResultatRecherche(demandeDocumentDto);
+                resultatRecherche.setButtonLayout(buildButtonLayout(demandeDocumentDto));
+                resultatsRecherche.add(resultatRecherche);
+            }
+
+            BeanContainer<String, ResultatRecherche> dataSource = new BeanContainer<String, ResultatRecherche>(ResultatRecherche.class);
+            dataSource.addNestedContainerBean("dto");
+            dataSource.setBeanIdProperty("dto.id");
+            dataSource.addAll(resultatsRecherche);
+
+            tableauResultDemande.setContainerDataSource(dataSource);
+            tableauResultDemande.setVisibleColumns("dto.numeroDossier", "dto.trigrammeDemandeur", "dto.dateDemandeDocument",
+                            "dto.nomBeneficiaire", "dto.prenomBeneficiaire", "dto.telephonePS", "dto.etat", "buttonLayout");
+
+            tableauResultDemande.sort();
+            this.setContent(tableResultLayout);
+        } else {
+            this.setContent(emptyTableauLayout);
         }
-
-        BeanContainer<String, ResultatRechercheForm> dataSource = new BeanContainer<String, ResultatRechercheForm>(ResultatRechercheForm.class);
-        dataSource.addNestedContainerBean("dto");
-        dataSource.setBeanIdProperty("dto.id");
-        dataSource.addAll(resultatsRecherche);
-
-        tableauResultDemande.setContainerDataSource(dataSource);
-        tableauResultDemande.setVisibleColumns("dto.numeroDossier", "dto.trigrammeDemandeur", "dto.dateDemandeDocument",
-                        "dto.nomBeneficiaire", "dto.prenomBeneficiaire", "dto.telephonePS", "dto.etat", "buttonLayout");
-
-        tableauResultDemande.sort();
+        this.setVisible(true);
 
         // Ie8CssFontHack.showFonts();
     }
-
 }

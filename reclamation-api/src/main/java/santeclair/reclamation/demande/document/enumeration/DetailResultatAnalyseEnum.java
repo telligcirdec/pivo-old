@@ -36,7 +36,15 @@ public enum DetailResultatAnalyseEnum implements CodeEnum<DetailResultatAnalyseE
     @XmlEnumValue("ABS_SIGN")
     ABSENCE_SIGNATURE("ABS_SIGN", "Absence de signature"),
     @XmlEnumValue("FAUS_SIGN")
-    FAUSSE_SIGNTAURE("FAUS_SIGN", "Fausse signature");
+    FAUSSE_SIGNATURE("FAUS_SIGN", "Fausse signature"),
+    @XmlEnumValue("VENTE_NF")
+    VENTE_NON_FINALISEE("VENTE_NF", "Vente non finalisée"),
+    @XmlEnumValue("ABAND_SC")
+    ABANDON_SANTECLAIR("ABAND_SC", "Abandon Santéclair"),
+    @XmlEnumValue("PS_RESIL")
+    PS_RESILIE("PS_RESIL", "PS résilié"),
+    @XmlEnumValue("DOC_NE")
+    DOCS_NON_ENVOYES("DOCS_NE", "Documents non envoyés ");
 
     /**
      * Le code du résultat d'analyse
@@ -66,6 +74,7 @@ public enum DetailResultatAnalyseEnum implements CodeEnum<DetailResultatAnalyseE
     /**
      * @return the code
      */
+    @Override
     public String getCode() {
         return code;
     }
@@ -73,6 +82,7 @@ public enum DetailResultatAnalyseEnum implements CodeEnum<DetailResultatAnalyseE
     /**
      * @return the libelle
      */
+    @Override
     public String getLibelle() {
         return libelle;
     }

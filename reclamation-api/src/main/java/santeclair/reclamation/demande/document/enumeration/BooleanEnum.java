@@ -8,38 +8,30 @@ import santeclair.lunar.framework.enumeration.CodeEnum;
 import santeclair.lunar.framework.enumeration.LibelleEnum;
 
 @XmlEnum
-public enum NiveauIncidentEnum implements
-                CodeEnum<NiveauIncidentEnum>,
-                LibelleEnum<NiveauIncidentEnum> {
+public enum BooleanEnum implements
+                CodeEnum<BooleanEnum>,
+                LibelleEnum<BooleanEnum> {
 
-    @XmlEnumValue("0")
-    ZERO("0", "0"),
-    @XmlEnumValue("1")
-    UN("1", "1"),
-    @XmlEnumValue("2")
-    DEUX("2", "2"),
-    @XmlEnumValue("3")
-    TROIS("3", "3"),
-    @XmlEnumValue("4")
-    QUATRE("4", "4"),
-    @XmlEnumValue("5")
-    CINQ("5", "5");
+    @XmlEnumValue("true")
+    OUI("true", "Oui"),
+    @XmlEnumValue("false")
+    NON("false", "Non");
 
     /**
-     * Le code du niveau d'incident
+     * Le code de l'état de la demande de document
      */
     private String code;
 
     /**
-     * Le libellé du niveau d'incident
+     * Le libellé de l'état de la demande de document
      */
     private String libelle;
 
     /* ======================================================= *
-     *                      constructeurs 
+     *                      constructeur
      * ======================================================= */
 
-    private NiveauIncidentEnum(String code, String libelle) {
+    private BooleanEnum(String code, String libelle) {
         this.code = code;
         this.libelle = libelle;
     }
@@ -65,13 +57,13 @@ public enum NiveauIncidentEnum implements
     }
 
     /**
-     * Retourne le NiveauIncidentEnum correspondant au code passé en paramètre
+     * Retourne l'EtatDemandeEnum correspondant au code passé en paramètre
      * 
      * @param code
-     * @return NiveauIncidentEnum
+     * @return EtatDemandeEnum
      */
-    public static NiveauIncidentEnum byCode(String code) {
+    public static BooleanEnum byCode(String code) {
         return AbstractEnumTools.findEnumValuesByCode(
-                        NiveauIncidentEnum.class, code);
+                        BooleanEnum.class, code);
     }
 }

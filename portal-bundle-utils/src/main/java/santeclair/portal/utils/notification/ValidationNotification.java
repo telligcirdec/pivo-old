@@ -14,7 +14,7 @@ import com.vaadin.ui.Notification.Type;
  * 
  */
 public class ValidationNotification {
-    private static final String TITRE_PAR_DEFAUT = "Votre saisie comporte des erreurs";
+    private static final String TITRE_PAR_DEFAUT = "Erreur de saisie";
     /** Liste de message d'erreur à afficher. */
     private final List<String> messages;
 

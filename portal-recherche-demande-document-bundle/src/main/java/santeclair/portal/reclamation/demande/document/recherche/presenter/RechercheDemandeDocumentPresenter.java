@@ -29,12 +29,12 @@ public class RechercheDemandeDocumentPresenter {
     @Requires
     private DemandeDocumentWebService demandeDocumentWebService;
 
-    @Publishes(name = "presenterPublisher", topics = EventConstant.TOPIC_RECHERCHER_DEMANDE_DOCUMENT, synchronous = true)
+    @Publishes(name = "presenterPublisher", topics = EventConstant.TOPIC_RECHERCHE_DEMANDE_DOCUMENT, synchronous = true)
     private Publisher presenterPublisher;
 
     @Subscriber(name = EventConstant.EVENT_RECHERCHER_DEMANDE_DOCUMENT, filter = "(&(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)("
                     + PROPERTY_KEY_TAB_HASH + "=*)(" + PROPERTY_KEY_EVENT_NAME + "=" + EventConstant.EVENT_RECHERCHER_DEMANDE_DOCUMENT
-                    + ")(" + EventConstant.PROPERTY_KEY_FORM + "=*))", topics = EventConstant.TOPIC_RECHERCHER_DEMANDE_DOCUMENT)
+                    + ")(" + EventConstant.PROPERTY_KEY_FORM + "=*))", topics = EventConstant.TOPIC_RECHERCHE_DEMANDE_DOCUMENT)
     public void rechercherDemandeDocumentParCriteres(Event event) {
 
         RechercheForm form = (RechercheForm) event.getProperty(EventConstant.PROPERTY_KEY_FORM);
@@ -48,6 +48,7 @@ public class RechercheDemandeDocumentPresenter {
         criteresDto.setPrenomBeneficiaire(form.getPrenomBeneficiaire());
         criteresDto.setTelephonePS(form.getTelephonePS());
         criteresDto.setTrigrammeDemandeur(form.getTrigrammeDemandeur());
+            
         List<DemandeDocumentDto> listeDemandesDocumentDto = demandeDocumentWebService.rechercherDemandesDocumentParCriteres(criteresDto);
 
         Dictionary<String, Object> props = new Hashtable<>();
@@ -56,6 +57,7 @@ public class RechercheDemandeDocumentPresenter {
         props.put(PROPERTY_KEY_TAB_HASH, event.getProperty(PROPERTY_KEY_TAB_HASH));
         props.put(EventConstant.PROPERTY_KEY_LISTE_DEMANDE_DOCUMENT, listeDemandesDocumentDto);
         presenterPublisher.send(props);
+
     }
 
 }

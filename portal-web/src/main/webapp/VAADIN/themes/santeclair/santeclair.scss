@@ -31,6 +31,13 @@ $v-table-border-width: 1px;
 	[class*="spacing"] > tbody > [class*="row"] > td {
 		padding-top: 1em;
 	}
+	
+    /*******************************************************************
+     * general purpose class
+     *******************************************************************/
+	.invisible, .v-filterselect-invisible {
+		display: none;
+	}
   
     /*******************************************************************
      * layout
