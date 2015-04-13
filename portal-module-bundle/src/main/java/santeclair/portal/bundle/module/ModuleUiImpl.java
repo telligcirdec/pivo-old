@@ -172,7 +172,7 @@ public class ModuleUiImpl implements ModuleUi {
         List<String> currentUserRoles = (List<String>) event.getProperty(PROPERTY_KEY_PORTAL_CURRENT_USER_ROLES);
         if (moduleCodeFromEvent.equalsIgnoreCase(code) && viewUis.containsKey(viewCodeFromEvent)) {
             ViewUi viewUi = viewUis.get(viewCodeFromEvent);
-            if (currentUserRoles.contains(viewUi.getRolesAllowed()) || viewUi.getRolesAllowed().equals("ANY")) {
+            if (currentUserRoles.contains(viewUi.getRolesAllowed()) || viewUi.getRolesAllowed().contains("ANY")) {
                 String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
                 TabsCallback tabsCallback = (TabsCallback) event.getProperty(PROPERTY_KEY_EVENT_DATA);
                 Map<String, Object> mapParams = (Map<String, Object>) event.getProperty(PROPERTY_KEY_PARAMS);

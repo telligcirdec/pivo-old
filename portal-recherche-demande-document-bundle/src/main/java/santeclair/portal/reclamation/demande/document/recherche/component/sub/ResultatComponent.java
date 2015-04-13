@@ -8,11 +8,14 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTA
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_NAVIGATOR;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Property;
@@ -32,6 +35,7 @@ import santeclair.portal.utils.component.SubComponentInit;
 import santeclair.reclamation.demande.document.dto.DemandeDocumentDto;
 
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.converter.StringToDateConverter;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -106,6 +110,15 @@ public class ResultatComponent extends Panel {
         tableauResultDemande.addContainerProperty("dto.trigrammeDemandeur", String.class, null);
         tableauResultDemande.setColumnHeader("dto.trigrammeDemandeur", "Trigramme");
         tableauResultDemande.addContainerProperty("dto.dateDemandeDocument", Date.class, null);
+        tableauResultDemande.setConverter("dto.dateDemandeDocument", new StringToDateConverter(){
+            
+            private static final long serialVersionUID = -7198083299937576685L;
+
+            @Override
+            public DateFormat getFormat(Locale locale) {
+                return new SimpleDateFormat("dd/MM/yyyy");
+            }
+        });
         tableauResultDemande.setColumnHeader("dto.dateDemandeDocument", "Date");
         tableauResultDemande.addContainerProperty("dto.nomBeneficiaire", String.class, null);
         tableauResultDemande.setColumnHeader("dto.nomBeneficiaire", "Nom Bénéficiaire");
@@ -175,6 +188,7 @@ public class ResultatComponent extends Panel {
     @Subscriber(name = EventConstant.EVENT_RECHERCHE_DEMANDE_DOCUMENT_OK, filter = "(&(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)(" + PROPERTY_KEY_TAB_HASH + "=*)("
                     + PROPERTY_KEY_EVENT_NAME + "=" + EventConstant.EVENT_RECHERCHE_DEMANDE_DOCUMENT_OK + ")(" + EventConstant.PROPERTY_KEY_LISTE_DEMANDE_DOCUMENT + "=*))",
                     topics = EventConstant.TOPIC_RECHERCHE_DEMANDE_DOCUMENT)
+    @SuppressWarnings("unchecked")
     private void setTableauRechercheItemsList(org.osgi.service.event.Event event) {
         List<DemandeDocumentDto> listeDemandesDocumentDto = (List<DemandeDocumentDto>) event.getProperty(EventConstant.PROPERTY_KEY_LISTE_DEMANDE_DOCUMENT);
 

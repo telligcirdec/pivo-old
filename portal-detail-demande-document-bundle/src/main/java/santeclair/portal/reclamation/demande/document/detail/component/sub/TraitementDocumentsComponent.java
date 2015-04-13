@@ -1,8 +1,5 @@
 package santeclair.portal.reclamation.demande.document.detail.component.sub;
 
-import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_VIEW_UI;
-import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_ASKING_CLOSED;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CONTEXT;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
@@ -23,6 +20,7 @@ import org.vaadin.viritin.fields.MTextArea;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
+import santeclair.portal.event.utils.TabsEventUtil;
 import santeclair.portal.reclamation.demande.document.detail.EventConstant;
 import santeclair.portal.utils.component.SubComponent;
 import santeclair.portal.utils.component.SubComponentInit;
@@ -30,10 +28,12 @@ import santeclair.reclamation.demande.document.dto.DemandeDocumentDto;
 import santeclair.reclamation.demande.document.dto.DocumentDto;
 import santeclair.reclamation.demande.document.enumeration.BooleanEnum;
 import santeclair.reclamation.demande.document.enumeration.DetailResultatAnalyseEnum;
+import santeclair.reclamation.demande.document.enumeration.EtatDemandeEnum;
 import santeclair.reclamation.demande.document.enumeration.NiveauIncidentEnum;
 import santeclair.reclamation.demande.document.enumeration.ResultatAnalyseEnum;
 import santeclair.reclamation.demande.document.enumeration.TypeDocumentEnum;
 
+import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.server.FontAwesome;
@@ -75,7 +75,7 @@ public class TraitementDocumentsComponent extends Panel {
 
     private MButton boutonAnnuler;
     private MButton boutonAccederDossierNotes;
-    private MButton boutonEnregistrer;
+    private MButton boutonEnregistrerFermer;
 
     private Table tableauDocuments;
 
@@ -109,19 +109,14 @@ public class TraitementDocumentsComponent extends Panel {
 
                             @Override
                             public void buttonClick(ClickEvent event) {
-                                Dictionary<String, Object> props = new Hashtable<>();
-                                props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_VIEW_UI);
-                                props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_ASKING_CLOSED);
-                                props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
-                                props.put(PROPERTY_KEY_TAB_HASH, tabHash);
-                                tabsComponentPublisher.send(props);
+                                tabsComponentPublisher.send(TabsEventUtil.getCloseTabsProps(sessionId, tabHash));
                             }
                         });
     }
 
     /** Initialise le bouton "Enregistrer". */
     private void initEnregistrer() {
-        boutonEnregistrer = new MButton("Enregistrer")
+        boutonEnregistrerFermer = new MButton("Enregistrer et fermer la fiche")
                         .withStyleName(ValoTheme.BUTTON_PRIMARY)
                         .withIcon(FontAwesome.SAVE)
                         .withListener(new ClickListener() {
@@ -131,9 +126,24 @@ public class TraitementDocumentsComponent extends Panel {
                             public void buttonClick(ClickEvent event) {
 
                                 // TODO Recuperer data vers dto
+                                demandeDocumentDto.setCommentaire(commentaire.getValue());
+                                demandeDocumentDto.setNiveauIncident((NiveauIncidentEnum) niveauIncident.getValue());
+                                for (DocumentDto documentDto : demandeDocumentDto.getDocumentsDto()) {
+                                    Item item = tableauDocuments.getItem(documentDto.getId());
+                                    documentDto.setDateReception(((DateField) item.getItemProperty("dateReception").getValue()).getValue());
+                                    if (null != ((ComboBox) item.getItemProperty("documentRecu").getValue()).getValue()) {
+                                        documentDto.setDocumentRecu(Boolean.parseBoolean(((BooleanEnum) ((ComboBox) item.getItemProperty("documentRecu").getValue()).getValue()).getCode()));
+                                    }
+                                    if (null != ((ComboBox) item.getItemProperty("originalDemande").getValue()).getValue()) {
+                                        documentDto.setOriginalDemande(Boolean.parseBoolean(((BooleanEnum) ((ComboBox) item.getItemProperty("originalDemande").getValue()).getValue()).getCode()));
+                                    }
+                                    documentDto.setResultatAnalyse(((ResultatAnalyseEnum) ((ComboBox) item.getItemProperty("resultatAnalyse").getValue()).getValue()));
+                                    documentDto.setDetailResultatAnalyse(((DetailResultatAnalyseEnum) ((ComboBox) item.getItemProperty("detailResultatAnalyse").getValue()).getValue()));
+                                    
+                                }
 
                                 Dictionary<String, Object> props = new Hashtable<>();
-                                props.put(PROPERTY_KEY_EVENT_NAME, EventConstant.EVENT_RECUPERER_DEMANDE_DOCUMENT);
+                                props.put(PROPERTY_KEY_EVENT_NAME, EventConstant.EVENT_ENREGISTRER_DEMANDE_DOCUMENT);
                                 props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
                                 props.put(PROPERTY_KEY_TAB_HASH, tabHash);
                                 props.put(EventConstant.PROPERTY_KEY_DEMANDE_DOCUMENT, demandeDocumentDto);
@@ -163,8 +173,9 @@ public class TraitementDocumentsComponent extends Panel {
         niveauIncident.setWidth(TAILLE_MIDDLE, Unit.EM);
         for (NiveauIncidentEnum niveauIncidentEnum : NiveauIncidentEnum.values()) {
             niveauIncident.addItem(niveauIncidentEnum);
-            niveauIncident.setItemCaption(niveauIncidentEnum, niveauIncidentEnum.getLibelle());
+            niveauIncident.setItemCaption(niveauIncidentEnum, niveauIncidentEnum.getCode());
         }
+        niveauIncident.setVisible(false);
     }
 
     /** Initialise le champ "Commentaire". */
@@ -181,30 +192,36 @@ public class TraitementDocumentsComponent extends Panel {
 
         tableauDocuments.addContainerProperty("typeDocument", String.class, null);
         tableauDocuments.setColumnHeader("typeDocument", "Type de justificatif");
+        tableauDocuments.setColumnExpandRatio("typeDocument", 1);
         tableauDocuments.addContainerProperty("documentRecu", ComboBox.class, null);
         tableauDocuments.setColumnHeader("documentRecu", "Document reçu");
         tableauDocuments.setColumnAlignment("documentRecu", Align.CENTER);
+        tableauDocuments.setColumnExpandRatio("documentRecu", 1);
         tableauDocuments.addContainerProperty("originalDemande", ComboBox.class, null);
         tableauDocuments.setColumnHeader("originalDemande", "Original demandé");
         tableauDocuments.setColumnAlignment("originalDemande", Align.CENTER);
+        tableauDocuments.setColumnExpandRatio("originalDemande", 1);
         tableauDocuments.addContainerProperty("dateReception", DateField.class, null);
         tableauDocuments.setColumnHeader("dateReception", "Date de réception");
         tableauDocuments.setColumnAlignment("dateReception", Align.CENTER);
+        tableauDocuments.setColumnExpandRatio("dateReception", 1);
         tableauDocuments.addContainerProperty("resultatAnalyse", ComboBox.class, null);
         tableauDocuments.setColumnHeader("resultatAnalyse", "Résultat analyse");
         tableauDocuments.setColumnAlignment("resultatAnalyse", Align.CENTER);
+        tableauDocuments.setColumnExpandRatio("resultatAnalyse", 2);
         tableauDocuments.addContainerProperty("detailResultatAnalyse", ComboBox.class, null);
         tableauDocuments.setColumnHeader("detailResultatAnalyse", "Choisissez");
         tableauDocuments.setColumnAlignment("detailResultatAnalyse", Align.CENTER);
+        tableauDocuments.setColumnExpandRatio("detailResultatAnalyse", 3);
     }
 
     /** Initialise la vue principale. */
     private void initLayout() {
-        MHorizontalLayout boutonsLayout = new MHorizontalLayout(boutonEnregistrer, boutonAnnuler)
+        MHorizontalLayout boutonsLayout = new MHorizontalLayout(boutonEnregistrerFermer, boutonAnnuler)
                         .withFullWidth()
                         .withMargin(true)
                         .withSpacing(true)
-                        .withAlign(boutonEnregistrer, Alignment.MIDDLE_RIGHT);
+                        .withAlign(boutonEnregistrerFermer, Alignment.MIDDLE_RIGHT);
 
         HorizontalLayout commentaireNiveauIncidentLayout = new MHorizontalLayout(commentaire, niveauIncident)
                         .withFullWidth()
@@ -244,6 +261,7 @@ public class TraitementDocumentsComponent extends Panel {
                     setDetailResultatAnalyse(detailResultatAnalyse, ResultatAnalyseEnum.ABANDON.getDetailsResultatAnalyseEnum());
                 } else {
                     detailResultatAnalyse.addStyleName("invisible");
+                    detailResultatAnalyse.setValue(null);
                 }
                 
             }
@@ -296,12 +314,26 @@ public class TraitementDocumentsComponent extends Panel {
         demandeDocumentDto = (DemandeDocumentDto) event.getProperty(EventConstant.PROPERTY_KEY_DEMANDE_DOCUMENT);
         
         commentaire.setValue(demandeDocumentDto.getCommentaire());
-        niveauIncident.setValue(demandeDocumentDto.getNiveauIncident());
+        if (demandeDocumentDto.getEtat().equals(EtatDemandeEnum.RECEPTION_COMPLETE) || demandeDocumentDto.getEtat().equals(EtatDemandeEnum.DOSSIER_ANALYSE)) {
+            niveauIncident.setVisible(true);
+            niveauIncident.setValue(demandeDocumentDto.getNiveauIncident());
+        } else {
+            niveauIncident.setValue(null);
+        }
         
         for (DocumentDto documentDto : demandeDocumentDto.getDocumentsDto()) {
             ComboBox detailResultatAnalyse = initDetailResultatAnalyse();
             ComboBox resultatAnalyse = initResultatAnalyse(detailResultatAnalyse, documentDto.getTypeDocument());
             
+            resultatAnalyse.setValue(documentDto.getResultatAnalyse());
+            if (null != documentDto.getResultatAnalyse()) {
+                if (documentDto.getResultatAnalyse().equals(ResultatAnalyseEnum.ABANDON)) {
+                    setDetailResultatAnalyse(detailResultatAnalyse, ResultatAnalyseEnum.ABANDON.getDetailsResultatAnalyseEnum());
+                } else if (documentDto.getResultatAnalyse().equals(ResultatAnalyseEnum.NON_CONFORME)) {
+                    setDetailResultatAnalyse(detailResultatAnalyse, documentDto.getTypeDocument().getDetailsResultatAnalyseEnum());
+                }
+                detailResultatAnalyse.setValue(documentDto.getDetailResultatAnalyse());
+            }
             
             ComboBox originalDemande = initOriginalDemande();
             originalDemande.setValue(documentDto.getOriginalDemande() != null ? BooleanEnum.byCode(documentDto.getOriginalDemande().toString()) : null);

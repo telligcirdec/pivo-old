@@ -70,4 +70,9 @@ public enum EtatDemandeEnum implements
         return AbstractEnumTools.findEnumValuesByCode(
                         EtatDemandeEnum.class, code);
     }
+    
+    @Override
+    public String toString() {
+        return libelle;
+    }
 }
