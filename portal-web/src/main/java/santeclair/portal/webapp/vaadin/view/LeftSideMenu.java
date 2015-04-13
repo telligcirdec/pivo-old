@@ -48,21 +48,17 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
 
     public synchronized void addModuleUi(final ModuleUi moduleUi, final Map<String, ViewUi> viewUiMap) {
         LOGGER.debug("global addModuleUi");
-        ModuleUiButon moduleUiButon = new ModuleUiButon(moduleUi, viewUiMap, eventAdminServiceListener, sessionId, proxy);
         TreeSet<Component> butonModuleUi = new TreeSet<>();
-        boolean moduleUiCodeAlreadyExist = false;
         for (Component component : buttonContainer) {
             if (ModuleUiButon.class.isAssignableFrom(component.getClass())) {
                 ModuleUiButon currentMainButonModuleUi = ModuleUiButon.class.cast(component);
-                moduleUiCodeAlreadyExist = currentMainButonModuleUi.getModuleUi().getCode().equals(moduleUi.getCode());
-                butonModuleUi.add(component);
+                if (!currentMainButonModuleUi.getModuleUi().getCode().equals(moduleUi.getCode())) {
+                    butonModuleUi.add(component);
+                }
             }
         }
-        if (!moduleUiCodeAlreadyExist) {
-            butonModuleUi.add(moduleUiButon);
-        } else {
-            LOGGER.warn("A ModuleUi with code {} already exist. Please choose a different one. ModuleUi hasn't been activated.", moduleUi.getCode());
-        }
+        ModuleUiButon moduleUiButon = new ModuleUiButon(moduleUi, viewUiMap, eventAdminServiceListener, sessionId, proxy);
+        butonModuleUi.add(moduleUiButon);
         buttonContainer.removeAllComponents();
         buttonContainer.addComponents(butonModuleUi.toArray(new Component[]{}));
     }

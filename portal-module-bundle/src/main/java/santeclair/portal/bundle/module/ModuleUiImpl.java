@@ -14,6 +14,7 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PARAMS;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_CURRENT_USER_ROLES;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_VIEW_UI;
@@ -161,33 +162,37 @@ public class ModuleUiImpl implements ModuleUi {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Subscriber(name = "newViewUi", topics = TOPIC_MODULE_UI, filter = "(&(" + PROPERTY_KEY_EVENT_CONTEXT + "=" + EVENT_CONTEXT_TABS + ")(" + PROPERTY_KEY_EVENT_NAME + "="
                     + EVENT_NAME_NEW + ")(" + PROPERTY_KEY_MODULE_UI_CODE + "=*)(" + PROPERTY_KEY_VIEW_UI_CODE + "=*)(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)("
-                    + PROPERTY_KEY_EVENT_DATA + "=*)(" + PROPERTY_KEY_PARAMS + "=*))")
+                    + PROPERTY_KEY_EVENT_DATA + "=*)(" + PROPERTY_KEY_PARAMS + "=*)(" + PROPERTY_KEY_PORTAL_CURRENT_USER_ROLES + "=*))")
     private void newViewUi(Event event) {
         String moduleCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_MODULE_UI_CODE);
         String viewCodeFromEvent = (String) event.getProperty(PROPERTY_KEY_VIEW_UI_CODE);
+        List<String> currentUserRoles = (List<String>) event.getProperty(PROPERTY_KEY_PORTAL_CURRENT_USER_ROLES);
         if (moduleCodeFromEvent.equalsIgnoreCase(code) && viewUis.containsKey(viewCodeFromEvent)) {
             ViewUi viewUi = viewUis.get(viewCodeFromEvent);
-            String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
-            TabsCallback tabsCallback = (TabsCallback) event.getProperty(PROPERTY_KEY_EVENT_DATA);
-            Map<String, Object> mapParams = (Map<String, Object>) event.getProperty(PROPERTY_KEY_PARAMS);
-            ModuleUiCustomComponent moduleUiCustomComponent = null;
-            if (onlyOneTabAllowed) {
-                moduleUiCustomComponent = checkModuleUiInstanceExistForSessionId(sessionId);
-            } else {
-                if (viewUi.getSeveralTabsAllowed()) {
-                    moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId);
+            if (currentUserRoles.contains(viewUi.getRolesAllowed()) || viewUi.getRolesAllowed().equals("ANY")) {
+                String sessionId = (String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID);
+                TabsCallback tabsCallback = (TabsCallback) event.getProperty(PROPERTY_KEY_EVENT_DATA);
+                Map<String, Object> mapParams = (Map<String, Object>) event.getProperty(PROPERTY_KEY_PARAMS);
+                ModuleUiCustomComponent moduleUiCustomComponent = null;
+                if (onlyOneTabAllowed) {
+                    moduleUiCustomComponent = checkModuleUiInstanceExistForSessionId(sessionId);
                 } else {
-                    moduleUiCustomComponent = checkModuleUiInstanceExistForSessionAndViewUiCodeId(sessionId, viewUi.getCode());
+                    if (viewUi.getSeveralTabsAllowed()) {
+                        moduleUiCustomComponent = new ModuleUiCustomComponent(sessionId);
+                    } else {
+                        moduleUiCustomComponent = checkModuleUiInstanceExistForSessionAndViewUiCodeId(sessionId, viewUi.getCode());
+                    }
                 }
+                int tabHash = tabsCallback.addView(this.libelle + " - " + viewUi.getLibelle(), icon, closeable, moduleUiCustomComponent);
+                com.vaadin.ui.Component component = viewUi.getViewMainComponent(sessionId, tabHash, null, mapParams);
+                moduleUiCustomComponent.setCodeViewUi(viewUi.getCode());
+                moduleUiCustomComponent.setTabHash(tabHash);
+                moduleUiCustomComponent.setCompositionRoot(component);
+                moduleUiCustomComponentMap.put(new SessionIdTabHashKey(sessionId, tabHash), moduleUiCustomComponent);
             }
-            int tabHash = tabsCallback.addView(this.libelle + " - " + viewUi.getLibelle(), icon, closeable, moduleUiCustomComponent);
-            com.vaadin.ui.Component component = viewUi.getViewMainComponent(sessionId, tabHash, null, mapParams);
-            moduleUiCustomComponent.setCodeViewUi(viewUi.getCode());
-            moduleUiCustomComponent.setTabHash(tabHash);
-            moduleUiCustomComponent.setCompositionRoot(component);
-            moduleUiCustomComponentMap.put(new SessionIdTabHashKey(sessionId, tabHash), moduleUiCustomComponent);
         }
     }
 
@@ -318,7 +323,7 @@ public class ModuleUiImpl implements ModuleUi {
             for (String viewKey : viewUis.keySet()) {
                 ViewUi viewUi = viewUis.get(viewKey);
                 for (String roleAllowed : viewUi.getRolesAllowed()) {
-                    if (currentUserRoles.contains(roleAllowed) || roleAllowed.equals("ANY")) {
+                    if ((currentUserRoles.contains(roleAllowed) || roleAllowed.equals("ANY")) && viewUi.getVisibleOnMenu()) {
                         viewMap.put(viewKey, viewUi);
                         break;
                     }
