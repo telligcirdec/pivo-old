@@ -32,7 +32,6 @@ public class ModuleUiButon extends Button implements Comparable<ModuleUiButon>, 
 
     private final ModuleUi moduleUi;
     private final Map<String, ViewUi> viewUiMap;
-    private final EventAdminServiceListener eventAdminServiceListener;
     private final Publisher<ModuleUiButon> publisher;
     private final String sessionId;
     private VerticalLayout viewUiButtonVl;
@@ -45,9 +44,8 @@ public class ModuleUiButon extends Button implements Comparable<ModuleUiButon>, 
                          final String sessionId, final AnimatorProxy proxy) {
         this.moduleUi = moduleUi;
         this.viewUiMap = viewUiMap;
-        this.publisher = eventAdminServiceListener.registerPublisher(this, TOPIC_NAVIGATOR);
+        this.publisher = eventAdminServiceListener.getPublisher(this, TOPIC_NAVIGATOR);
         this.sessionId = sessionId;
-        this.eventAdminServiceListener = eventAdminServiceListener;
         this.proxy = proxy;
         init(moduleUi.getLibelle(), moduleUi.getIcon());
     }
@@ -62,12 +60,6 @@ public class ModuleUiButon extends Button implements Comparable<ModuleUiButon>, 
         if (severalViewUi()) {
             this.addStyleName("btn-menu-close");
         }
-    }
-
-    @Override
-    public void detach() {
-        super.detach();
-        eventAdminServiceListener.unregisterPublisher(publisher);
     }
 
     @Override

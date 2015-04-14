@@ -185,6 +185,9 @@ public class FormComponent extends Panel {
         MHorizontalLayout horizontalLayout = new MHorizontalLayout(formLayoutLeft, formLayoutCenter, formLayoutRight)
                         .withAlign(formLayoutRight, Alignment.MIDDLE_CENTER)
                         .withFullWidth();
+        horizontalLayout.setExpandRatio(formLayoutLeft, 2f);
+        horizontalLayout.setExpandRatio(formLayoutCenter, 2f);
+        horizontalLayout.setExpandRatio(formLayoutRight, 1f);
 
         this.setCaption("Recherche de demandes de document");
         this.setContent(new MVerticalLayout(horizontalLayout).withFullWidth().withMargin(true));
