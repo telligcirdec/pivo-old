@@ -89,6 +89,13 @@ public interface EventDictionaryConstant {
      */
     public static final String PROPERTY_KEY_PARAMS = "property.key.params";
     
+    /**
+     * Propriété de gestion des exceptions dans le portail
+     */
+    public static final String PROPERTY_KEY_EXCEPTION_SUMMARY = "property.exception.summary";
+    public static final String PROPERTY_KEY_EXCEPTION_MESSAGE = "property.exception.message";
+    public static final String PROPERTY_KEY_EXCEPTION_THROWABLE = "property.exception.throwable";
+    
     /*
      * Event context
      */
@@ -108,5 +115,6 @@ public interface EventDictionaryConstant {
     public static final String EVENT_NAME_CLOSED = "closed";
     public static final String EVENT_NAME_ON_CLICK = "on_click";
     public static final String EVENT_NAME_NAVIGATION = "navigation";
+    public static final String EVENT_NAME_EXCEPTION = "exception";
 
 }

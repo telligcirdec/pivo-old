@@ -2,10 +2,14 @@ package santeclair.portal.webapp.vaadin;
 
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_CONTEXT_PORTAL;
+import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_EXCEPTION;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STARTED;
 import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_STOPPED;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_CONTEXT;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EXCEPTION_MESSAGE;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EXCEPTION_SUMMARY;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EXCEPTION_THROWABLE;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
@@ -46,18 +50,14 @@ import santeclair.portal.webapp.vaadin.view.Main;
 import santeclair.portal.webapp.vaadin.view.Tabs;
 
 import com.vaadin.annotations.PreserveOnRefresh;
-import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.DefaultErrorHandler;
-import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.shared.communication.PushMode;
-import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
@@ -68,7 +68,7 @@ import com.vaadin.ui.UI;
 @PreserveOnRefresh
 @Title("Portail Santeclair")
 @Theme("santeclair")
-@Push(value = PushMode.MANUAL, transport = Transport.WEBSOCKET)
+// @Push(value = PushMode.MANUAL, transport = Transport.WEBSOCKET)
 public class PortalApp extends UI implements PortalEventHandler, PortalStartCallback, ViewDisplay {
 
     private static final long serialVersionUID = -5547062232353913227L;
@@ -86,6 +86,8 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
     private DataPublisher<PortalApp, PortalStartCallback> dataPublisherToModuleUiTopic;
 
     private Publisher<PortalApp> publisherToViewUiTopic;
+
+    private String sessionId;
 
     /*
      * Début du Code UI
@@ -106,13 +108,13 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         this.setErrorHandler();
 
         Navigator navigator = new Navigator(this, (ViewDisplay) this);
-        String sessionId = this.getSession().getSession().getId();
+        this.sessionId = this.getSession().getSession().getId();
         navigatorEventHandler = new NavigatorEventHandler(navigator, sessionId);
         navigatorEventHandler.registerEventHandlerItself(context);
 
         // Création du composant contenant les tabsheet
         LOGGER.info("Initialisation du container d'onglet");
-        tabs = new Tabs(eventAdminServiceListener, sessionId, getCurrentUserRoles(),context);
+        tabs = new Tabs(eventAdminServiceListener, sessionId, getCurrentUserRoles(), context);
         tabs.init();
 
         navigator.addView("", tabs);
@@ -229,6 +231,22 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         }
     }
 
+    @Subscriber(topic = TOPIC_PORTAL, filter = "(&(" + PROPERTY_KEY_EVENT_NAME + "="
+                    + EVENT_NAME_EXCEPTION + ")(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)(" + PROPERTY_KEY_EXCEPTION_SUMMARY + "=*)(" + PROPERTY_KEY_EXCEPTION_MESSAGE + "=*))")
+    public void showError(@EventProperty(propKey = PROPERTY_KEY_PORTAL_SESSION_ID, required = true) final String sessionId,
+                    @EventProperty(propKey = PROPERTY_KEY_EXCEPTION_SUMMARY, required = true) final String summary,
+                    @EventProperty(propKey = PROPERTY_KEY_EXCEPTION_MESSAGE, required = true) final String message,
+                    @EventProperty(propKey = PROPERTY_KEY_EXCEPTION_THROWABLE, required = false) final Throwable throwable) {
+        if (sessionId.equals(this.sessionId)) {
+            Notification.show(summary, message, Type.ERROR_MESSAGE);
+            if(throwable != null){
+                LOGGER.error(summary + " : " + message, throwable);
+            }else{
+                LOGGER.error(summary + " : " + message);
+            }
+        }
+    }
+
     private List<String> getCurrentUserRoles() {
         return Arrays.asList(new String[]{"ADMIN", "USER"});
     }
@@ -239,10 +257,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
 
             @Override
             public void error(com.vaadin.server.ErrorEvent event) {
-                String uriFragment = Page.getCurrent().getUriFragment();
-                StringBuilder sbCodeErreur = new StringBuilder(uriFragment != null ? uriFragment : "No uriFragment");
-                sbCodeErreur.append(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
-                String codeErreur = sbCodeErreur.toString();
+                String codeErreur = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
                 Throwable t = event.getThrowable();
                 if (findAccesDeniedExceptionException(t) != null) {
                     Notification.show("Vous n'avez pas les droits suffisant pour accéder à la ressource demandée.", Type.WARNING_MESSAGE);
