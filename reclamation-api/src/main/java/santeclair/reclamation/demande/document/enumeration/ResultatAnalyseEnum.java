@@ -29,23 +29,23 @@ public enum ResultatAnalyseEnum implements
     /**
      * Le code du résultat d'analyse
      */
-    private String code;
+    private final String code;
 
     /**
      * Le libellé du résultat d'analyse
      */
-    private String libelle;
+    private final String libelle;
 
     /**
      * Liste des DetailResultatAnalyseEnum dans le cas d'un résultat d'analyse "Abandon"
      */
-    private List<DetailResultatAnalyseEnum> detailsResultatAnalyseEnum;
+    private final List<DetailResultatAnalyseEnum> detailsResultatAnalyseEnum;
 
     /* ======================================================= *
      *                      constructeur 		   		   	   *
      * ======================================================= */
 
-    private ResultatAnalyseEnum(String code, String libelle, DetailResultatAnalyseEnum... detailsResultatAnalyseEnum) {
+    private ResultatAnalyseEnum(final String code, final String libelle, final DetailResultatAnalyseEnum... detailsResultatAnalyseEnum) {
         this.code = code;
         this.libelle = libelle;
         this.detailsResultatAnalyseEnum = Arrays.asList(detailsResultatAnalyseEnum);

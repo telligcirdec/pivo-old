@@ -1,9 +1,7 @@
 package santeclair.portal.reclamation.demande.document.recherche.component.sub;
 
-import static santeclair.portal.event.EventDictionaryConstant.EVENT_NAME_NAVIGATION;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_NAME;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
-import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_NAVIGATOR_URI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_NAVIGATOR;
@@ -12,8 +10,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -28,6 +25,7 @@ import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
+import santeclair.portal.event.utils.TabsEventUtil;
 import santeclair.portal.reclamation.demande.document.recherche.EventConstant;
 import santeclair.portal.reclamation.demande.document.recherche.form.ResultatRecherche;
 import santeclair.portal.utils.component.SubComponent;
@@ -164,7 +162,7 @@ public class ResultatComponent extends Panel {
      * @return le bouton
      */
     private Button creerBtnConsulter(final DemandeDocumentDto demandeDocumentDto) {
-        MButton btnConsulter = new MButton("Consultation")
+        MButton btnConsulter = new MButton("Accéder à la demande")
                         .withStyleName(ValoTheme.BUTTON_PRIMARY)
                         .withStyleName(ValoTheme.BUTTON_ICON_ONLY)
                         .withStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED)
@@ -174,12 +172,9 @@ public class ResultatComponent extends Panel {
 
                             @Override
                             public void buttonClick(ClickEvent event) {
-                                Dictionary<String, Object> props = new Hashtable<>();
-                                props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_NAVIGATION);
-                                props.put(PROPERTY_KEY_NAVIGATOR_URI,
-                                                "container/new/modules/" + moduleCode + "/views/DEMANDE/params/idDemandeDocument/" + demandeDocumentDto.getId());
-                                props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
-                                resultatComponentPublisher.send(props);
+                                HashMap<String, Object> mapParams = new HashMap<>();
+                                mapParams.put("idDemandeDocument", demandeDocumentDto.getId());
+                                resultatComponentPublisher.send(TabsEventUtil.getNewViewUiProps(sessionId, moduleCode, "DEMANDE", mapParams));
                             }
                         });
         return btnConsulter;

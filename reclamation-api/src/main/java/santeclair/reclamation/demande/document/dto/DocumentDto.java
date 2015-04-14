@@ -17,7 +17,7 @@ import santeclair.reclamation.demande.document.enumeration.TypeDocumentEnum;
 @XmlType
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DocumentDto {
+public class DocumentDto implements Comparable<DocumentDto> {
 
 	private Integer id;
     private TypeDocumentEnum typeDocument;
@@ -83,4 +83,9 @@ public class DocumentDto {
 			DetailResultatAnalyseEnum detailResultatAnalyse) {
 		this.detailResultatAnalyse = detailResultatAnalyse;
 	}
+
+    @Override
+    public int compareTo(DocumentDto documentDto) {
+        return this.getTypeDocument().getOrdre().compareTo(documentDto.getTypeDocument().getOrdre());
+    }
 }

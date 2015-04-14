@@ -60,6 +60,7 @@ public class DemandeDocumentPresenter {
         demandeDocumentWebService.enregistrerDemandeDocument(demandeDocumentDto);
         
         tabsComponentPublisher.send(TabsEventUtil.getCloseTabsProps((String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID), (Integer) event.getProperty(PROPERTY_KEY_TAB_HASH)));
+        
     }
 
 }

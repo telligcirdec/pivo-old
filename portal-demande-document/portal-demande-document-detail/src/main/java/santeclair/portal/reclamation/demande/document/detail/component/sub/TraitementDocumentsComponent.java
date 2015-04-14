@@ -5,6 +5,7 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTA
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_HASH;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_TABS;
 
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -320,6 +321,8 @@ public class TraitementDocumentsComponent extends Panel {
         } else {
             niveauIncident.setValue(null);
         }
+        
+        Collections.sort(demandeDocumentDto.getDocumentsDto());
         
         for (DocumentDto documentDto : demandeDocumentDto.getDocumentsDto()) {
             ComboBox detailResultatAnalyse = initDetailResultatAnalyse();

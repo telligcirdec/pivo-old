@@ -49,19 +49,19 @@ public enum DetailResultatAnalyseEnum implements CodeEnum<DetailResultatAnalyseE
     /**
      * Le code du résultat d'analyse
      */
-    private String code;
+    private final String code;
 
     /**
      * Le libellé du résultat d'analyse
      */
-    private String libelle;
+    private final String libelle;
 
     /*
      * ======================================================= * constructeur *
      * =======================================================
      */
 
-    private DetailResultatAnalyseEnum(String code, String libelle) {
+    private DetailResultatAnalyseEnum(final String code, final String libelle) {
         this.code = code;
         this.libelle = libelle;
     }

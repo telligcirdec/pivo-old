@@ -20,18 +20,18 @@ public enum BooleanEnum implements
     /**
      * Le code de l'état de la demande de document
      */
-    private String code;
+    private final String code;
 
     /**
      * Le libellé de l'état de la demande de document
      */
-    private String libelle;
+    private final String libelle;
 
     /* ======================================================= *
      *                      constructeur
      * ======================================================= */
 
-    private BooleanEnum(String code, String libelle) {
+    private BooleanEnum(final String code, final String libelle) {
         this.code = code;
         this.libelle = libelle;
     }

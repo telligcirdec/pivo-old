@@ -18,13 +18,13 @@ public enum TypeDocumentEnum implements
                 LibelleEnum<TypeDocumentEnum> {
 
     @XmlEnumValue("ORDO")
-    ORDONNANCE("ORDO", "Ordonnance",
+    ORDONNANCE("ORDO", "Ordonnance", 1,
                     DetailResultatAnalyseEnum.DOCUMENT_FALSIFIE,
                     DetailResultatAnalyseEnum.PUISSANCE_NON_CONFORME,
                     DetailResultatAnalyseEnum.DATE_NON_CONFORME,
                     DetailResultatAnalyseEnum.DOCUMENT_NON_REGLEMENTAIRE),
     @XmlEnumValue("BON_LIVR")
-    BON_LIVRAISON("BON_LIVR", "Bon de livraison",
+    BON_LIVRAISON("BON_LIVR", "Bon de livraison", 2,
                     DetailResultatAnalyseEnum.DOCUMENT_AUTRE_PS,
                     DetailResultatAnalyseEnum.DOCUMENT_FALSIFIE,
                     DetailResultatAnalyseEnum.DATE_POST_EGAL_DEMANDE,
@@ -33,7 +33,7 @@ public enum TypeDocumentEnum implements
                     DetailResultatAnalyseEnum.QUANTITE_NON_CONFORME,
                     DetailResultatAnalyseEnum.VERRIER_NON_CONFORME),
     @XmlEnumValue("MAGASIN")
-    FACTURE_MAGASIN("MAGASIN", "Facture magasin",
+    FACTURE_MAGASIN("MAGASIN", "Facture magasin", 3,
                     DetailResultatAnalyseEnum.RAC_NON_CONFORME,
                     DetailResultatAnalyseEnum.DOCUMENT_AUTRE_PS,
                     DetailResultatAnalyseEnum.PRODUIT_NON_CONFORME,
@@ -43,36 +43,42 @@ public enum TypeDocumentEnum implements
                     DetailResultatAnalyseEnum.VERRIER_NON_CONFORME,
                     DetailResultatAnalyseEnum.QUANTITE_NON_CONFORME),
     @XmlEnumValue("TIERS_P")
-    DEMANDE_TIERS_PAYANT("TIERS_P", "Demande de tiers payant",
+    DEMANDE_TIERS_PAYANT("TIERS_P", "Demande de tiers payant", 4,
                     DetailResultatAnalyseEnum.ABSENCE_SIGNATURE,
                     DetailResultatAnalyseEnum.FAUSSE_SIGNATURE),
     @XmlEnumValue("SUBRO")
-    FACTURE_SUBROGATOIRE("SUBRO", "Facture subrogatoire",
+    FACTURE_SUBROGATOIRE("SUBRO", "Facture subrogatoire", 5,
                     DetailResultatAnalyseEnum.ABSENCE_SIGNATURE,
                     DetailResultatAnalyseEnum.FAUSSE_SIGNATURE);
 
     /**
      * Le code du type de document
      */
-    private String code;
+    private final String code;
 
     /**
      * Le libellé du type de document
      */
-    private String libelle;
+    private final String libelle;
+
+    /**
+     * Ordre des types de document
+     */
+    private final Integer ordre;
 
     /**
      * Liste des DetailResultatAnalyseEnum dans le cas d'un résultat d'analyse "Non Conforme"
      */
-    private List<DetailResultatAnalyseEnum> detailsResultatAnalyseEnum;
+    private final List<DetailResultatAnalyseEnum> detailsResultatAnalyseEnum;
 
     /* ======================================================= *
      *                      constructeurs  		   		   	   *
      * ======================================================= */
 
-    private TypeDocumentEnum(String code, String libelle, DetailResultatAnalyseEnum... detailsResultatAnalyseEnum) {
+    private TypeDocumentEnum(final String code, final String libelle, final Integer ordre, final DetailResultatAnalyseEnum... detailsResultatAnalyseEnum) {
         this.code = code;
         this.libelle = libelle;
+        this.ordre = ordre;
         this.detailsResultatAnalyseEnum = Arrays.asList(detailsResultatAnalyseEnum);
     }
 
@@ -83,6 +89,7 @@ public enum TypeDocumentEnum implements
     /**
      * @return the code
      */
+    @Override
     public String getCode() {
         return code;
     }
@@ -90,8 +97,16 @@ public enum TypeDocumentEnum implements
     /**
      * @return the libelle
      */
+    @Override
     public String getLibelle() {
         return libelle;
+    }
+    
+    /**
+     * @return the ordre
+     */
+    public Integer getOrdre() {
+        return ordre;
     }
 
     /**

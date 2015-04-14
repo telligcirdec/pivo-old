@@ -30,18 +30,18 @@ public enum MotifDemandeEnum implements
     /**
      * Le code du motif de la demande de document
      */
-    private String code;
+    private final String code;
 
     /**
      * Le libellé du motif de la demande de document
      */
-    private String libelle;
+    private final String libelle;
 
     /* ======================================================= *
      *                      constructeur
      * ======================================================= */
 
-    private MotifDemandeEnum(String code, String libelle) {
+    private MotifDemandeEnum(final String code, final String libelle) {
         this.code = code;
         this.libelle = libelle;
     }
@@ -53,6 +53,7 @@ public enum MotifDemandeEnum implements
     /**
      * @return the code
      */
+    @Override
     public String getCode() {
         return code;
     }
@@ -60,6 +61,7 @@ public enum MotifDemandeEnum implements
     /**
      * @return the libelle
      */
+    @Override
     public String getLibelle() {
         return libelle;
     }

@@ -26,13 +26,13 @@ public enum NiveauIncidentEnum implements
     /**
      * Le code du niveau d'incident
      */
-    private String code;
+    private final String code;
 
     /* ======================================================= *
      *                      constructeurs 
      * ======================================================= */
 
-    private NiveauIncidentEnum(String code) {
+    private NiveauIncidentEnum(final String code) {
         this.code = code;
     }
 

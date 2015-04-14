@@ -31,12 +31,12 @@ public class DescriptifDemandeComponent extends Panel {
     private static final long serialVersionUID = 8369775167208351407L;
 
     private static final float TAILLE_STANDARD = 24;
-    
-    @Property(name = PROPERTY_KEY_PORTAL_SESSION_ID) 
+
+    @Property(name = PROPERTY_KEY_PORTAL_SESSION_ID)
     private String sessionId;
-    @Property(name = PROPERTY_KEY_TAB_HASH) 
+    @Property(name = PROPERTY_KEY_TAB_HASH)
     private Integer tabHash;
-    
+
     private Label beneficiaire;
     private Label ps;
 
@@ -83,7 +83,7 @@ public class DescriptifDemandeComponent extends Panel {
 
     /** Initialise le label "Bénéficiaire". */
     private void initBeneficiaire() {
-        beneficiaire = new Label("Bénéficiaire");
+        beneficiaire = new Label("Bénéficiaire", ContentMode.HTML);
         beneficiaire.addStyleName(ValoTheme.LABEL_LARGE);
         beneficiaire.addStyleName(ValoTheme.LABEL_BOLD);
         beneficiaire.setWidth(TAILLE_STANDARD, Unit.EM);
@@ -177,40 +177,44 @@ public class DescriptifDemandeComponent extends Panel {
 
     /** Initialise la vue principale. */
     private void initLayout() {
-        MVerticalLayout verticalLayoutLeft = new MVerticalLayout(numeroDossier, motifDemande, trigrammeDemandeur)
-                        .withMargin(true)
+        MVerticalLayout verticalLayoutDescriptifLeft = new MVerticalLayout(numeroDossier, motifDemande, trigrammeDemandeur)
                         .withSpacing(true);
 
-        MHorizontalLayout horizontalLayoutTop = new MHorizontalLayout(verticalLayoutLeft, etatDossier)
-                        .withFullWidth()
+        MVerticalLayout verticalLayoutDescriptifRight = new MVerticalLayout(etatDossier)
                         .withSpacing(true)
                         .withAlign(etatDossier, Alignment.MIDDLE_LEFT);
 
-        MVerticalLayout verticalLayoutBeneficiaire = new MVerticalLayout(beneficiaire, organismeBeneficiaire, numeroContratBeneficiaire, nomBeneficiaire, prenomBeneficiaire)
-                        .withMargin(true)
+        MHorizontalLayout horizontalLayoutTop = new MHorizontalLayout(verticalLayoutDescriptifLeft, verticalLayoutDescriptifRight)
+                        .withFullWidth()
                         .withSpacing(true)
+                        .withStyleName(ValoTheme.LAYOUT_WELL)
+                        .withAlign(verticalLayoutDescriptifRight, Alignment.MIDDLE_LEFT);
+
+        MVerticalLayout verticalLayoutBeneficiaire = new MVerticalLayout(beneficiaire, organismeBeneficiaire, numeroContratBeneficiaire, nomBeneficiaire, prenomBeneficiaire)
+                        .withSpacing(true)
+                        .withMargin(true)
                         .withStyleName(ValoTheme.LAYOUT_WELL);
 
-        MVerticalLayout verticalLayoutPS = new MVerticalLayout(ps, nomMagasinPS, enseignePS, numeroTelephonePS, codePostalPS, communePS)
-                        .withMargin(true)
+        MHorizontalLayout horizontalLayoutCodePostalCommune = new MHorizontalLayout(codePostalPS, communePS)
+                        .withFullWidth();
+
+        MVerticalLayout verticalLayoutPS = new MVerticalLayout(ps, nomMagasinPS, enseignePS, numeroTelephonePS, horizontalLayoutCodePostalCommune)
                         .withSpacing(true)
+                        .withMargin(true)
                         .withStyleName(ValoTheme.LAYOUT_WELL);
 
         MHorizontalLayout horizontalLayoutBottom = new MHorizontalLayout(verticalLayoutBeneficiaire, verticalLayoutPS)
                         .withFullWidth()
-                        .withMargin(true)
-                        .withSpacing(true)
-                        .withAlign(verticalLayoutBeneficiaire, Alignment.MIDDLE_LEFT)
-                        .withAlign(verticalLayoutPS, Alignment.MIDDLE_LEFT);
+                        .withSpacing(true);
 
         descriptifDemandeLayout = new MVerticalLayout(horizontalLayoutTop, horizontalLayoutBottom)
-                        .withFullWidth()
-                        .withMargin(true);
+                        .withMargin(true)
+                        .withFullWidth();
 
         this.setCaption("Descriptif de la demande");
         this.setContent(descriptifDemandeLayout);
     }
-    
+
     @Subscriber(name = EventConstant.EVENT_RECUPERER_DEMANDE_DOCUMENT_OK, filter = "(&(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)(" + PROPERTY_KEY_TAB_HASH + "=*)("
                     + PROPERTY_KEY_EVENT_NAME + "=" + EventConstant.EVENT_RECUPERER_DEMANDE_DOCUMENT_OK + ")(" + EventConstant.PROPERTY_KEY_DEMANDE_DOCUMENT + "=*))",
                     topics = EventConstant.TOPIC_DEMANDE_DOCUMENT)
@@ -220,17 +224,17 @@ public class DescriptifDemandeComponent extends Panel {
         motifDemande.setValue(motifDemande.getValue() + StringUtils.defaultString(demandeDocumentDto.getMotifDemande().getLibelle()));
         trigrammeDemandeur.setValue(trigrammeDemandeur.getValue() + StringUtils.defaultString(demandeDocumentDto.getTrigrammeDemandeur()));
         etatDossier.setValue(etatDossier.getValue() + StringUtils.defaultString(demandeDocumentDto.getEtat().getLibelle()));
-        
+
         organismeBeneficiaire.setValue(organismeBeneficiaire.getValue() + StringUtils.defaultString(demandeDocumentDto.getOrganismeBeneficiaire()));
         numeroContratBeneficiaire.setValue(numeroContratBeneficiaire.getValue() + StringUtils.defaultString(demandeDocumentDto.getNumeroContratBeneficiaire()));
         nomBeneficiaire.setValue(nomBeneficiaire.getValue() + StringUtils.defaultString(demandeDocumentDto.getNomBeneficiaire()));
         prenomBeneficiaire.setValue(prenomBeneficiaire.getValue() + StringUtils.defaultString(demandeDocumentDto.getPrenomBeneficiaire()));
-        
+
         nomMagasinPS.setValue(nomMagasinPS.getValue() + StringUtils.defaultString(demandeDocumentDto.getNomMagasinPS()));
         enseignePS.setValue(enseignePS.getValue() + StringUtils.defaultString(demandeDocumentDto.getEnseignePS()));
         numeroTelephonePS.setValue(numeroTelephonePS.getValue() + StringUtils.defaultString(demandeDocumentDto.getTelephonePS()));
         codePostalPS.setValue(codePostalPS.getValue() + StringUtils.defaultString(demandeDocumentDto.getCodePostalPS()));
         communePS.setValue(communePS.getValue() + StringUtils.defaultString(demandeDocumentDto.getCommunePS()));
-        
+
     }
 }

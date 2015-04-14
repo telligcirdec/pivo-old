@@ -1,7 +1,7 @@
 package santeclair.reclamation.demande.document.dto;
 
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -38,7 +38,7 @@ public class DemandeDocumentDto {
     private String codePostalPS;
     private String communePS;
     private String commentaire;
-    private Set<DocumentDto> documentsDto;
+    private List<DocumentDto> documentsDto;
     
 	public Integer getId() {
 		return id;
@@ -184,11 +184,11 @@ public class DemandeDocumentDto {
 		this.commentaire = commentaire;
 	}
 
-	public Set<DocumentDto> getDocumentsDto() {
+	public List<DocumentDto> getDocumentsDto() {
 		return documentsDto;
 	}
 	
-	public void setDocumentsDto(Set<DocumentDto> documentsDto) {
+	public void setDocumentsDto(List<DocumentDto> documentsDto) {
 		this.documentsDto = documentsDto;
 	}
 }
