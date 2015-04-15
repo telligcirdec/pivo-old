@@ -1,11 +1,12 @@
 package santeclair.portal.event.handler;
 
+import java.util.List;
+
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 public interface PortalEventHandler {
 
-    void registerEventHandlerItself(BundleContext bundleContext);
-
-    void unregisterEventHandlerItSelf(BundleContext bundleContext);
+    List<ServiceRegistration<?>> registerEventHandlerItself(BundleContext bundleContext);
 
 }

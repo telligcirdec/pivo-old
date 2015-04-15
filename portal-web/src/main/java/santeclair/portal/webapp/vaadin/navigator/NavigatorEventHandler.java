@@ -20,10 +20,10 @@ public class NavigatorEventHandler extends AbstractEventHandler {
     private final String sessionId;
     private final Navigator navigator;
 
-    public NavigatorEventHandler(final Navigator navigator, final String uiId) {
+    public NavigatorEventHandler(final Navigator navigator, final String sessionId) {
         super();
         this.navigator = navigator;
-        this.sessionId = uiId;
+        this.sessionId = sessionId;
     }
 
     @Subscriber(topic = TOPIC_NAVIGATOR, filter = "(&(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_NAVIGATION + ")(!(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*))("
@@ -34,7 +34,8 @@ public class NavigatorEventHandler extends AbstractEventHandler {
 
     @Subscriber(topic = TOPIC_NAVIGATOR, filter = "(&(" + PROPERTY_KEY_EVENT_NAME + "=" + EVENT_NAME_NAVIGATION + ")(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)("
                     + PROPERTY_KEY_NAVIGATOR_URI + "=*))")
-    public void navigatorEvent(@EventProperty(propKey = PROPERTY_KEY_NAVIGATOR_URI) final String uri, @EventProperty(propKey = PROPERTY_KEY_PORTAL_SESSION_ID, required = true) String sessionId) {
+    public void navigatorEvent(@EventProperty(propKey = PROPERTY_KEY_NAVIGATOR_URI) final String uri,
+                    @EventProperty(propKey = PROPERTY_KEY_PORTAL_SESSION_ID, required = true) String sessionId) {
         if (this.sessionId.equals(sessionId)) {
             navigator.navigateTo(uri);
         }
@@ -53,4 +54,5 @@ public class NavigatorEventHandler extends AbstractEventHandler {
         props.put(PROPERTY_KEY_NAVIGATOR_URI, uri);
         return props;
     }
+
 }

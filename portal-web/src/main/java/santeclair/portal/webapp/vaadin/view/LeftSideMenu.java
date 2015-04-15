@@ -3,14 +3,10 @@ package santeclair.portal.webapp.vaadin.view;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.jouni.animator.AnimatorProxy;
 
-import santeclair.portal.event.handler.AbstractEventHandler;
-import santeclair.portal.event.handler.PortalEventHandler;
 import santeclair.portal.listener.service.impl.EventAdminServiceListener;
 import santeclair.portal.module.ModuleUi;
 import santeclair.portal.view.ViewUi;
@@ -20,7 +16,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.VerticalLayout;
 
-public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
+public class LeftSideMenu extends CustomLayout {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LeftSideMenu.class);
     private static final long serialVersionUID = -4748523363216844520L;
@@ -39,11 +35,10 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
         this.addComponent(proxy);
     }
 
-    public void init(BundleContext bundleContext) {
+    public void init() {
         this.setSizeFull();
         buttonContainer.setSizeFull();
         this.addComponent(buttonContainer, "buttonLayout");
-        registerEventHandlerItself(bundleContext);
     }
 
     public synchronized void addModuleUi(final ModuleUi moduleUi, final Map<String, ViewUi> viewUiMap) {
@@ -76,24 +71,6 @@ public class LeftSideMenu extends CustomLayout implements PortalEventHandler {
             }
         }
         return modulehasBeenRemoved;
-    }
-
-    @Override
-    public void registerEventHandlerItself(BundleContext bundleContext) {
-        try {
-            AbstractEventHandler.registerEventHandler(bundleContext, this);
-        } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void unregisterEventHandlerItSelf(BundleContext bundleContext) {
-        try {
-            AbstractEventHandler.unregisterEventHandler(bundleContext, this);
-        } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
-        }
     }
 
 }

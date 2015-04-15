@@ -71,6 +71,7 @@ public interface EventDictionaryConstant {
      * Propriété des onglets
      */
     public static final String PROPERTY_KEY_TAB_HASH = "property.key.event.tab.hash";
+    public static final String PROPERTY_KEY_TAB_CALLBACK = "property.key.event.tab.callback";
 
     /**
      * Propriété autour des modules ui

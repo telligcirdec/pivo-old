@@ -180,16 +180,15 @@ public class FormComponent extends Panel {
 
         MFormLayout formLayoutCenter = new MFormLayout(prenomBeneficiaire, numeroDossier, etatDossier, dateFin);
 
-        MVerticalLayout verticalLayoutRight = new MVerticalLayout(boutonRechercher)
-        .withAlign(boutonRechercher, Alignment.MIDDLE_CENTER)
-        ;
+       MFormLayout formLayoutRight = new MFormLayout(boutonRechercher);
 
-        MHorizontalLayout horizontalLayout = new MHorizontalLayout(formLayoutLeft, formLayoutCenter, verticalLayoutRight)
-                        .withMargin(true)
-                        .withFullWidth()
-                        .withAlign(formLayoutLeft, Alignment.MIDDLE_CENTER)
-                        .withAlign(formLayoutCenter, Alignment.MIDDLE_CENTER)
-                        .withAlign(verticalLayoutRight, Alignment.MIDDLE_CENTER);
+        MHorizontalLayout horizontalLayout = new MHorizontalLayout(formLayoutLeft, formLayoutCenter, formLayoutRight)
+                        .withAlign(formLayoutRight, Alignment.MIDDLE_CENTER)
+                        .withFullWidth();
+
+        horizontalLayout.setExpandRatio(formLayoutLeft, 2f);
+        horizontalLayout.setExpandRatio(formLayoutCenter, 2f);
+        horizontalLayout.setExpandRatio(formLayoutRight, 1f);
 
         this.setCaption("Recherche de demandes de document");
         this.setContent(new MVerticalLayout(horizontalLayout).withFullWidth().withMargin(true));

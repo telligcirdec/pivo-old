@@ -50,5 +50,5 @@ public class ModuleUiCustomComponent extends CustomComponent {
     public Component getCompositionRoot() {
         return super.getCompositionRoot();
     }
-
+    
 }

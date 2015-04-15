@@ -5,10 +5,8 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EVENT_SOURCE;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
 
 import org.osgi.framework.ServiceEvent;
 import org.osgi.service.event.Event;
@@ -31,8 +29,6 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventAdminServiceListener.class);
 
-    private final List<Publisher<?>> publishers = new ArrayList<>();
-
     private EventAdmin service;
 
     @Override
@@ -45,30 +41,16 @@ public class EventAdminServiceListener extends AbstractPortalServiceListener<Eve
         this.service = null;
     }
 
-    public <SOURCE, DATA> DataPublisher<SOURCE, DATA> registerDataPublisher(SOURCE source, Class<DATA> dataClazz, String... topics) {
+    public <SOURCE, DATA> DataPublisher<SOURCE, DATA> getDataPublisher(SOURCE source, Class<DATA> dataClazz, String... topics) {
         LOGGER.info("Create a new Publisher");
         DataPublisher<SOURCE, DATA> publisher = new DataPublisherImpl<>(this, source, dataClazz, topics);
-        publishers.add(publisher);
         return publisher;
     }
 
-    public <SOURCE, DATA> Publisher<SOURCE> registerPublisher(SOURCE source, String... topics) {
+    public <SOURCE, DATA> Publisher<SOURCE> getPublisher(SOURCE source, String... topics) {
         LOGGER.info("Create a new Publisher");
         Publisher<SOURCE> publisher = new PublisherImpl<>(this, source, topics);
-        publishers.add(publisher);
         return publisher;
-    }
-
-    public void unregisterPublisher(Publisher<?>... publishers) {
-        LOGGER.info("Destroying publishers");
-        if (publishers != null && publishers.length > 0) {
-            for (Publisher<?> publisher : publishers) {
-                if (publisher != null) {
-                    this.publishers.remove(publisher);
-                }
-            }
-        }
-
     }
 
     public interface Publisher<SOURCE> extends Serializable {

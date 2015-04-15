@@ -8,8 +8,9 @@ import santeclair.portal.webapp.vaadin.PortalApp;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinServlet;
 
-@WebServlet(value = {"/app/*", "/VAADIN/*"}, asyncSupported = true, initParams = {@WebInitParam(name = "widgetset", value = "santeclair.portal.webapp.vaadin.widgetset.PortalWidgetSet")})
-@VaadinServletConfiguration(productionMode = false, ui = PortalApp.class)
+@WebServlet(value = {"/app/*", "/VAADIN/*"}, initParams = {
+        @WebInitParam(name = "widgetset", value = "santeclair.portal.webapp.vaadin.widgetset.PortalWidgetSet")})
+@VaadinServletConfiguration(productionMode = false, ui = PortalApp.class, closeIdleSessions=true)
 public class PortalServlet extends VaadinServlet {
 
     /**

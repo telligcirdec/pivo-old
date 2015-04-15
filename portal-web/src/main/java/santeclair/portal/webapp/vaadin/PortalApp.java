@@ -13,10 +13,12 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_EXCEP
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_MODULE_UI_CODE;
 import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_PORTAL_SESSION_ID;
+import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_CALLBACK;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_MODULE_UI;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_PORTAL;
 import static santeclair.portal.event.EventDictionaryConstant.TOPIC_VIEW_UI;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
@@ -27,6 +29,7 @@ import java.util.Map;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -55,6 +58,7 @@ import com.vaadin.annotations.Title;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewDisplay;
+import com.vaadin.server.ClientConnector;
 import com.vaadin.server.DefaultErrorHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -68,8 +72,7 @@ import com.vaadin.ui.UI;
 @PreserveOnRefresh
 @Title("Portail Santeclair")
 @Theme("santeclair")
-// @Push(value = PushMode.MANUAL, transport = Transport.WEBSOCKET)
-public class PortalApp extends UI implements PortalEventHandler, PortalStartCallback, ViewDisplay {
+public class PortalApp extends UI implements PortalEventHandler, PortalStartCallback, ViewDisplay, ClientConnector.DetachListener {
 
     private static final long serialVersionUID = -5547062232353913227L;
     private static final Logger LOGGER = LoggerFactory.getLogger(PortalApp.class);
@@ -95,10 +98,13 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
     @Override
     public void init(VaadinRequest request) {
         LOGGER.info("Initialisation de l'UI");
-
         ApplicationContext applicationContext = WebApplicationContextUtils.
                         getRequiredWebApplicationContext(VaadinServlet.getCurrent().getServletContext());
         HostActivator hostActivator = applicationContext.getBean(HostActivator.class);
+
+        CurrentSessionServiceRegistration currentSessionServiceRegistration = applicationContext.getBean(CurrentSessionServiceRegistration.class);
+        currentSessionServiceRegistration.unregisterAllServices();
+
         EventAdminServiceListener eventAdminServiceListener = applicationContext.getBean(EventAdminServiceListener.class);
 
         BundleContext context = hostActivator.getBundleContext();
@@ -110,12 +116,13 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         Navigator navigator = new Navigator(this, (ViewDisplay) this);
         this.sessionId = this.getSession().getSession().getId();
         navigatorEventHandler = new NavigatorEventHandler(navigator, sessionId);
-        navigatorEventHandler.registerEventHandlerItself(context);
+        currentSessionServiceRegistration.addServiceRegistrations(navigatorEventHandler.registerEventHandlerItself(context));
 
         // Création du composant contenant les tabsheet
         LOGGER.info("Initialisation du container d'onglet");
-        tabs = new Tabs(eventAdminServiceListener, sessionId, getCurrentUserRoles(), context);
+        tabs = new Tabs(eventAdminServiceListener, sessionId, getCurrentUserRoles());
         tabs.init();
+        currentSessionServiceRegistration.addServiceRegistrations(tabs.registerEventHandlerItself(context));
 
         navigator.addView("", tabs);
         navigator.addView("container", tabs);
@@ -123,7 +130,7 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         // Création du composant contenant le menu à gauche avec les boutons
         LOGGER.info("Initialisation du menu gauche");
         leftSideMenu = new LeftSideMenu(eventAdminServiceListener, sessionId);
-        leftSideMenu.init(context);
+        leftSideMenu.init();
 
         // Création du container principal
         LOGGER.info("Création du container principal");
@@ -133,10 +140,10 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         // Enregistrement des listeners d'event dans le portalEventBus
         LOGGER.info("Enregistrement des listeners d'event dans le portalEventBus");
 
-        registerEventHandlerItself(context);
+        currentSessionServiceRegistration.addServiceRegistrations(registerEventHandlerItself(context));
 
-        dataPublisherToModuleUiTopic = eventAdminServiceListener.registerDataPublisher(this, PortalStartCallback.class, TOPIC_MODULE_UI);
-        publisherToViewUiTopic = eventAdminServiceListener.registerPublisher(this, TOPIC_VIEW_UI);
+        dataPublisherToModuleUiTopic = eventAdminServiceListener.getDataPublisher(this, PortalStartCallback.class, TOPIC_MODULE_UI);
+        publisherToViewUiTopic = eventAdminServiceListener.getPublisher(this, TOPIC_VIEW_UI);
 
         this.setContent(main);
 
@@ -144,56 +151,23 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
         props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_PORTAL);
         props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STARTED);
         props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
+        props.put(PROPERTY_KEY_TAB_CALLBACK, tabs);
 
         dataPublisherToModuleUiTopic.publishEventDataAndDictionnarySynchronously(this, props);
         LOGGER.debug("Fin Initialisation de l'UI");
 
+        addDetachListener(this);
     }
 
     @Override
-    public void detach() {
-        LOGGER.info("Detachement de l'UI");
-        ApplicationContext applicationContext = WebApplicationContextUtils.
-                        getRequiredWebApplicationContext(VaadinServlet.getCurrent().getServletContext());
-        HostActivator hostActivator = applicationContext.getBean(HostActivator.class);
-        EventAdminServiceListener eventAdminServiceListener = applicationContext.getBean(EventAdminServiceListener.class);
-
-        BundleContext context = hostActivator.getBundleContext();
-
-        String sessionId = this.getSession().getSession().getId();
-
-        Dictionary<String, Object> props = new Hashtable<>(3);
-        props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_PORTAL);
-        props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STOPPED);
-        props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
-
-        dataPublisherToModuleUiTopic.publishEventDataAndDictionnarySynchronously(this, props);
-        publisherToViewUiTopic.publishEventSynchronously(props);
-
-        unregisterEventHandlerItSelf(context);
-
-        eventAdminServiceListener.unregisterPublisher(dataPublisherToModuleUiTopic, publisherToViewUiTopic);
-        navigatorEventHandler.unregisterEventHandlerItSelf(context);
-
-        super.detach();
-    }
-
-    @Override
-    public void registerEventHandlerItself(BundleContext bundleContext) {
+    public List<ServiceRegistration<?>> registerEventHandlerItself(BundleContext bundleContext) {
+        List<ServiceRegistration<?>> srList = new ArrayList<>();
         try {
-            AbstractEventHandler.registerEventHandler(bundleContext, this);
+            srList = AbstractEventHandler.registerEventHandler(bundleContext, this);
         } catch (InvalidSyntaxException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void unregisterEventHandlerItSelf(BundleContext bundleContext) {
-        try {
-            AbstractEventHandler.unregisterEventHandler(bundleContext, this);
-        } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
-        }
+        return srList;
     }
 
     @Override
@@ -239,9 +213,9 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
                     @EventProperty(propKey = PROPERTY_KEY_EXCEPTION_THROWABLE, required = false) final Throwable throwable) {
         if (sessionId.equals(this.sessionId)) {
             Notification.show(summary, message, Type.ERROR_MESSAGE);
-            if(throwable != null){
+            if (throwable != null) {
                 LOGGER.error(summary + " : " + message, throwable);
-            }else{
+            } else {
                 LOGGER.error(summary + " : " + message);
             }
         }
@@ -293,6 +267,24 @@ public class PortalApp extends UI implements PortalEventHandler, PortalStartCall
     @Override
     public void showView(View view) {
         LOGGER.debug("view : " + view);
+    }
+
+    @Override
+    public void detach(DetachEvent event) {
+        LOGGER.info("Detachement de l'UI");
+        ApplicationContext applicationContext = WebApplicationContextUtils.
+                        getRequiredWebApplicationContext(VaadinServlet.getCurrent().getServletContext());
+        CurrentSessionServiceRegistration currentSessionServiceRegistration = applicationContext.getBean(CurrentSessionServiceRegistration.class);
+
+        Dictionary<String, Object> props = new Hashtable<>(3);
+        props.put(PROPERTY_KEY_EVENT_CONTEXT, EVENT_CONTEXT_PORTAL);
+        props.put(PROPERTY_KEY_EVENT_NAME, EVENT_NAME_STOPPED);
+        props.put(PROPERTY_KEY_PORTAL_SESSION_ID, sessionId);
+
+        dataPublisherToModuleUiTopic.publishEventDataAndDictionnarySynchronously(this, props);
+        publisherToViewUiTopic.publishEventSynchronously(props);
+
+        currentSessionServiceRegistration.unregisterAllServices();
     }
 
 }

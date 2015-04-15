@@ -9,11 +9,6 @@
 	<description>Portail d'accès aux applications web internes [${project.version} - ${environnement}]</description>
 	
 	<context-param>
-		<param-name>productionMode</param-name>
-		<param-value>false</param-value>
-	</context-param>
-	
-	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>/WEB-INF/spring/applicationContext.xml</param-value>
 	</context-param>
@@ -52,10 +47,5 @@
 	<listener>
 		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
 	</listener>
-
-	<!-- configuration requise pour jmeter. <servlet> <servlet-name>FeatureBrowser</servlet-name> 
-		<servlet-class>com.vaadin.server.VaadinServlet</servlet-class> <init-param> 
-		<param-name>UI</param-name> <param-value>com.vaadin.demo.featurebrowser.FeatureBrowserUI</param-value> 
-		</init-param> <init-param> <param-name>disable-xsrf-protection</param-name> 
-		<param-value>true</param-value> </init-param> </servlet> -->
+	
 </web-app>

@@ -15,7 +15,7 @@ public interface ModuleUi {
 
     FontIcon getIcon();
 
-    Boolean isCloseable();
+    Boolean isClosable();
 
     Boolean isOnlyOneTabAllowed();
 
