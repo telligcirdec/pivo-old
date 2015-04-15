@@ -30,7 +30,9 @@ import santeclair.portal.reclamation.demande.document.recherche.EventConstant;
 import santeclair.portal.reclamation.demande.document.recherche.form.ResultatRecherche;
 import santeclair.portal.utils.component.SubComponent;
 import santeclair.portal.utils.component.SubComponentInit;
+import santeclair.portal.utils.notification.ValidationNotification;
 import santeclair.reclamation.demande.document.dto.DemandeDocumentDto;
+import santeclair.reclamation.demande.document.enumeration.EtatDemandeEnum;
 
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.converter.StringToDateConverter;
@@ -58,8 +60,6 @@ public class ResultatComponent extends Panel {
 
     private static final long serialVersionUID = 8369775167208351407L;
 
-    private static final String MSG_NO_RESULTAT = "Aucun résultat pour cette recherche de demande de document";
-
     @Publishes(name = "resultatComponentPublisher", topics = TOPIC_NAVIGATOR, synchronous = true)
     private Publisher resultatComponentPublisher;
 
@@ -82,7 +82,7 @@ public class ResultatComponent extends Panel {
 
     /** Initialise le bouton exporter. */
     private void initEmptyTableau() {
-        labelEmptyTableau = new Label(MSG_NO_RESULTAT);
+        labelEmptyTableau = new Label("Aucun résultat pour cette recherche de demande de document");
         labelEmptyTableau.setSizeUndefined();
     }
 
@@ -135,7 +135,9 @@ public class ResultatComponent extends Panel {
 
     /** Initialise la vue principale. */
     private void initLayout() {
-        tableResultLayout = new MVerticalLayout(boutonExporter, tableauResultDemande)
+        Panel tableResultPanel = new Panel(tableauResultDemande);
+        
+        tableResultLayout = new MVerticalLayout(boutonExporter, tableResultPanel)
                         .withMargin(true)
                         .withSpacing(true)
                         .withFullWidth()
@@ -147,6 +149,7 @@ public class ResultatComponent extends Panel {
                         .withAlign(labelEmptyTableau, Alignment.TOP_CENTER);
 
         this.setCaption("Résultat de la recherche");
+//        this.addStyleName("no-fucking-scroll");
         this.setVisible(false);
     }
 
@@ -181,13 +184,17 @@ public class ResultatComponent extends Panel {
     }
 
     @Subscriber(name = EventConstant.EVENT_RECHERCHE_DEMANDE_DOCUMENT_OK, filter = "(&(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)(" + PROPERTY_KEY_TAB_HASH + "=*)("
-                    + PROPERTY_KEY_EVENT_NAME + "=" + EventConstant.EVENT_RECHERCHE_DEMANDE_DOCUMENT_OK + ")(" + EventConstant.PROPERTY_KEY_LISTE_DEMANDE_DOCUMENT + "=*))",
+                    + PROPERTY_KEY_EVENT_NAME + "=" + EventConstant.EVENT_RECHERCHE_DEMANDE_DOCUMENT_OK + ")(" + EventConstant.PROPERTY_KEY_LISTE_DEMANDE_DOCUMENT + "=*)(" + EventConstant.PROPERTY_KEY_MAX_RESULT + "=*))",
                     topics = EventConstant.TOPIC_RECHERCHE_DEMANDE_DOCUMENT)
     @SuppressWarnings("unchecked")
     private void setTableauRechercheItemsList(org.osgi.service.event.Event event) {
         List<DemandeDocumentDto> listeDemandesDocumentDto = (List<DemandeDocumentDto>) event.getProperty(EventConstant.PROPERTY_KEY_LISTE_DEMANDE_DOCUMENT);
+        Integer maxResult = (Integer) event.getProperty(EventConstant.PROPERTY_KEY_MAX_RESULT);
 
         if (null != listeDemandesDocumentDto && !listeDemandesDocumentDto.isEmpty()) {
+            if (listeDemandesDocumentDto.size() > maxResult) {
+                ValidationNotification.showOneMessage("Erreur lors de la recherche", "Votre recherche comporte plus de " + maxResult + " résultats.<br/>Merci de bien vouloir affiner vos critères de recherche.");
+            }
             List<ResultatRecherche> resultatsRecherche = new ArrayList<ResultatRecherche>();
             for (final DemandeDocumentDto demandeDocumentDto : listeDemandesDocumentDto) {
                 ResultatRecherche resultatRecherche = new ResultatRecherche(demandeDocumentDto);
@@ -199,7 +206,7 @@ public class ResultatComponent extends Panel {
             dataSource.addNestedContainerBean("dto");
             dataSource.setBeanIdProperty("dto.id");
             dataSource.addAll(resultatsRecherche);
-
+            
             tableauResultDemande.setContainerDataSource(dataSource);
             tableauResultDemande.setVisibleColumns("dto.numeroDossier", "dto.trigrammeDemandeur", "dto.dateDemandeDocument",
                             "dto.nomBeneficiaire", "dto.prenomBeneficiaire", "dto.telephonePS", "dto.etat", "buttonLayout");
@@ -210,7 +217,14 @@ public class ResultatComponent extends Panel {
             this.setContent(emptyTableauLayout);
         }
         this.setVisible(true);
-
-        // Ie8CssFontHack.showFonts();
+    }
+    
+    @Subscriber(name = EventConstant.EVENT_UPDATE_RESULTAT_RECHERCHE_DEMANDE_DOCUMENT, filter = "(&(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)(" + PROPERTY_KEY_TAB_HASH + "=*)("
+                    + PROPERTY_KEY_EVENT_NAME + "=" + EventConstant.EVENT_UPDATE_RESULTAT_RECHERCHE_DEMANDE_DOCUMENT + ")(" + EventConstant.PROPERTY_KEY_ID_DEMANDE_DOCUMENT + "=*)(" + EventConstant.PROPERTY_KEY_ETAT_DEMANDE_DOCUMENT + "=*))",
+                    topics = EventConstant.TOPIC_RECHERCHE_DEMANDE_DOCUMENT)
+    private void updateTableauRechercheItem(org.osgi.service.event.Event event) {
+        Integer idDemandeDocument = (Integer) event.getProperty(EventConstant.PROPERTY_KEY_ID_DEMANDE_DOCUMENT);
+        EtatDemandeEnum etatDemande = (EtatDemandeEnum) event.getProperty(EventConstant.PROPERTY_KEY_ETAT_DEMANDE_DOCUMENT);
+        tableauResultDemande.getItem(idDemandeDocument).getItemProperty("dto.etat").setValue(etatDemande);
     }
 }

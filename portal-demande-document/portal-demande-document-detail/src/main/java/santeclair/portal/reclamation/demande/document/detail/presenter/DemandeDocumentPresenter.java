@@ -28,8 +28,11 @@ public class DemandeDocumentPresenter {
     @Requires
     private DemandeDocumentWebService demandeDocumentWebService;
 
-    @Publishes(name = "presenterPublisher", topics = EventConstant.TOPIC_DEMANDE_DOCUMENT, synchronous = true)
-    private Publisher presenterPublisher;
+    @Publishes(name = "detailDemandeDocumentPublisher", topics = EventConstant.TOPIC_DEMANDE_DOCUMENT, synchronous = true)
+    private Publisher detailDemandeDocumentPublisher;
+    
+    @Publishes(name = "rechercheDemandeDocumentPublisher", topics = EventConstant.TOPIC_RECHERCHE_DEMANDE_DOCUMENT, synchronous = true)
+    private Publisher rechercheDemandeDocumentPublisher;
     
     @Publishes(name = "tabsComponentPublisher", topics = TOPIC_TABS, synchronous = true)
     private Publisher tabsComponentPublisher;
@@ -48,7 +51,7 @@ public class DemandeDocumentPresenter {
         props.put(PROPERTY_KEY_PORTAL_SESSION_ID, event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID));
         props.put(PROPERTY_KEY_TAB_HASH, event.getProperty(PROPERTY_KEY_TAB_HASH));
         props.put(EventConstant.PROPERTY_KEY_DEMANDE_DOCUMENT, demandeDocumentDto);
-        presenterPublisher.send(props);
+        detailDemandeDocumentPublisher.send(props);
     }
     
     @Subscriber(name = EventConstant.EVENT_ENREGISTRER_DEMANDE_DOCUMENT, filter = "(&(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)("
@@ -57,10 +60,17 @@ public class DemandeDocumentPresenter {
     public void enregistrerDemandeDocument(Event event) {
 
         DemandeDocumentDto demandeDocumentDto = (DemandeDocumentDto) event.getProperty(EventConstant.PROPERTY_KEY_DEMANDE_DOCUMENT);
-        demandeDocumentWebService.enregistrerDemandeDocument(demandeDocumentDto);
+        demandeDocumentDto = demandeDocumentWebService.enregistrerDemandeDocument(demandeDocumentDto);
+        
+        Dictionary<String, Object> props = new Hashtable<>();
+        props.put(PROPERTY_KEY_EVENT_NAME, EventConstant.EVENT_UPDATE_RESULTAT_RECHERCHE_DEMANDE_DOCUMENT);
+        props.put(PROPERTY_KEY_PORTAL_SESSION_ID, event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID));
+        props.put(PROPERTY_KEY_TAB_HASH, event.getProperty(PROPERTY_KEY_TAB_HASH));
+        props.put(EventConstant.PROPERTY_KEY_ID_DEMANDE_DOCUMENT, demandeDocumentDto.getId());
+        props.put(EventConstant.PROPERTY_KEY_ETAT_DEMANDE_DOCUMENT, demandeDocumentDto.getEtat());
+        rechercheDemandeDocumentPublisher.send(props);
         
         tabsComponentPublisher.send(TabsEventUtil.getCloseTabsProps((String) event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID), (Integer) event.getProperty(PROPERTY_KEY_TAB_HASH)));
-        
     }
 
 }

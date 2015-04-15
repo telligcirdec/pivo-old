@@ -25,6 +25,7 @@ public class DemandeDocumentCriteresDto {
     private Date dateDebut;
     private Date dateFin;
     private EtatDemandeEnum etatDossier;
+    private Integer maxResult;
     
 	public String getNomBeneficiaire() {
 		return nomBeneficiaire;
@@ -89,4 +90,12 @@ public class DemandeDocumentCriteresDto {
 	public void setEtatDossier(EtatDemandeEnum etatDossier) {
 		this.etatDossier = etatDossier;
 	}
+
+    public Integer getMaxResult() {
+        return maxResult;
+    }
+
+    public void setMaxResult(Integer maxResult) {
+        this.maxResult = maxResult;
+    }
 }

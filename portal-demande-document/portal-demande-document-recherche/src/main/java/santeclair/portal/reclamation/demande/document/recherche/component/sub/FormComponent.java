@@ -50,7 +50,7 @@ public class FormComponent extends Panel {
 
     private static final long serialVersionUID = 8369775167208351407L;
 
-    private static final float TAILLE_STANDARD = 16;
+    private static final float TAILLE_STANDARD = 14;
 
     private static final String MSG_ERROR_SAISIE = "Vous devez renseigner au moins un critère pour effectuer une recherche";
     private static final String MSG_ERROR_SAISIE_NOM = "Le nom du bénéficiaire doit contenir au moins 3 caractères";
@@ -180,11 +180,16 @@ public class FormComponent extends Panel {
 
         MFormLayout formLayoutCenter = new MFormLayout(prenomBeneficiaire, numeroDossier, etatDossier, dateFin);
 
-        MFormLayout formLayoutRight = new MFormLayout(boutonRechercher);
+        MVerticalLayout verticalLayoutRight = new MVerticalLayout(boutonRechercher)
+        .withAlign(boutonRechercher, Alignment.MIDDLE_CENTER)
+        ;
 
-        MHorizontalLayout horizontalLayout = new MHorizontalLayout(formLayoutLeft, formLayoutCenter, formLayoutRight)
-                        .withAlign(formLayoutRight, Alignment.MIDDLE_CENTER)
-                        .withFullWidth();
+        MHorizontalLayout horizontalLayout = new MHorizontalLayout(formLayoutLeft, formLayoutCenter, verticalLayoutRight)
+                        .withMargin(true)
+                        .withFullWidth()
+                        .withAlign(formLayoutLeft, Alignment.MIDDLE_CENTER)
+                        .withAlign(formLayoutCenter, Alignment.MIDDLE_CENTER)
+                        .withAlign(verticalLayoutRight, Alignment.MIDDLE_CENTER);
 
         this.setCaption("Recherche de demandes de document");
         this.setContent(new MVerticalLayout(horizontalLayout).withFullWidth().withMargin(true));

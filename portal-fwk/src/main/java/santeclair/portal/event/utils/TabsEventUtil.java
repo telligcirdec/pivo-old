@@ -12,6 +12,7 @@ import static santeclair.portal.event.EventDictionaryConstant.PROPERTY_KEY_TAB_H
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map.Entry;
 
 public abstract class TabsEventUtil {
     
@@ -30,8 +31,9 @@ public abstract class TabsEventUtil {
         String uri = "container/new/modules/" + moduleCode + "/views/" + viewCode + "/";
         if (null != mapParams && !mapParams.isEmpty()) {
             uri += "params";
-            for (String key : mapParams.keySet()) {
-                uri += "/" + key + "/" + mapParams.get(key);
+            
+            for (Entry<String, Object> param : mapParams.entrySet()) {
+                uri += "/" + param.getKey() + "/" + param.getValue();
             }
         }
         props.put(PROPERTY_KEY_NAVIGATOR_URI, uri);

@@ -26,11 +26,13 @@ import santeclair.reclamation.demande.document.webservice.DemandeDocumentWebServ
 @Instantiate
 public class RechercheDemandeDocumentPresenter {
 
+    private static final Integer maxResult = 50;
+    
     @Requires
     private DemandeDocumentWebService demandeDocumentWebService;
 
-    @Publishes(name = "presenterPublisher", topics = EventConstant.TOPIC_RECHERCHE_DEMANDE_DOCUMENT, synchronous = true)
-    private Publisher presenterPublisher;
+    @Publishes(name = "rechercheDemandeDocumentPublisher", topics = EventConstant.TOPIC_RECHERCHE_DEMANDE_DOCUMENT, synchronous = true)
+    private Publisher rechercheDemandeDocumentPublisher;
 
     @Subscriber(name = EventConstant.EVENT_RECHERCHER_DEMANDE_DOCUMENT, filter = "(&(" + PROPERTY_KEY_PORTAL_SESSION_ID + "=*)("
                     + PROPERTY_KEY_TAB_HASH + "=*)(" + PROPERTY_KEY_EVENT_NAME + "=" + EventConstant.EVENT_RECHERCHER_DEMANDE_DOCUMENT
@@ -48,6 +50,7 @@ public class RechercheDemandeDocumentPresenter {
         criteresDto.setPrenomBeneficiaire(form.getPrenomBeneficiaire());
         criteresDto.setTelephonePS(form.getTelephonePS());
         criteresDto.setTrigrammeDemandeur(form.getTrigrammeDemandeur());
+        criteresDto.setMaxResult(maxResult);
             
         List<DemandeDocumentDto> listeDemandesDocumentDto = demandeDocumentWebService.rechercherDemandesDocumentParCriteres(criteresDto);
 
@@ -56,7 +59,8 @@ public class RechercheDemandeDocumentPresenter {
         props.put(PROPERTY_KEY_PORTAL_SESSION_ID, event.getProperty(PROPERTY_KEY_PORTAL_SESSION_ID));
         props.put(PROPERTY_KEY_TAB_HASH, event.getProperty(PROPERTY_KEY_TAB_HASH));
         props.put(EventConstant.PROPERTY_KEY_LISTE_DEMANDE_DOCUMENT, listeDemandesDocumentDto);
-        presenterPublisher.send(props);
+        props.put(EventConstant.PROPERTY_KEY_MAX_RESULT, maxResult);
+        rechercheDemandeDocumentPublisher.send(props);
 
     }
 
