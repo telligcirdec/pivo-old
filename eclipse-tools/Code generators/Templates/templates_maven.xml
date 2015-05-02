@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><templates><template autoinsert="true" context="org.eclipse.m2e.editor.xml.templates.contextType.dependencies" deleted="false" description="custom_dependency" enabled="true" name="dependency">		&lt;dependency&gt;&#13;
-			&lt;groupId&gt;${groupId}&lt;/groupId&gt;   &#13;
-			&lt;artifactId&gt;${artifactId}&lt;/artifactId&gt;&#13;
-			&lt;version&gt;${version}&lt;/version&gt;&#13;
-		&lt;/dependency&gt;&#13;
-${cursor}</template></templates>
