@@ -1,4 +1,4 @@
-package santeclair.portal.utils;
+package com.mmdi.projet.pivo.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -54,8 +54,8 @@ public class FelixPropertiesUtil {
                             String defaultToken = propertieTokenizer
                                             .nextToken();
                             System.err.println("Le token : " + defaultToken
-                                            + " à l'index : " + index
-                                            + " n'est pas géré par le système.");
+                                            + " ï¿½ l'index : " + index
+                                            + " n'est pas gï¿½rï¿½ par le systï¿½me.");
                             break;
                         }
                         index++;

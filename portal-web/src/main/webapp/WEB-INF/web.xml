@@ -1,51 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-	version="3.0">
-
-	<display-name>Portail d'accès aux applications web internes
-		[${project.version} - ${environnement}]
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+  
+  <display-name>Pivo [${project.version}]
 	</display-name>
-	<description>Portail d'accès aux applications web internes [${project.version} - ${environnement}]</description>
-	
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>/WEB-INF/spring/applicationContext.xml</param-value>
-	</context-param>
-
-	<!-- Nom du context logback -->
-	<env-entry>
-		<env-entry-name>logback/context-name</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>${build.finalName}</env-entry-value>
-	</env-entry>
-
-	<!-- Filtre logback pour réduire le nombre de recherche JNDI -->
-	<filter>
-		<filter-name>LoggerContextFilter</filter-name>
-		<filter-class>ch.qos.logback.classic.selector.servlet.LoggerContextFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>LoggerContextFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
-	<!-- Filtre pour la gestion de l'authentification transparente -->
-	<!-- <filter> <filter-name>WaffleFilter</filter-name> <filter-class>waffle.servlet.NegotiateSecurityFilter</filter-class> 
-		</filter> <filter-mapping> <filter-name>WaffleFilter</filter-name> <url-pattern>/*</url-pattern> 
-		</filter-mapping> -->
-
-	<!-- Filtre Spring Security -->
-	<!-- <filter> <filter-name>springSecurityFilterChain</filter-name> <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class> 
-		</filter> <filter-mapping> <filter-name>springSecurityFilterChain</filter-name> 
-		<url-pattern>/*</url-pattern> </filter-mapping> -->
-
-	<!-- Classes d'écoute Spring -->
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-	</listener>
-	<listener>
-		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-	</listener>
-	
+  <description>Portail léger d'entreprise</description>
+  
 </web-app>

@@ -2638,7 +2638,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "7.4.3";
+	content: "7.4.7";
 }
 
 .v-widget {
@@ -5985,6 +5985,8 @@ div.v-layout.v-horizontal.v-widget {
 	left: 0;
 	right: 0;
 	border: 0px solid #999999;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
 	margin-top: 0px;
 	-webkit-box-shadow: 0 0 9px rgba(0, 0, 0, 0.2);
 	box-shadow: 0 0 9px rgba(0, 0, 0, 0.2);
@@ -10040,6 +10042,7 @@ div.v-layout.v-horizontal.v-widget {
 	position: relative;
 	background: #ffffff;
 	color: #474747;
+	overflow: hidden;
 }
 
 .santeclair .v-table-header table, .santeclair .v-table-footer table, .santeclair .v-table-table {
@@ -10177,10 +10180,16 @@ div.v-layout.v-horizontal.v-widget {
 
 .santeclair .v-table-row {
 	background-color: white;
+	cursor: pointer;
 }
 
 .santeclair .v-table-row-odd {
 	background-color: #f5f5f5;
+	cursor: pointer;
+}
+
+.santeclair .v-table-body-noselection .v-table-row, .santeclair .v-table-body-noselection .v-table-row-odd {
+	cursor: default;
 }
 
 .santeclair .v-table [class*="-row"].v-selected {
@@ -10258,7 +10267,7 @@ div.v-layout.v-horizontal.v-widget {
 .santeclair .v-table-focus-slot-right {
 	border-right: 3px solid #224E6A;
 	right: -2px;
-	margin-left: -9px;
+	margin-left: -9px !important;
 }
 
 .santeclair .v-table-focus-slot-left {
@@ -10284,24 +10293,26 @@ div.v-layout.v-horizontal.v-widget {
 	background-color: #ffffff;
 	background-image: -webkit-linear-gradient(top, white 2%, #f4f4f4 98%);
 	background-image: linear-gradient(to bottom,white 2%, #f4f4f4 98%);
-	-webkit-box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
-	box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
+	
+	
 	position: absolute;
 	z-index: 2;
-	top: -7px;
-	right: -7px;
+	top: 0;
+	right: 0;
+	width: 13px;
 	height: 13px;
 	line-height: 13px;
-	width: 13px;
 	padding: 0;
-	border-radius: 50%;
+	border-top-width: 0;
+	border-right-width: 0;
+	border-radius: 0 0 0 4px;
 	cursor: pointer;
 	text-align: center;
 	opacity: 0;
 	filter: alpha(opacity=0) ;
-	-webkit-transition: opacity 200ms 1s;
-	-moz-transition: opacity 200ms 1s;
-	transition: opacity 200ms 1s;
+	-webkit-transition: opacity 200ms 2s;
+	-moz-transition: opacity 200ms 2s;
+	transition: opacity 200ms 2s;
 }
 
 .santeclair .v-table-column-selector:after {
@@ -10329,11 +10340,11 @@ div.v-layout.v-horizontal.v-widget {
 .santeclair .v-table-column-selector:after {
 	content: "";
 	position: absolute;
-	top: 0px;
-	right: 0px;
-	bottom: 0px;
-	left: 0px;
-	border-radius: inherit;
+	border: none;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
 }
 
 .santeclair .v-table-column-selector:active:after {
@@ -10345,25 +10356,12 @@ div.v-layout.v-horizontal.v-widget {
 	content: "\f013";
 }
 
-.santeclair .v-scrollable > .v-table .v-table-column-selector {
-	right: 0;
-	top: 0;
-	border-top: none;
-	border-right: none;
-	border-radius: 0 0 0 50%;
-}
-
-.santeclair .v-scrollable > .v-table .v-table-column-selector:after {
-	top: 0;
-	right: 0;
-}
-
 .santeclair .v-table-header-wrap:hover .v-table-column-selector {
 	opacity: 1;
 	filter: none ;
-	-webkit-transition-delay: 100ms;
-	-moz-transition-delay: 100ms;
-	transition-delay: 100ms;
+	-webkit-transition-delay: 200ms;
+	-moz-transition-delay: 200ms;
+	transition-delay: 200ms;
 }
 
 .santeclair .v-on:before, .santeclair .v-off:before {
@@ -10417,6 +10415,10 @@ div.v-layout.v-horizontal.v-widget {
 	line-height: 26px;
 	margin: -13px 0 0 !important;
 	text-align: center;
+}
+
+.santeclair .v-table-drag {
+	overflow: visible;
 }
 
 .santeclair .v-table-drag .v-table-body {
@@ -11708,7 +11710,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .santeclair .v-colorpicker {
-	width: auto !important;
+	width: auto;
 }
 
 .santeclair .v-colorpicker-button-color {

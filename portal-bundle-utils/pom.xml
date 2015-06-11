@@ -3,73 +3,39 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<parent>
+		<groupId>com.mmdi.projet</groupId>
+		<artifactId>pivo</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
 	<properties>
 		<bundle.namespace>santeclair.portal.utils</bundle.namespace>
 	</properties>
-
-	<parent>
-		<groupId>santeclair</groupId>
-		<artifactId>super-pom</artifactId>
-		<version>4.57.0.PORTAL-SNAPSHOT</version>
-	</parent>
 
 	<artifactId>portal-bundle-utils</artifactId>
 	<packaging>bundle</packaging>
 	<name>Bundle utils</name>
 	<version>1.0.0-SNAPSHOT</version>
-	
-	<!-- Paramétrage de la connexion au gestionnaire de source -->
-	<scm>
-		<developerConnection>scm:svn:http://hephaistos/svn/framework/portal-bundle-fwk/trunk</developerConnection>
-	</scm>
-
-	<!-- Injection dépendances managées -->
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>santeclair</groupId>
-				<artifactId>infra-bom</artifactId>
-				<type>pom</type>
-				<version>${santeclair.infra.bom.version}</version>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<dependencies>
-		<!-- Santeclair -->
-		<dependency>
-			<groupId>santeclair</groupId>
-			<artifactId>lunar-fwk</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>santeclair</groupId>
-			<artifactId>portal-fwk</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		
+		<!-- felix -->
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.ipojo.annotations</artifactId>
-			<version>1.12.1</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.ipojo.handler.eventadmin</artifactId>
-			<version>1.8.0</version>
-			<scope>provided</scope>
 		</dependency>
-		
 
 		<!-- Vaadin -->
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-server</artifactId>
+			<scope>provided</scope>
 		</dependency>
-		
+
 	</dependencies>
 
 	<build>
@@ -86,7 +52,7 @@
 									<pluginExecutionFilter>
 										<groupId>org.apache.maven.plugins</groupId>
 										<artifactId>maven-clean-plugin</artifactId>
-										<versionRange>2.5</versionRange>
+										<versionRange>[2.6,3.0.0)</versionRange>
 										<goals>
 											<goal>clean</goal>
 										</goals>
@@ -102,7 +68,7 @@
 									<pluginExecutionFilter>
 										<groupId>org.apache.felix</groupId>
 										<artifactId>maven-bundle-plugin</artifactId>
-										<versionRange>2.3.7</versionRange>
+										<versionRange>[2.3.7,3.0.0)</versionRange>
 										<goals>
 											<goal>bundle</goal>
 											<goal>install</goal>
@@ -119,7 +85,7 @@
 									<pluginExecutionFilter>
 										<groupId>org.apache.felix</groupId>
 										<artifactId>maven-ipojo-plugin</artifactId>
-										<versionRange>1.12.1</versionRange>
+										<versionRange>[1.12.1,2.0.0)</versionRange>
 										<goals>
 											<goal>ipojo-bundle</goal>
 											<goal>install</goal>
@@ -136,7 +102,7 @@
 									<pluginExecutionFilter>
 										<groupId>org.apache.maven.plugins</groupId>
 										<artifactId>maven-dependency-plugin</artifactId>
-										<versionRange>[2.7,)</versionRange>
+										<versionRange>[2.7,3.0.0)</versionRange>
 										<goals>
 											<goal>copy</goal>
 										</goals>
@@ -152,7 +118,7 @@
 									<pluginExecutionFilter>
 										<groupId>org.apache.maven.plugins</groupId>
 										<artifactId>maven-resources-plugin</artifactId>
-										<versionRange>[2.6,)</versionRange>
+										<versionRange>[2.6,3.0.0)</versionRange>
 										<goals>
 											<goal>copy</goal>
 										</goals>
@@ -199,7 +165,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
@@ -232,14 +198,14 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
+			</plugin> -->
+			<!-- <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
 				<executions>
 					<execution>
 						<id>copy-resources</id>
-						<!-- here the phase you need -->
+						here the phase you need
 						<phase>install</phase>
 						<goals>
 							<goal>copy-resources</goal>
@@ -256,8 +222,8 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-			
+			</plugin> -->
+
 		</plugins>
 	</build>
 

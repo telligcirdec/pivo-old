@@ -1,7 +1,7 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-    <entry key="felix.dependency.santeclair.portal.vaadin">C:\Program Files\Maven 3\repository\santeclair\portal-fwk\1.7.0-SNAPSHOT\portal-fwk-1.7.0-SNAPSHOT.jar|1.7.0.SNAPSHOT|santeclair.portal.vaadin</entry>
-    <entry key="felix.dependency.santeclair.portal.ident.dto">C:\Program Files\Maven 3\repository\santeclair\portal-fwk\1.7.0-SNAPSHOT\portal-fwk-1.7.0-SNAPSHOT.jar|1.7.0.SNAPSHOT|santeclair.portal.ident.dto</entry>
+    <entry key="felix.dependency.santeclair.portal.vaadin">C:\Program Files\Maven 3\repository\santeclair\portal-fwk\1.7.0-SNAPSHOT\portal-fwk-1.7.0-SNAPSHOT.jar|1.7.0.SNAPSHOT|com.mmdi.projet.pivo.vaadin</entry>
+    <entry key="felix.dependency.santeclair.portal.ident.dto">C:\Program Files\Maven 3\repository\santeclair\portal-fwk\1.7.0-SNAPSHOT\portal-fwk-1.7.0-SNAPSHOT.jar|1.7.0.SNAPSHOT|com.mmdi.projet.pivo.ident.dto</entry>
     <entry key="felix.dependency.santeclair.wsutils.connexion.bean">C:\Program Files\Maven 3\repository\santeclair\ws-utils-fwk\3.16.0\ws-utils-fwk-3.16.0.jar|3.16.0|santeclair.wsutils</entry>
     <entry key="felix.dependency.santeclair.lunar">C:\Program Files\Maven 3\repository\santeclair\lunar-fwk\3.16.0\lunar-fwk-3.16.0.jar|3.16.0|santeclair.lunar.framework</entry>
 	<entry key="felix.dependency.vaadin.server">C:\Program Files\Maven 3\repository\com\vaadin\vaadin-server\7.3.1\vaadin-server-7.3.1.jar|7.3.1|com.vaadin</entry>
