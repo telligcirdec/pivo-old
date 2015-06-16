@@ -43,7 +43,7 @@ public class FelixLauncher implements Serializable {
 	@Qualifier("felixProperties")
 	private PropertiesFactoryBean propertiesFactoryBean;
 
-	@Value("#{felixProperties['felixlaucher.root.dir']}")
+	@Value("${felixlaucher.root.dir}")
 	private String rootDir;
 
 	private Felix felix;
